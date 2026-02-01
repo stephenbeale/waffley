@@ -227,6 +227,94 @@
             position: relative;
         }
 
+        .audio-indicator {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            padding: 0.5rem 1rem;
+            background: rgba(233, 69, 96, 0.2);
+            border-radius: 8px;
+            color: #e94560;
+            font-size: 0.9rem;
+        }
+
+        .audio-indicator.active { display: flex; }
+
+        .mic-icon {
+            width: 20px;
+            height: 20px;
+            position: relative;
+        }
+
+        .mic-icon::before {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 14px;
+            background: currentColor;
+            border-radius: 5px;
+            left: 5px;
+            top: 0;
+        }
+
+        .mic-icon::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 8px;
+            border: 2px solid currentColor;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            left: 2px;
+            top: 10px;
+        }
+
+        .mic-icon.listening {
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .mic-icon.listening {
+                animation: none;
+            }
+        }
+
+        .audio-toggle-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            color: #aaa;
+            font-size: 1rem;
+        }
+
+        .audio-warning {
+            display: none;
+            color: #ff9800;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .audio-warning.visible { display: block; }
+
+        .voice-feedback {
+            display: none;
+            color: #666;
+            font-size: 1rem;
+            margin-top: 0.5rem;
+            min-height: 1.5em;
+        }
+
+        .voice-feedback.active { display: block; }
+
         .stats-row {
             display: flex;
             gap: 2rem;
@@ -278,13 +366,26 @@
     </div>
     <div class="difficulty-info" id="difficulty-info">5 colours, 10 seconds per round</div>
 
+    <div class="audio-toggle-row">
+        <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer">
+            <input type="checkbox" id="voice-mode" style="width:18px;height:18px;cursor:pointer">
+            <span>Voice input mode (say the colour in your chosen language)</span>
+        </label>
+    </div>
+    <div class="audio-warning" id="audio-warning">Voice input requires Chrome or Edge browser and microphone permission.</div>
+
     <button id="start-btn">Start Learning</button>
 </div>
 
 <div id="game-screen">
     <div class="score-display">Score: <span id="current-score">0</span></div>
+    <div class="audio-indicator" id="audio-indicator">
+        <div class="mic-icon" id="mic-icon"></div>
+        <span id="audio-status" aria-live="polite" aria-atomic="true">Listening...</span>
+    </div>
     <div class="prompt-label">What colour is this?</div>
     <div class="color-display" id="color-display"></div>
+    <div class="voice-feedback" id="voice-feedback" aria-live="polite" aria-atomic="true"></div>
     <div id="timer-bar-container">
         <div id="timer-bar"></div>
     </div>
@@ -311,6 +412,104 @@
 </div>
 
 <script>
+    // Speech recognition language codes
+    const SPEECH_LANG_CODES = {
+        es: 'es-ES',
+        fr: 'fr-FR',
+        de: 'de-DE',
+        it: 'it-IT',
+        cy: 'cy-GB',
+        pt: 'pt-PT'
+    };
+
+    // Aliases for voice recognition to handle accents and pronunciation variations
+    const COLOR_ALIASES = {
+        es: {
+            red: ['rojo'],
+            green: ['verde'],
+            blue: ['azul'],
+            yellow: ['amarillo'],
+            orange: ['naranja'],
+            pink: ['rosa'],
+            purple: ['morado'],
+            brown: ['marron', 'marrón'],
+            grey: ['gris'],
+            black: ['negro'],
+            white: ['blanco']
+        },
+        fr: {
+            red: ['rouge'],
+            green: ['vert', 'verte'],
+            blue: ['bleu', 'bleue'],
+            yellow: ['jaune'],
+            orange: ['orange'],
+            pink: ['rose'],
+            purple: ['violet', 'violette'],
+            brown: ['marron', 'brun', 'brune'],
+            grey: ['gris', 'grise'],
+            black: ['noir', 'noire'],
+            white: ['blanc', 'blanche']
+        },
+        de: {
+            red: ['rot', 'rote'],
+            green: ['grun', 'grün', 'grune', 'grüne'],
+            blue: ['blau', 'blaue'],
+            yellow: ['gelb', 'gelbe'],
+            orange: ['orange'],
+            pink: ['rosa'],
+            purple: ['lila'],
+            brown: ['braun', 'braune'],
+            grey: ['grau', 'graue'],
+            black: ['schwarz', 'schwarze'],
+            white: ['weiss', 'weiß', 'weise', 'weiße']
+        },
+        it: {
+            red: ['rosso'],
+            green: ['verde'],
+            blue: ['blu'],
+            yellow: ['giallo'],
+            orange: ['arancione'],
+            pink: ['rosa'],
+            purple: ['viola'],
+            brown: ['marrone'],
+            grey: ['grigio'],
+            black: ['nero'],
+            white: ['bianco']
+        },
+        cy: {
+            red: ['coch', 'goch'],
+            green: ['gwyrdd', 'wyrdd'],
+            blue: ['glas', 'las'],
+            yellow: ['melyn', 'felyn'],
+            orange: ['oren'],
+            pink: ['pinc'],
+            purple: ['porffor'],
+            brown: ['brown'],
+            grey: ['llwyd', 'lwyd'],
+            black: ['du'],
+            white: ['gwyn', 'wyn']
+        },
+        pt: {
+            red: ['vermelho'],
+            green: ['verde'],
+            blue: ['azul'],
+            yellow: ['amarelo'],
+            orange: ['laranja'],
+            pink: ['rosa'],
+            purple: ['roxo'],
+            brown: ['castanho'],
+            grey: ['cinzento'],
+            black: ['preto'],
+            white: ['branco']
+        }
+    };
+
+    // Web Speech Recognition setup
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let voiceModeEnabled = false;
+    let isListening = false;
+
     // Colour translations
     const TRANSLATIONS = {
         es: { // Spanish
@@ -380,6 +579,31 @@
     const endMessage = document.getElementById('end-message');
     const difficultyInfo = document.getElementById('difficulty-info');
 
+    // Voice mode elements
+    const voiceModeToggle = document.getElementById('voice-mode');
+    const audioWarning = document.getElementById('audio-warning');
+    const audioIndicator = document.getElementById('audio-indicator');
+    const micIcon = document.getElementById('mic-icon');
+    const audioStatus = document.getElementById('audio-status');
+    const voiceFeedback = document.getElementById('voice-feedback');
+
+    // Check for Web Speech API support
+    const speechSupported = !!SpeechRecognition;
+    if (!speechSupported) {
+        voiceModeToggle.disabled = true;
+        voiceModeToggle.parentElement.style.opacity = '0.5';
+        audioWarning.classList.add('visible');
+    }
+
+    voiceModeToggle.addEventListener('change', () => {
+        voiceModeEnabled = voiceModeToggle.checked;
+        if (voiceModeEnabled && !speechSupported) {
+            voiceModeToggle.checked = false;
+            voiceModeEnabled = false;
+            audioWarning.classList.add('visible');
+        }
+    });
+
     // Language selection
     document.querySelectorAll('.language-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -400,11 +624,109 @@
     });
 
     document.getElementById('start-btn').addEventListener('click', startGame);
-    document.getElementById('restart-btn').addEventListener('click', () => show(startScreen));
+    document.getElementById('restart-btn').addEventListener('click', () => {
+        stopListening();
+        show(startScreen);
+    });
 
     function show(screen) {
         [startScreen, gameScreen, endScreen].forEach(s => s.classList.remove('active'));
         screen.classList.add('active');
+    }
+
+    // Get speech recognition language code
+    function getSpeechLangCode() {
+        return SPEECH_LANG_CODES[selectedLanguage] || 'es-ES';
+    }
+
+    // Initialize speech recognition
+    function initSpeechRecognition() {
+        if (!speechSupported) return null;
+
+        const recog = new SpeechRecognition();
+        recog.continuous = true;
+        recog.interimResults = true;
+        recog.lang = getSpeechLangCode();
+
+        recog.onresult = (event) => {
+            const result = event.results[event.results.length - 1];
+            const transcript = result[0].transcript.trim().toLowerCase();
+            const lastWord = transcript.split(' ').pop();
+
+            voiceFeedback.textContent = `Heard: "${lastWord}"`;
+
+            if (result.isFinal) {
+                const matchedColor = matchColorFromSpeech(lastWord);
+                if (matchedColor) {
+                    handleAnswer(matchedColor);
+                }
+            }
+        };
+
+        recog.onerror = (event) => {
+            console.log('Speech recognition error:', event.error);
+            if (event.error === 'no-speech') {
+                audioStatus.textContent = 'No speech detected...';
+            } else if (event.error === 'not-allowed') {
+                audioStatus.textContent = 'Microphone blocked';
+                stopListening();
+            }
+        };
+
+        recog.onend = () => {
+            isListening = false;
+            // Restart if still in voice mode and game is active
+            if (voiceModeEnabled && gameScreen.classList.contains('active')) {
+                setTimeout(() => {
+                    if (voiceModeEnabled && gameScreen.classList.contains('active') && !isListening) {
+                        startListening();
+                    }
+                }, 100);
+            }
+        };
+
+        return recog;
+    }
+
+    function matchColorFromSpeech(word) {
+        const aliases = COLOR_ALIASES[selectedLanguage];
+        if (!aliases) return null;
+
+        for (const color of activeColors) {
+            const colorAliases = aliases[color];
+            if (colorAliases && colorAliases.some(alias => alias.toLowerCase() === word.toLowerCase())) {
+                return color;
+            }
+        }
+        return null;
+    }
+
+    function startListening() {
+        if (!recognition || isListening) return;
+        try {
+            recognition.start();
+            isListening = true;
+            audioIndicator.classList.add('active');
+            micIcon.classList.add('listening');
+            audioStatus.textContent = 'Listening...';
+            voiceFeedback.classList.add('active');
+            voiceFeedback.textContent = '';
+        } catch (e) {
+            console.log('Speech recognition start error:', e);
+        }
+    }
+
+    function stopListening() {
+        if (!recognition) return;
+        try {
+            recognition.stop();
+        } catch (e) {
+            // Ignore
+        }
+        isListening = false;
+        audioIndicator.classList.remove('active');
+        micIcon.classList.remove('listening');
+        voiceFeedback.classList.remove('active');
     }
 
     function startGame() {
@@ -417,6 +739,16 @@
         currentScoreEl.textContent = '0';
 
         generateButtons();
+
+        // Hide buttons in voice mode
+        buttonsContainer.style.display = voiceModeEnabled ? 'none' : 'grid';
+
+        // Initialize and start speech recognition if voice mode enabled
+        if (voiceModeEnabled && speechSupported) {
+            recognition = initSpeechRecognition();
+            startListening();
+        }
+
         show(gameScreen);
         nextRound();
     }
@@ -498,6 +830,11 @@
     function endGame() {
         clearTimeout(timeout);
         cancelAnimationFrame(timerRAF);
+
+        // Stop voice recognition
+        if (voiceModeEnabled) {
+            stopListening();
+        }
 
         const accuracy = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
         const avgTime = responseTimes.length > 0
