@@ -113,6 +113,23 @@
         .answer-btn:hover {
             transform: scale(1.05);
             border-color: #e94560;
+        }
+
+        /* Learning mode: buttons have colored backgrounds */
+        .answer-btn.learning-mode {
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .answer-btn.learning-mode:hover {
+            filter: brightness(1.1);
+        }
+
+        /* Practice mode: neutral backgrounds, text only */
+        .answer-btn.practice-mode {
+            background: #2a2a4e;
+        }
+
+        .answer-btn.practice-mode:hover {
             background: #3a3a5e;
         }
 
@@ -178,42 +195,6 @@
             letter-spacing: 0.1em;
         }
 
-        .difficulty-selector {
-            display: flex;
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .difficulty-btn {
-            padding: 0.6rem 1.2rem;
-            font-size: 0.95rem;
-            font-weight: 600;
-            border: 2px solid #444;
-            border-radius: 6px;
-            background: transparent;
-            color: #aaa;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .difficulty-btn:hover {
-            border-color: #666;
-            color: #fff;
-        }
-
-        .difficulty-btn.selected {
-            border-color: #e94560;
-            background: #e94560;
-            color: #fff;
-        }
-
-        .difficulty-info {
-            color: #666;
-            font-size: 0.9rem;
-            margin-bottom: 1.5rem;
-            text-align: center;
-        }
-
         .score-display {
             position: absolute;
             top: 1rem;
@@ -249,6 +230,162 @@
             text-transform: uppercase;
             letter-spacing: 0.1em;
         }
+
+        /* Level system styles */
+        .level-display {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            text-align: left;
+        }
+
+        .level-info {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.3rem;
+        }
+
+        .phase-badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .phase-badge.learning {
+            background: #28a745;
+            color: #fff;
+        }
+
+        .phase-badge.practice {
+            background: #fd7e14;
+            color: #fff;
+        }
+
+        .phase-badge.speech {
+            background: #e83e8c;
+            color: #fff;
+        }
+
+        .level-progress-container {
+            width: 120px;
+            height: 6px;
+            background: #333;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .level-progress-bar {
+            height: 100%;
+            background: #0f3460;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .time-display {
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-top: 0.3rem;
+        }
+
+        /* Level-up overlay */
+        #level-up-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 26, 46, 0.95);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        #level-up-overlay.active {
+            display: flex;
+        }
+
+        .level-up-title {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #e94560;
+            margin-bottom: 1rem;
+            animation: levelUpPulse 0.5s ease-out;
+        }
+
+        @keyframes levelUpPulse {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .level-up-message {
+            font-size: 1.3rem;
+            color: #aaa;
+            margin-bottom: 0.5rem;
+        }
+
+        .level-up-phase {
+            font-size: 1.1rem;
+            color: #0f3460;
+            margin-bottom: 0.5rem;
+        }
+
+        .level-up-time {
+            font-size: 1rem;
+            color: #e94560;
+            margin-bottom: 2rem;
+        }
+
+        .level-up-countdown {
+            font-size: 4rem;
+            font-weight: 900;
+            color: #0f3460;
+        }
+
+        /* Start screen progress display */
+        .progress-display {
+            background: rgba(15, 52, 96, 0.3);
+            border: 2px solid #0f3460;
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            min-width: 250px;
+        }
+
+        .progress-title {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-level {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .progress-answers {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-top: 0.3rem;
+        }
+
+        .progress-time {
+            font-size: 0.85rem;
+            color: #e94560;
+            margin-top: 0.3rem;
+        }
     </style>
 </head>
 <body>
@@ -270,18 +407,25 @@
         <button class="language-btn" data-lang="pt">Portuguese</button>
     </div>
 
-    <div class="setting-label">Difficulty</div>
-    <div class="difficulty-selector">
-        <button class="difficulty-btn selected" data-difficulty="easy">Easy</button>
-        <button class="difficulty-btn" data-difficulty="medium">Medium</button>
-        <button class="difficulty-btn" data-difficulty="hard">Hard</button>
+    <div class="progress-display" id="progress-display">
+        <div class="progress-title">Your Progress</div>
+        <div class="progress-level">Level <span id="start-level">1</span> - <span id="start-phase">Learning</span></div>
+        <div class="progress-answers"><span id="start-total-answers">0</span> correct answers</div>
+        <div class="progress-time">Time limit: <span id="start-time-limit">10</span>s</div>
     </div>
-    <div class="difficulty-info" id="difficulty-info">5 colours, 10 seconds per round</div>
 
     <button id="start-btn">Start Learning</button>
 </div>
 
 <div id="game-screen">
+    <div class="level-display">
+        <div class="phase-badge learning" id="phase-badge">Learning</div>
+        <div class="level-info">Level <span id="current-level">1</span></div>
+        <div class="level-progress-container">
+            <div class="level-progress-bar" id="level-progress-bar" style="width: 0%"></div>
+        </div>
+        <div class="time-display">Time: <span id="time-display">10</span>s</div>
+    </div>
     <div class="score-display">Score: <span id="current-score">0</span></div>
     <div class="prompt-label">What colour is this?</div>
     <div class="color-display" id="color-display"></div>
@@ -289,6 +433,14 @@
         <div id="timer-bar"></div>
     </div>
     <div class="buttons" id="buttons-container"></div>
+</div>
+
+<div id="level-up-overlay">
+    <div class="level-up-title" id="level-up-title">Level Up!</div>
+    <div class="level-up-message" id="level-up-message">You reached Level 2</div>
+    <div class="level-up-phase" id="level-up-phase"></div>
+    <div class="level-up-time" id="level-up-time"></div>
+    <div class="level-up-countdown" id="level-up-countdown">3</div>
 </div>
 
 <div id="end-screen">
@@ -311,7 +463,89 @@
 </div>
 
 <script>
-    // Colour translations
+    // ========== LEVEL SYSTEM CONSTANTS ==========
+    const ANSWERS_PER_LEVEL = 10;
+    const LEVELS_PER_PHASE = 10;
+    const ANSWERS_PER_CYCLE = 300;
+    const PHASES = ['Learning', 'Practice', 'Speech'];
+    const PHASE_CLASSES = ['learning', 'practice', 'speech'];
+    const MAX_TIME = 10; // seconds
+    const MIN_TIME = 1;  // seconds
+
+    // ========== LEVEL SYSTEM FUNCTIONS ==========
+
+    // Load saved progress from localStorage
+    function loadProgress() {
+        const saved = localStorage.getItem('waffley_progress');
+        if (saved) {
+            try {
+                return JSON.parse(saved);
+            } catch (e) {
+                return { totalAnswers: 0 };
+            }
+        }
+        return { totalAnswers: 0 };
+    }
+
+    // Save progress to localStorage
+    function saveProgress() {
+        localStorage.setItem('waffley_progress', JSON.stringify({
+            totalAnswers: totalCorrectAnswers
+        }));
+    }
+
+    // Calculate level from total answers (1-based, 1 level = 10 answers)
+    function getLevel(answers) {
+        return Math.floor(answers / ANSWERS_PER_LEVEL) + 1;
+    }
+
+    // Get level within current cycle (1-30)
+    function getLevelWithinCycle(answers) {
+        const answersInCycle = answers % ANSWERS_PER_CYCLE;
+        return Math.floor(answersInCycle / ANSWERS_PER_LEVEL) + 1;
+    }
+
+    // Calculate phase from level within cycle (0=Learning, 1=Practice, 2=Speech)
+    function getPhase(levelInCycle) {
+        return Math.floor((levelInCycle - 1) / LEVELS_PER_PHASE) % 3;
+    }
+
+    // Get phase name
+    function getPhaseName(levelInCycle) {
+        return PHASES[getPhase(levelInCycle)];
+    }
+
+    // Get progress within current level (0-9)
+    function getLevelProgress(answers) {
+        return answers % ANSWERS_PER_LEVEL;
+    }
+
+    // Calculate time limit based on level within cycle
+    // Level 1 = 10s, Level 2 = 9s, ..., Level 10+ = 1s
+    function getTimeLimit(answers) {
+        const levelInCycle = getLevelWithinCycle(answers);
+        const timeInSeconds = Math.max(MIN_TIME, MAX_TIME - (levelInCycle - 1));
+        return timeInSeconds * 1000; // return in milliseconds
+    }
+
+    // Get time limit in seconds for display
+    function getTimeLimitSeconds(answers) {
+        return getTimeLimit(answers) / 1000;
+    }
+
+    // Check if we just leveled up
+    function checkLevelUp(previousAnswers, currentAnswers) {
+        const previousLevel = getLevel(previousAnswers);
+        const currentLevel = getLevel(currentAnswers);
+        return currentLevel > previousLevel;
+    }
+
+    // Check if time changed between levels
+    function didTimeChange(previousAnswers, currentAnswers) {
+        return getTimeLimit(previousAnswers) !== getTimeLimit(currentAnswers);
+    }
+
+    // ========== COLOUR DATA ==========
     const TRANSLATIONS = {
         es: { // Spanish
             red: 'Rojo', green: 'Verde', blue: 'Azul', yellow: 'Amarillo',
@@ -351,15 +585,12 @@
         grey: '#6c757d', black: '#212529', white: '#f8f9fa'
     };
 
-    const DIFFICULTY_SETTINGS = {
-        easy: { colors: ['red', 'green', 'blue', 'yellow', 'orange'], time: 10000, info: '5 colours, 10 seconds per round' },
-        medium: { colors: ['red', 'green', 'blue', 'yellow', 'orange', 'pink', 'purple'], time: 7000, info: '7 colours, 7 seconds per round' },
-        hard: { colors: ['red', 'green', 'blue', 'yellow', 'orange', 'pink', 'purple', 'brown', 'grey'], time: 5000, info: '9 colours, 5 seconds per round' }
-    };
+    // Base colours (5 for now - will expand in Feature 6)
+    const BASE_COLORS = ['red', 'green', 'blue', 'yellow', 'orange'];
 
+    // ========== GAME STATE ==========
     let selectedLanguage = 'es';
-    let selectedDifficulty = 'easy';
-    let activeColors = [];
+    let activeColors = BASE_COLORS.slice();
     let currentColor = '';
     let score = 0;
     let totalQuestions = 0;
@@ -369,6 +600,11 @@
     let timeLimit = 10000;
     let responseTimes = [];
 
+    // Level system state
+    let totalCorrectAnswers = loadProgress().totalAnswers;
+    let levelUpPending = false;
+
+    // ========== DOM ELEMENTS ==========
     const startScreen = document.getElementById('start-screen');
     const gameScreen = document.getElementById('game-screen');
     const endScreen = document.getElementById('end-screen');
@@ -378,7 +614,101 @@
     const currentScoreEl = document.getElementById('current-score');
     const finalScore = document.getElementById('final-score');
     const endMessage = document.getElementById('end-message');
-    const difficultyInfo = document.getElementById('difficulty-info');
+
+    // Level system elements
+    const phaseBadge = document.getElementById('phase-badge');
+    const currentLevelEl = document.getElementById('current-level');
+    const levelProgressBar = document.getElementById('level-progress-bar');
+    const timeDisplayEl = document.getElementById('time-display');
+    const levelUpOverlay = document.getElementById('level-up-overlay');
+    const levelUpTitle = document.getElementById('level-up-title');
+    const levelUpMessage = document.getElementById('level-up-message');
+    const levelUpPhase = document.getElementById('level-up-phase');
+    const levelUpTime = document.getElementById('level-up-time');
+    const levelUpCountdown = document.getElementById('level-up-countdown');
+    const startLevelEl = document.getElementById('start-level');
+    const startPhaseEl = document.getElementById('start-phase');
+    const startTotalAnswersEl = document.getElementById('start-total-answers');
+    const startTimeLimitEl = document.getElementById('start-time-limit');
+
+    // ========== UI UPDATE FUNCTIONS ==========
+
+    // Update start screen progress display
+    function updateStartScreenProgress() {
+        const levelInCycle = getLevelWithinCycle(totalCorrectAnswers);
+        startLevelEl.textContent = levelInCycle;
+        startPhaseEl.textContent = getPhaseName(levelInCycle);
+        startTotalAnswersEl.textContent = totalCorrectAnswers;
+        startTimeLimitEl.textContent = getTimeLimitSeconds(totalCorrectAnswers);
+    }
+
+    // Update game screen level display
+    function updateLevelDisplay() {
+        const levelInCycle = getLevelWithinCycle(totalCorrectAnswers);
+        const phase = getPhase(levelInCycle);
+        const progress = getLevelProgress(totalCorrectAnswers);
+
+        currentLevelEl.textContent = levelInCycle;
+        levelProgressBar.style.width = (progress / ANSWERS_PER_LEVEL * 100) + '%';
+        timeDisplayEl.textContent = getTimeLimitSeconds(totalCorrectAnswers);
+
+        // Update phase badge
+        phaseBadge.textContent = PHASES[phase];
+        phaseBadge.className = 'phase-badge ' + PHASE_CLASSES[phase];
+    }
+
+    // Show level-up overlay
+    function showLevelUp(newLevelInCycle, previousAnswers, currentAnswers) {
+        levelUpPending = true;
+        const phase = getPhase(newLevelInCycle);
+        const previousLevelInCycle = getLevelWithinCycle(previousAnswers);
+        const previousPhase = getPhase(previousLevelInCycle);
+        const phaseChanged = phase !== previousPhase;
+        const timeChanged = didTimeChange(previousAnswers, currentAnswers);
+        const newTimeSeconds = getTimeLimitSeconds(currentAnswers);
+
+        levelUpTitle.textContent = phaseChanged ? 'Phase Complete!' : 'Level Up!';
+        levelUpMessage.textContent = `You reached Level ${newLevelInCycle}`;
+
+        if (phaseChanged) {
+            levelUpPhase.textContent = `Welcome to ${PHASES[phase]} Mode!`;
+        } else {
+            levelUpPhase.textContent = '';
+        }
+
+        if (timeChanged) {
+            levelUpTime.textContent = `Time decreased to ${newTimeSeconds} second${newTimeSeconds !== 1 ? 's' : ''}!`;
+        } else {
+            levelUpTime.textContent = '';
+        }
+
+        levelUpOverlay.classList.add('active');
+
+        // Countdown
+        let count = 3;
+        levelUpCountdown.textContent = count;
+
+        const countdownInterval = setInterval(() => {
+            count--;
+            if (count > 0) {
+                levelUpCountdown.textContent = count;
+            } else {
+                clearInterval(countdownInterval);
+                levelUpOverlay.classList.remove('active');
+                levelUpPending = false;
+
+                // Regenerate buttons if phase changed (Learning -> Practice styling)
+                if (phaseChanged) {
+                    generateButtons();
+                }
+
+                nextRound();
+            }
+        }, 1000);
+    }
+
+    // ========== INITIALIZATION ==========
+    updateStartScreenProgress();
 
     // Language selection
     document.querySelectorAll('.language-btn').forEach(btn => {
@@ -389,45 +719,59 @@
         });
     });
 
-    // Difficulty selection
-    document.querySelectorAll('.difficulty-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-            selectedDifficulty = btn.dataset.difficulty;
-            difficultyInfo.textContent = DIFFICULTY_SETTINGS[selectedDifficulty].info;
-        });
-    });
-
     document.getElementById('start-btn').addEventListener('click', startGame);
-    document.getElementById('restart-btn').addEventListener('click', () => show(startScreen));
+    document.getElementById('restart-btn').addEventListener('click', () => {
+        updateStartScreenProgress();
+        show(startScreen);
+    });
 
     function show(screen) {
         [startScreen, gameScreen, endScreen].forEach(s => s.classList.remove('active'));
         screen.classList.add('active');
     }
 
+    // ========== GAME FUNCTIONS ==========
+
     function startGame() {
-        const settings = DIFFICULTY_SETTINGS[selectedDifficulty];
-        activeColors = settings.colors;
-        timeLimit = settings.time;
+        activeColors = BASE_COLORS.slice();
+        timeLimit = getTimeLimit(totalCorrectAnswers);
         score = 0;
         totalQuestions = 0;
         responseTimes = [];
         currentScoreEl.textContent = '0';
 
         generateButtons();
+        updateLevelDisplay();
         show(gameScreen);
         nextRound();
     }
 
     function generateButtons() {
         buttonsContainer.innerHTML = '';
+        const levelInCycle = getLevelWithinCycle(totalCorrectAnswers);
+        const phase = getPhase(levelInCycle);
+
         activeColors.forEach(color => {
             const btn = document.createElement('button');
             btn.className = 'answer-btn';
             btn.dataset.color = color;
             btn.textContent = TRANSLATIONS[selectedLanguage][color];
+
+            // Apply styling based on current phase
+            if (phase === 0) {
+                // Learning mode: show colored backgrounds
+                btn.classList.add('learning-mode');
+                btn.style.backgroundColor = COLOR_CSS[color];
+                // Ensure text is readable on light colors
+                if (color === 'yellow' || color === 'white') {
+                    btn.style.color = '#222';
+                    btn.style.textShadow = 'none';
+                }
+            } else {
+                // Practice mode (and Speech mode fallback): neutral backgrounds
+                btn.classList.add('practice-mode');
+            }
+
             btn.addEventListener('click', () => handleAnswer(color));
             buttonsContainer.appendChild(btn);
         });
@@ -443,6 +787,9 @@
     }
 
     function nextRound() {
+        // Update time limit based on current level
+        timeLimit = getTimeLimit(totalCorrectAnswers);
+
         // Pick a random color different from current
         let newColor;
         do {
@@ -480,6 +827,7 @@
 
     function handleAnswer(chosen) {
         if (!gameScreen.classList.contains('active')) return;
+        if (levelUpPending) return;
 
         clearTimeout(timeout);
         cancelAnimationFrame(timerRAF);
@@ -489,7 +837,18 @@
             responseTimes.push(performance.now() - timerStart);
             score++;
             currentScoreEl.textContent = score;
-            nextRound();
+
+            // Track total correct answers and check for level-up
+            const previousAnswers = totalCorrectAnswers;
+            totalCorrectAnswers++;
+            saveProgress();
+            updateLevelDisplay();
+
+            if (checkLevelUp(previousAnswers, totalCorrectAnswers)) {
+                showLevelUp(getLevelWithinCycle(totalCorrectAnswers), previousAnswers, totalCorrectAnswers);
+            } else {
+                nextRound();
+            }
         } else {
             endGame();
         }
