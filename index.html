@@ -520,11 +520,20 @@
         return answers % ANSWERS_PER_LEVEL;
     }
 
-    // Calculate time limit based on level within cycle
-    // Level 1 = 10s, Level 2 = 9s, ..., Level 10+ = 1s
+    // Get level within current phase (1-10)
+    // Each phase has 10 levels (100 answers)
+    function getLevelWithinPhase(answers) {
+        const answersInCycle = answers % ANSWERS_PER_CYCLE;
+        const answersInPhase = answersInCycle % (LEVELS_PER_PHASE * ANSWERS_PER_LEVEL);
+        return Math.floor(answersInPhase / ANSWERS_PER_LEVEL) + 1;
+    }
+
+    // Calculate time limit based on level within phase
+    // Time resets to 10s at start of each phase (Learning, Practice, Speech)
+    // Level 1 = 10s, Level 2 = 9s, ..., Level 10 = 1s
     function getTimeLimit(answers) {
-        const levelInCycle = getLevelWithinCycle(answers);
-        const timeInSeconds = Math.max(MIN_TIME, MAX_TIME - (levelInCycle - 1));
+        const levelInPhase = getLevelWithinPhase(answers);
+        const timeInSeconds = Math.max(MIN_TIME, MAX_TIME - (levelInPhase - 1));
         return timeInSeconds * 1000; // return in milliseconds
     }
 
