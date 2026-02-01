@@ -249,6 +249,144 @@
             text-transform: uppercase;
             letter-spacing: 0.1em;
         }
+
+        /* Level system styles */
+        .level-display {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            text-align: left;
+        }
+
+        .level-info {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.3rem;
+        }
+
+        .phase-badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .phase-badge.learning {
+            background: #28a745;
+            color: #fff;
+        }
+
+        .phase-badge.practice {
+            background: #fd7e14;
+            color: #fff;
+        }
+
+        .phase-badge.speech {
+            background: #e83e8c;
+            color: #fff;
+        }
+
+        .level-progress-container {
+            width: 120px;
+            height: 6px;
+            background: #333;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .level-progress-bar {
+            height: 100%;
+            background: #0f3460;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        /* Level-up overlay */
+        #level-up-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 26, 46, 0.95);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        #level-up-overlay.active {
+            display: flex;
+        }
+
+        .level-up-title {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #e94560;
+            margin-bottom: 1rem;
+            animation: levelUpPulse 0.5s ease-out;
+        }
+
+        @keyframes levelUpPulse {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .level-up-message {
+            font-size: 1.3rem;
+            color: #aaa;
+            margin-bottom: 0.5rem;
+        }
+
+        .level-up-phase {
+            font-size: 1.1rem;
+            color: #0f3460;
+            margin-bottom: 2rem;
+        }
+
+        .level-up-countdown {
+            font-size: 4rem;
+            font-weight: 900;
+            color: #0f3460;
+        }
+
+        /* Start screen progress display */
+        .progress-display {
+            background: rgba(15, 52, 96, 0.3);
+            border: 2px solid #0f3460;
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            min-width: 250px;
+        }
+
+        .progress-title {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-level {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .progress-answers {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-top: 0.3rem;
+        }
     </style>
 </head>
 <body>
@@ -278,10 +416,23 @@
     </div>
     <div class="difficulty-info" id="difficulty-info">5 colours, 10 seconds per round</div>
 
+    <div class="progress-display" id="progress-display">
+        <div class="progress-title">Your Progress</div>
+        <div class="progress-level">Level <span id="start-level">1</span> - <span id="start-phase">Learning</span></div>
+        <div class="progress-answers"><span id="start-total-answers">0</span> correct answers</div>
+    </div>
+
     <button id="start-btn">Start Learning</button>
 </div>
 
 <div id="game-screen">
+    <div class="level-display">
+        <div class="phase-badge learning" id="phase-badge">Learning</div>
+        <div class="level-info">Level <span id="current-level">1</span></div>
+        <div class="level-progress-container">
+            <div class="level-progress-bar" id="level-progress-bar" style="width: 0%"></div>
+        </div>
+    </div>
     <div class="score-display">Score: <span id="current-score">0</span></div>
     <div class="prompt-label">What colour is this?</div>
     <div class="color-display" id="color-display"></div>
@@ -289,6 +440,13 @@
         <div id="timer-bar"></div>
     </div>
     <div class="buttons" id="buttons-container"></div>
+</div>
+
+<div id="level-up-overlay">
+    <div class="level-up-title" id="level-up-title">Level Up!</div>
+    <div class="level-up-message" id="level-up-message">You reached Level 2</div>
+    <div class="level-up-phase" id="level-up-phase"></div>
+    <div class="level-up-countdown" id="level-up-countdown">3</div>
 </div>
 
 <div id="end-screen">
@@ -311,6 +469,61 @@
 </div>
 
 <script>
+    // Level system constants
+    const ANSWERS_PER_LEVEL = 10;
+    const LEVELS_PER_PHASE = 10;
+    const PHASES = ['Learning', 'Practice', 'Speech'];
+    const PHASE_CLASSES = ['learning', 'practice', 'speech'];
+
+    // Load saved progress from localStorage
+    function loadProgress() {
+        const saved = localStorage.getItem('waffley_progress');
+        if (saved) {
+            try {
+                return JSON.parse(saved);
+            } catch (e) {
+                return { totalAnswers: 0 };
+            }
+        }
+        return { totalAnswers: 0 };
+    }
+
+    // Save progress to localStorage
+    function saveProgress() {
+        localStorage.setItem('waffley_progress', JSON.stringify({
+            totalAnswers: totalCorrectAnswers
+        }));
+    }
+
+    // Calculate level from total answers (1-based, 1 level = 10 answers)
+    function getLevel(answers) {
+        return Math.floor(answers / ANSWERS_PER_LEVEL) + 1;
+    }
+
+    // Calculate phase from level (0=Learning, 1=Practice, 2=Speech)
+    function getPhase(level) {
+        // Levels 1-10 = Learning, 11-20 = Practice, 21-30 = Speech, then repeats
+        const phaseIndex = Math.floor((level - 1) / LEVELS_PER_PHASE) % 3;
+        return phaseIndex;
+    }
+
+    // Get phase name
+    function getPhaseName(level) {
+        return PHASES[getPhase(level)];
+    }
+
+    // Get progress within current level (0-10)
+    function getLevelProgress(answers) {
+        return answers % ANSWERS_PER_LEVEL;
+    }
+
+    // Check if we just leveled up
+    function checkLevelUp(previousAnswers, currentAnswers) {
+        const previousLevel = getLevel(previousAnswers);
+        const currentLevel = getLevel(currentAnswers);
+        return currentLevel > previousLevel;
+    }
+
     // Colour translations
     const TRANSLATIONS = {
         es: { // Spanish
@@ -369,6 +582,10 @@
     let timeLimit = 10000;
     let responseTimes = [];
 
+    // Level system state
+    let totalCorrectAnswers = loadProgress().totalAnswers;
+    let levelUpPending = false;
+
     const startScreen = document.getElementById('start-screen');
     const gameScreen = document.getElementById('game-screen');
     const endScreen = document.getElementById('end-screen');
@@ -379,6 +596,79 @@
     const finalScore = document.getElementById('final-score');
     const endMessage = document.getElementById('end-message');
     const difficultyInfo = document.getElementById('difficulty-info');
+
+    // Level system elements
+    const phaseBadge = document.getElementById('phase-badge');
+    const currentLevelEl = document.getElementById('current-level');
+    const levelProgressBar = document.getElementById('level-progress-bar');
+    const levelUpOverlay = document.getElementById('level-up-overlay');
+    const levelUpTitle = document.getElementById('level-up-title');
+    const levelUpMessage = document.getElementById('level-up-message');
+    const levelUpPhase = document.getElementById('level-up-phase');
+    const levelUpCountdown = document.getElementById('level-up-countdown');
+    const startLevelEl = document.getElementById('start-level');
+    const startPhaseEl = document.getElementById('start-phase');
+    const startTotalAnswersEl = document.getElementById('start-total-answers');
+
+    // Update start screen progress display
+    function updateStartScreenProgress() {
+        const level = getLevel(totalCorrectAnswers);
+        startLevelEl.textContent = level;
+        startPhaseEl.textContent = getPhaseName(level);
+        startTotalAnswersEl.textContent = totalCorrectAnswers;
+    }
+
+    // Update game screen level display
+    function updateLevelDisplay() {
+        const level = getLevel(totalCorrectAnswers);
+        const phase = getPhase(level);
+        const progress = getLevelProgress(totalCorrectAnswers);
+
+        currentLevelEl.textContent = level;
+        levelProgressBar.style.width = (progress / ANSWERS_PER_LEVEL * 100) + '%';
+
+        // Update phase badge
+        phaseBadge.textContent = PHASES[phase];
+        phaseBadge.className = 'phase-badge ' + PHASE_CLASSES[phase];
+    }
+
+    // Show level-up overlay
+    function showLevelUp(newLevel) {
+        levelUpPending = true;
+        const phase = getPhase(newLevel);
+        const previousPhase = getPhase(newLevel - 1);
+        const phaseChanged = phase !== previousPhase;
+
+        levelUpTitle.textContent = phaseChanged ? 'Phase Complete!' : 'Level Up!';
+        levelUpMessage.textContent = `You reached Level ${newLevel}`;
+
+        if (phaseChanged) {
+            levelUpPhase.textContent = `Welcome to ${PHASES[phase]} Mode!`;
+        } else {
+            levelUpPhase.textContent = '';
+        }
+
+        levelUpOverlay.classList.add('active');
+
+        // Countdown
+        let count = 3;
+        levelUpCountdown.textContent = count;
+
+        const countdownInterval = setInterval(() => {
+            count--;
+            if (count > 0) {
+                levelUpCountdown.textContent = count;
+            } else {
+                clearInterval(countdownInterval);
+                levelUpOverlay.classList.remove('active');
+                levelUpPending = false;
+                nextRound();
+            }
+        }, 1000);
+    }
+
+    // Initialize start screen
+    updateStartScreenProgress();
 
     // Language selection
     document.querySelectorAll('.language-btn').forEach(btn => {
@@ -400,7 +690,10 @@
     });
 
     document.getElementById('start-btn').addEventListener('click', startGame);
-    document.getElementById('restart-btn').addEventListener('click', () => show(startScreen));
+    document.getElementById('restart-btn').addEventListener('click', () => {
+        updateStartScreenProgress();
+        show(startScreen);
+    });
 
     function show(screen) {
         [startScreen, gameScreen, endScreen].forEach(s => s.classList.remove('active'));
@@ -417,6 +710,7 @@
         currentScoreEl.textContent = '0';
 
         generateButtons();
+        updateLevelDisplay();
         show(gameScreen);
         nextRound();
     }
@@ -480,6 +774,7 @@
 
     function handleAnswer(chosen) {
         if (!gameScreen.classList.contains('active')) return;
+        if (levelUpPending) return;
 
         clearTimeout(timeout);
         cancelAnimationFrame(timerRAF);
@@ -489,7 +784,18 @@
             responseTimes.push(performance.now() - timerStart);
             score++;
             currentScoreEl.textContent = score;
-            nextRound();
+
+            // Track total correct answers and check for level-up
+            const previousAnswers = totalCorrectAnswers;
+            totalCorrectAnswers++;
+            saveProgress();
+            updateLevelDisplay();
+
+            if (checkLevelUp(previousAnswers, totalCorrectAnswers)) {
+                showLevelUp(getLevel(totalCorrectAnswers));
+            } else {
+                nextRound();
+            }
         } else {
             endGame();
         }
