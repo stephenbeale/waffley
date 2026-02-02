@@ -709,6 +709,22 @@
             color: #fff;
         }
 
+        #reset-progress-btn {
+            padding: 0.8rem 1.5rem;
+            font-size: 0.9rem;
+            border: 2px solid #ff9800;
+            border-radius: 8px;
+            background: transparent;
+            color: #ff9800;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        #reset-progress-btn:hover {
+            background: #ff9800;
+            color: #fff;
+        }
+
         /* Personal best indicator on end screen */
         .personal-best {
             display: none;
@@ -789,6 +805,7 @@
     <div class="stats-buttons">
         <button id="close-stats-btn">Close</button>
         <button id="reset-stats-btn">Reset Stats</button>
+        <button id="reset-progress-btn">Reset Progress</button>
     </div>
 </div>
 
@@ -978,6 +995,15 @@
     function resetStats() {
         stats = getDefaultStats();
         saveStats();
+        updateStatsDisplay();
+    }
+
+    // Reset level progress (back to Level 1)
+    function resetProgress() {
+        totalCorrectAnswers = 0;
+        currentCycle = 1;
+        saveProgress();
+        updateStartScreenProgress();
         updateStatsDisplay();
     }
 
@@ -1545,6 +1571,13 @@
     document.getElementById('reset-stats-btn').addEventListener('click', () => {
         if (confirm('Are you sure you want to reset all statistics? This cannot be undone.')) {
             resetStats();
+        }
+    });
+
+    document.getElementById('reset-progress-btn').addEventListener('click', () => {
+        if (confirm('Are you sure you want to reset your level progress? You will start back at Level 1 with 10 seconds. This cannot be undone.')) {
+            resetProgress();
+            hideStats();
         }
     });
 
