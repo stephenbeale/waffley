@@ -97,6 +97,8 @@
             justify-content: center;
         }
 
+        .buttons.hidden { display: none; }
+
         .answer-btn {
             padding: 1rem;
             font-size: 1.1rem;
@@ -386,6 +388,98 @@
             color: #e94560;
             margin-top: 0.3rem;
         }
+
+        /* Speech mode styles */
+        .speech-ui {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .speech-ui.active {
+            display: flex;
+        }
+
+        .speech-prompt {
+            font-size: 1.5rem;
+            color: #e83e8c;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .audio-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(232, 62, 140, 0.2);
+            border: 2px solid #e83e8c;
+            border-radius: 50px;
+            color: #e83e8c;
+            font-size: 1rem;
+        }
+
+        .mic-icon {
+            width: 24px;
+            height: 24px;
+            position: relative;
+        }
+
+        .mic-icon::before {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 18px;
+            background: currentColor;
+            border-radius: 6px;
+            left: 6px;
+            top: 0;
+        }
+
+        .mic-icon::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 10px;
+            border: 3px solid currentColor;
+            border-top: none;
+            border-radius: 0 0 9px 9px;
+            left: 3px;
+            top: 12px;
+        }
+
+        .mic-icon.listening {
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .voice-feedback {
+            color: #aaa;
+            font-size: 1rem;
+            min-height: 1.5em;
+        }
+
+        .speech-warning {
+            display: none;
+            color: #ff9800;
+            font-size: 0.9rem;
+            text-align: center;
+            max-width: 350px;
+            padding: 0.75rem;
+            background: rgba(255, 152, 0, 0.1);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .speech-warning.visible {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -414,6 +508,10 @@
         <div class="progress-time">Time limit: <span id="start-time-limit">10</span>s</div>
     </div>
 
+    <div class="speech-warning" id="speech-warning">
+        Your browser doesn't support speech recognition. Speech Mode will fall back to Practice Mode (click buttons).
+    </div>
+
     <button id="start-btn">Start Learning</button>
 </div>
 
@@ -427,12 +525,20 @@
         <div class="time-display">Time: <span id="time-display">10</span>s</div>
     </div>
     <div class="score-display">Score: <span id="current-score">0</span></div>
-    <div class="prompt-label">What colour is this?</div>
+    <div class="prompt-label" id="game-prompt">What colour is this?</div>
     <div class="color-display" id="color-display"></div>
     <div id="timer-bar-container">
         <div id="timer-bar"></div>
     </div>
     <div class="buttons" id="buttons-container"></div>
+    <div class="speech-ui" id="speech-ui">
+        <div class="speech-prompt">Say the colour!</div>
+        <div class="audio-indicator">
+            <div class="mic-icon" id="mic-icon"></div>
+            <span id="audio-status">Listening...</span>
+        </div>
+        <div class="voice-feedback" id="voice-feedback"></div>
+    </div>
 </div>
 
 <div id="level-up-overlay">
@@ -471,6 +577,104 @@
     const PHASE_CLASSES = ['learning', 'practice', 'speech'];
     const MAX_TIME = 10; // seconds
     const MIN_TIME = 1;  // seconds
+
+    // ========== SPEECH RECOGNITION CONSTANTS ==========
+    const SPEECH_LANG_CODES = {
+        es: 'es-ES',
+        fr: 'fr-FR',
+        de: 'de-DE',
+        it: 'it-IT',
+        cy: 'cy-GB',
+        pt: 'pt-PT'
+    };
+
+    // Aliases for voice recognition to handle accents and pronunciation variations
+    const COLOR_ALIASES = {
+        es: {
+            red: ['rojo'],
+            green: ['verde'],
+            blue: ['azul'],
+            yellow: ['amarillo'],
+            orange: ['naranja'],
+            pink: ['rosa'],
+            purple: ['morado'],
+            brown: ['marron', 'marrón'],
+            grey: ['gris'],
+            black: ['negro'],
+            white: ['blanco']
+        },
+        fr: {
+            red: ['rouge'],
+            green: ['vert', 'verte'],
+            blue: ['bleu', 'bleue'],
+            yellow: ['jaune'],
+            orange: ['orange'],
+            pink: ['rose'],
+            purple: ['violet', 'violette'],
+            brown: ['marron', 'brun', 'brune'],
+            grey: ['gris', 'grise'],
+            black: ['noir', 'noire'],
+            white: ['blanc', 'blanche']
+        },
+        de: {
+            red: ['rot', 'rote'],
+            green: ['grun', 'grün', 'grune', 'grüne'],
+            blue: ['blau', 'blaue'],
+            yellow: ['gelb', 'gelbe'],
+            orange: ['orange'],
+            pink: ['rosa'],
+            purple: ['lila'],
+            brown: ['braun', 'braune'],
+            grey: ['grau', 'graue'],
+            black: ['schwarz', 'schwarze'],
+            white: ['weiss', 'weiß', 'weise', 'weiße']
+        },
+        it: {
+            red: ['rosso'],
+            green: ['verde'],
+            blue: ['blu'],
+            yellow: ['giallo'],
+            orange: ['arancione'],
+            pink: ['rosa'],
+            purple: ['viola'],
+            brown: ['marrone'],
+            grey: ['grigio'],
+            black: ['nero'],
+            white: ['bianco']
+        },
+        cy: {
+            red: ['coch', 'goch'],
+            green: ['gwyrdd', 'wyrdd'],
+            blue: ['glas', 'las'],
+            yellow: ['melyn', 'felyn'],
+            orange: ['oren'],
+            pink: ['pinc'],
+            purple: ['porffor'],
+            brown: ['brown'],
+            grey: ['llwyd', 'lwyd'],
+            black: ['du'],
+            white: ['gwyn', 'wyn']
+        },
+        pt: {
+            red: ['vermelho'],
+            green: ['verde'],
+            blue: ['azul'],
+            yellow: ['amarelo'],
+            orange: ['laranja'],
+            pink: ['rosa'],
+            purple: ['roxo'],
+            brown: ['castanho'],
+            grey: ['cinzento'],
+            black: ['preto'],
+            white: ['branco']
+        }
+    };
+
+    // Web Speech Recognition setup
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const speechSupported = !!SpeechRecognition;
+    let recognition = null;
+    let isListening = false;
 
     // ========== LEVEL SYSTEM FUNCTIONS ==========
 
@@ -521,7 +725,6 @@
     }
 
     // Get level within current phase (1-10)
-    // Each phase has 10 levels (100 answers)
     function getLevelWithinPhase(answers) {
         const answersInCycle = answers % ANSWERS_PER_CYCLE;
         const answersInPhase = answersInCycle % (LEVELS_PER_PHASE * ANSWERS_PER_LEVEL);
@@ -529,12 +732,10 @@
     }
 
     // Calculate time limit based on level within phase
-    // Time resets to 10s at start of each phase (Learning, Practice, Speech)
-    // Level 1 = 10s, Level 2 = 9s, ..., Level 10 = 1s
     function getTimeLimit(answers) {
         const levelInPhase = getLevelWithinPhase(answers);
         const timeInSeconds = Math.max(MIN_TIME, MAX_TIME - (levelInPhase - 1));
-        return timeInSeconds * 1000; // return in milliseconds
+        return timeInSeconds * 1000;
     }
 
     // Get time limit in seconds for display
@@ -554,34 +755,40 @@
         return getTimeLimit(previousAnswers) !== getTimeLimit(currentAnswers);
     }
 
+    // Check if in speech mode
+    function isInSpeechMode() {
+        const levelInCycle = getLevelWithinCycle(totalCorrectAnswers);
+        return getPhase(levelInCycle) === 2;
+    }
+
     // ========== COLOUR DATA ==========
     const TRANSLATIONS = {
-        es: { // Spanish
+        es: {
             red: 'Rojo', green: 'Verde', blue: 'Azul', yellow: 'Amarillo',
             orange: 'Naranja', pink: 'Rosa', purple: 'Morado', brown: 'Marrón',
             grey: 'Gris', black: 'Negro', white: 'Blanco'
         },
-        fr: { // French
+        fr: {
             red: 'Rouge', green: 'Vert', blue: 'Bleu', yellow: 'Jaune',
             orange: 'Orange', pink: 'Rose', purple: 'Violet', brown: 'Marron',
             grey: 'Gris', black: 'Noir', white: 'Blanc'
         },
-        de: { // German
+        de: {
             red: 'Rot', green: 'Grün', blue: 'Blau', yellow: 'Gelb',
             orange: 'Orange', pink: 'Rosa', purple: 'Lila', brown: 'Braun',
             grey: 'Grau', black: 'Schwarz', white: 'Weiß'
         },
-        it: { // Italian
+        it: {
             red: 'Rosso', green: 'Verde', blue: 'Blu', yellow: 'Giallo',
             orange: 'Arancione', pink: 'Rosa', purple: 'Viola', brown: 'Marrone',
             grey: 'Grigio', black: 'Nero', white: 'Bianco'
         },
-        cy: { // Welsh
+        cy: {
             red: 'Coch', green: 'Gwyrdd', blue: 'Glas', yellow: 'Melyn',
             orange: 'Oren', pink: 'Pinc', purple: 'Porffor', brown: 'Brown',
             grey: 'Llwyd', black: 'Du', white: 'Gwyn'
         },
-        pt: { // Portuguese
+        pt: {
             red: 'Vermelho', green: 'Verde', blue: 'Azul', yellow: 'Amarelo',
             orange: 'Laranja', pink: 'Rosa', purple: 'Roxo', brown: 'Castanho',
             grey: 'Cinzento', black: 'Preto', white: 'Branco'
@@ -623,6 +830,7 @@
     const currentScoreEl = document.getElementById('current-score');
     const finalScore = document.getElementById('final-score');
     const endMessage = document.getElementById('end-message');
+    const gamePrompt = document.getElementById('game-prompt');
 
     // Level system elements
     const phaseBadge = document.getElementById('phase-badge');
@@ -640,15 +848,121 @@
     const startTotalAnswersEl = document.getElementById('start-total-answers');
     const startTimeLimitEl = document.getElementById('start-time-limit');
 
+    // Speech mode elements
+    const speechUI = document.getElementById('speech-ui');
+    const micIcon = document.getElementById('mic-icon');
+    const audioStatus = document.getElementById('audio-status');
+    const voiceFeedback = document.getElementById('voice-feedback');
+    const speechWarning = document.getElementById('speech-warning');
+
+    // ========== SPEECH RECOGNITION FUNCTIONS ==========
+
+    function initSpeechRecognition() {
+        if (!speechSupported) return null;
+
+        const recog = new SpeechRecognition();
+        recog.continuous = true;
+        recog.interimResults = true;
+        recog.lang = SPEECH_LANG_CODES[selectedLanguage] || 'es-ES';
+
+        recog.onresult = (event) => {
+            if (levelUpPending) return;
+
+            const result = event.results[event.results.length - 1];
+            const transcript = result[0].transcript.trim().toLowerCase();
+            const lastWord = transcript.split(' ').pop();
+
+            voiceFeedback.textContent = `Heard: "${lastWord}"`;
+
+            if (result.isFinal) {
+                const matchedColor = matchColorFromSpeech(lastWord);
+                if (matchedColor) {
+                    handleAnswer(matchedColor);
+                }
+            }
+        };
+
+        recog.onerror = (event) => {
+            console.log('Speech recognition error:', event.error);
+            if (event.error === 'no-speech') {
+                audioStatus.textContent = 'No speech detected...';
+            } else if (event.error === 'not-allowed') {
+                audioStatus.textContent = 'Microphone blocked';
+                stopListening();
+            }
+        };
+
+        recog.onend = () => {
+            isListening = false;
+            micIcon.classList.remove('listening');
+            // Restart if still in speech mode and game is active
+            if (isInSpeechMode() && speechSupported && gameScreen.classList.contains('active') && !levelUpPending) {
+                setTimeout(() => {
+                    if (isInSpeechMode() && gameScreen.classList.contains('active') && !isListening && !levelUpPending) {
+                        startListening();
+                    }
+                }, 100);
+            }
+        };
+
+        return recog;
+    }
+
+    function matchColorFromSpeech(word) {
+        const aliases = COLOR_ALIASES[selectedLanguage];
+        if (!aliases) return null;
+
+        for (const color of activeColors) {
+            const colorAliases = aliases[color];
+            if (colorAliases && colorAliases.some(alias => alias.toLowerCase() === word.toLowerCase())) {
+                return color;
+            }
+        }
+        return null;
+    }
+
+    function startListening() {
+        if (!recognition || isListening || !speechSupported) return;
+        try {
+            recognition.lang = SPEECH_LANG_CODES[selectedLanguage] || 'es-ES';
+            recognition.start();
+            isListening = true;
+            micIcon.classList.add('listening');
+            audioStatus.textContent = 'Listening...';
+            voiceFeedback.textContent = '';
+        } catch (e) {
+            console.log('Failed to start recognition:', e);
+        }
+    }
+
+    function stopListening() {
+        if (!recognition || !isListening) return;
+        try {
+            recognition.stop();
+            isListening = false;
+            micIcon.classList.remove('listening');
+        } catch (e) {
+            console.log('Failed to stop recognition:', e);
+        }
+    }
+
     // ========== UI UPDATE FUNCTIONS ==========
 
     // Update start screen progress display
     function updateStartScreenProgress() {
         const levelInCycle = getLevelWithinCycle(totalCorrectAnswers);
+        const phase = getPhase(levelInCycle);
         startLevelEl.textContent = levelInCycle;
         startPhaseEl.textContent = getPhaseName(levelInCycle);
         startTotalAnswersEl.textContent = totalCorrectAnswers;
         startTimeLimitEl.textContent = getTimeLimitSeconds(totalCorrectAnswers);
+
+        // Show speech warning if in Speech Mode and speech not supported
+        if (phase === 2 && !speechSupported) {
+            speechWarning.classList.add('visible');
+        } else {
+            speechWarning.classList.remove('visible');
+        }
     }
 
     // Update game screen level display
@@ -666,9 +980,26 @@
         phaseBadge.className = 'phase-badge ' + PHASE_CLASSES[phase];
     }
 
+    // Update UI for current mode (show/hide buttons, speech UI)
+    function updateModeUI() {
+        const inSpeechMode = isInSpeechMode() && speechSupported;
+
+        if (inSpeechMode) {
+            buttonsContainer.classList.add('hidden');
+            speechUI.classList.add('active');
+            gamePrompt.textContent = 'What colour is this?';
+        } else {
+            buttonsContainer.classList.remove('hidden');
+            speechUI.classList.remove('active');
+            gamePrompt.textContent = 'What colour is this?';
+        }
+    }
+
     // Show level-up overlay
     function showLevelUp(newLevelInCycle, previousAnswers, currentAnswers) {
         levelUpPending = true;
+        stopListening();
+
         const phase = getPhase(newLevelInCycle);
         const previousLevelInCycle = getLevelWithinCycle(previousAnswers);
         const previousPhase = getPhase(previousLevelInCycle);
@@ -680,7 +1011,11 @@
         levelUpMessage.textContent = `You reached Level ${newLevelInCycle}`;
 
         if (phaseChanged) {
-            levelUpPhase.textContent = `Welcome to ${PHASES[phase]} Mode!`;
+            let phaseMessage = `Welcome to ${PHASES[phase]} Mode!`;
+            if (phase === 2 && !speechSupported) {
+                phaseMessage = 'Welcome to Speech Mode! (Falling back to Practice Mode - speech not supported)';
+            }
+            levelUpPhase.textContent = phaseMessage;
         } else {
             levelUpPhase.textContent = '';
         }
@@ -706,9 +1041,10 @@
                 levelUpOverlay.classList.remove('active');
                 levelUpPending = false;
 
-                // Regenerate buttons if phase changed (Learning -> Practice styling)
+                // Regenerate buttons if phase changed
                 if (phaseChanged) {
                     generateButtons();
+                    updateModeUI();
                 }
 
                 nextRound();
@@ -718,6 +1054,11 @@
 
     // ========== INITIALIZATION ==========
     updateStartScreenProgress();
+
+    // Initialize speech recognition if supported
+    if (speechSupported) {
+        recognition = initSpeechRecognition();
+    }
 
     // Language selection
     document.querySelectorAll('.language-btn').forEach(btn => {
@@ -730,6 +1071,7 @@
 
     document.getElementById('start-btn').addEventListener('click', startGame);
     document.getElementById('restart-btn').addEventListener('click', () => {
+        stopListening();
         updateStartScreenProgress();
         show(startScreen);
     });
@@ -749,8 +1091,14 @@
         responseTimes = [];
         currentScoreEl.textContent = '0';
 
+        // Re-initialize speech recognition with current language
+        if (speechSupported) {
+            recognition = initSpeechRecognition();
+        }
+
         generateButtons();
         updateLevelDisplay();
+        updateModeUI();
         show(gameScreen);
         nextRound();
     }
@@ -771,7 +1119,6 @@
                 // Learning mode: show colored backgrounds
                 btn.classList.add('learning-mode');
                 btn.style.backgroundColor = COLOR_CSS[color];
-                // Ensure text is readable on light colors
                 if (color === 'yellow' || color === 'white') {
                     btn.style.color = '#222';
                     btn.style.textShadow = 'none';
@@ -810,6 +1157,12 @@
 
         shuffleButtons();
 
+        // Start speech recognition if in speech mode
+        if (isInSpeechMode() && speechSupported) {
+            voiceFeedback.textContent = '';
+            startListening();
+        }
+
         // Timer setup
         timerBar.style.transition = 'none';
         timerBar.style.width = '100%';
@@ -840,6 +1193,7 @@
 
         clearTimeout(timeout);
         cancelAnimationFrame(timerRAF);
+        stopListening();
         totalQuestions++;
 
         if (chosen === currentColor) {
@@ -866,6 +1220,7 @@
     function endGame() {
         clearTimeout(timeout);
         cancelAnimationFrame(timerRAF);
+        stopListening();
 
         const accuracy = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
         const avgTime = responseTimes.length > 0
