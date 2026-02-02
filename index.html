@@ -554,6 +554,179 @@
             font-weight: 900;
             color: #28a745;
         }
+
+        /* Statistics styles */
+        .start-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        #stats-btn {
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            border: 2px solid #0f3460;
+            border-radius: 8px;
+            background: transparent;
+            color: #0f3460;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        #stats-btn:hover {
+            background: #0f3460;
+            color: #fff;
+        }
+
+        #stats-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 26, 46, 0.98);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        #stats-overlay.active {
+            display: flex;
+        }
+
+        .stats-title {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #e94560;
+            margin-bottom: 1.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            max-width: 400px;
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+
+        .stats-card {
+            background: rgba(15, 52, 96, 0.3);
+            border: 2px solid #0f3460;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stats-card.wide {
+            grid-column: span 2;
+        }
+
+        .stats-card-value {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #fff;
+        }
+
+        .stats-card-label {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 0.3rem;
+        }
+
+        .language-stats {
+            max-width: 400px;
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+
+        .language-stats-title {
+            font-size: 1rem;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 0.75rem;
+            text-align: center;
+        }
+
+        .language-stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .language-stat-name {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .language-stat-data {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .stats-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        #close-stats-btn {
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            border: none;
+            border-radius: 8px;
+            background: #0f3460;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        #close-stats-btn:hover {
+            background: #1a4a7a;
+        }
+
+        #reset-stats-btn {
+            padding: 0.8rem 1.5rem;
+            font-size: 0.9rem;
+            border: 2px solid #e94560;
+            border-radius: 8px;
+            background: transparent;
+            color: #e94560;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        #reset-stats-btn:hover {
+            background: #e94560;
+            color: #fff;
+        }
+
+        /* Personal best indicator on end screen */
+        .personal-best {
+            display: none;
+            color: #28a745;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .personal-best.visible {
+            display: block;
+        }
+
+        .best-streak-display {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
     </style>
 </head>
 <body>
@@ -583,7 +756,40 @@
         <div class="progress-time">Time limit: <span id="start-time-limit">10</span>s</div>
     </div>
 
-    <button id="start-btn">Start Learning</button>
+    <div class="start-buttons">
+        <button id="start-btn">Start Learning</button>
+        <button id="stats-btn">Statistics</button>
+    </div>
+</div>
+
+<div id="stats-overlay">
+    <div class="stats-title">Your Statistics</div>
+    <div class="stats-grid">
+        <div class="stats-card">
+            <div class="stats-card-value" id="stats-total-correct">0</div>
+            <div class="stats-card-label">Total Correct</div>
+        </div>
+        <div class="stats-card">
+            <div class="stats-card-value" id="stats-highest-cycle">1</div>
+            <div class="stats-card-label">Highest Cycle</div>
+        </div>
+        <div class="stats-card">
+            <div class="stats-card-value" id="stats-best-streak">0</div>
+            <div class="stats-card-label">Best Streak</div>
+        </div>
+        <div class="stats-card">
+            <div class="stats-card-value" id="stats-games-played">0</div>
+            <div class="stats-card-label">Games Played</div>
+        </div>
+    </div>
+    <div class="language-stats">
+        <div class="language-stats-title">By Language</div>
+        <div id="language-stats-list"></div>
+    </div>
+    <div class="stats-buttons">
+        <button id="close-stats-btn">Close</button>
+        <button id="reset-stats-btn">Reset Stats</button>
+    </div>
 </div>
 
 <div id="game-screen">
@@ -637,6 +843,8 @@
     <div id="end-message"></div>
     <div id="final-score">0</div>
     <div class="prompt-label">correct answers</div>
+    <div class="personal-best" id="personal-best">New Personal Best!</div>
+    <div class="best-streak-display" id="best-streak-display"></div>
     <div class="stats-row">
         <div class="stat-item">
             <div class="stat-value" id="accuracy-stat">0%</div>
@@ -677,6 +885,12 @@
 
     // ========== LEVEL SYSTEM FUNCTIONS ==========
 
+    // Language display names
+    const LANGUAGE_NAMES = {
+        es: 'Spanish', fr: 'French', de: 'German',
+        it: 'Italian', cy: 'Welsh', pt: 'Portuguese'
+    };
+
     // Load saved progress from localStorage
     function loadProgress() {
         const saved = localStorage.getItem('waffley_progress');
@@ -701,6 +915,120 @@
             currentCycle: currentCycle
         }));
     }
+
+    // ========== STATISTICS SYSTEM ==========
+
+    // Load statistics from localStorage
+    function loadStats() {
+        const saved = localStorage.getItem('waffley_stats');
+        if (saved) {
+            try {
+                return JSON.parse(saved);
+            } catch (e) {
+                return getDefaultStats();
+            }
+        }
+        return getDefaultStats();
+    }
+
+    function getDefaultStats() {
+        return {
+            bestStreak: 0,
+            highestCycle: 1,
+            gamesPlayed: 0,
+            languageStats: {}
+        };
+    }
+
+    // Save statistics to localStorage
+    function saveStats() {
+        localStorage.setItem('waffley_stats', JSON.stringify(stats));
+    }
+
+    // Update statistics after a game ends
+    function updateStatsAfterGame(sessionScore, language) {
+        stats.gamesPlayed++;
+
+        // Update best streak
+        if (sessionScore > stats.bestStreak) {
+            stats.bestStreak = sessionScore;
+        }
+
+        // Update highest cycle
+        if (currentCycle > stats.highestCycle) {
+            stats.highestCycle = currentCycle;
+        }
+
+        // Update language stats
+        if (!stats.languageStats[language]) {
+            stats.languageStats[language] = { correct: 0, games: 0 };
+        }
+        stats.languageStats[language].correct += sessionScore;
+        stats.languageStats[language].games++;
+
+        saveStats();
+    }
+
+    // Check if this is a new personal best
+    function isNewPersonalBest(sessionScore) {
+        return sessionScore > 0 && sessionScore > stats.bestStreak;
+    }
+
+    // Reset all statistics
+    function resetStats() {
+        stats = getDefaultStats();
+        saveStats();
+        updateStatsDisplay();
+    }
+
+    // Update the statistics overlay display
+    function updateStatsDisplay() {
+        document.getElementById('stats-total-correct').textContent = totalCorrectAnswers;
+        document.getElementById('stats-highest-cycle').textContent = stats.highestCycle;
+        document.getElementById('stats-best-streak').textContent = stats.bestStreak;
+        document.getElementById('stats-games-played').textContent = stats.gamesPlayed;
+
+        // Language stats
+        const langList = document.getElementById('language-stats-list');
+        langList.innerHTML = '';
+
+        Object.keys(LANGUAGE_NAMES).forEach(lang => {
+            const langStats = stats.languageStats[lang];
+            const row = document.createElement('div');
+            row.className = 'language-stat-row';
+
+            const name = document.createElement('span');
+            name.className = 'language-stat-name';
+            name.textContent = LANGUAGE_NAMES[lang];
+
+            const data = document.createElement('span');
+            data.className = 'language-stat-data';
+            if (langStats && langStats.games > 0) {
+                const avg = Math.round(langStats.correct / langStats.games);
+                data.textContent = `${langStats.correct} correct (${langStats.games} games, avg ${avg})`;
+            } else {
+                data.textContent = 'No games yet';
+            }
+
+            row.appendChild(name);
+            row.appendChild(data);
+            langList.appendChild(row);
+        });
+    }
+
+    // Show statistics overlay
+    function showStats() {
+        updateStatsDisplay();
+        document.getElementById('stats-overlay').classList.add('active');
+    }
+
+    // Hide statistics overlay
+    function hideStats() {
+        document.getElementById('stats-overlay').classList.remove('active');
+    }
+
+    // Statistics state
+    let stats = loadStats();
 
     // Get current cycle number from total answers
     function getCycleFromAnswers(answers) {
@@ -1211,6 +1539,15 @@
         show(startScreen);
     });
 
+    // Statistics button handlers
+    document.getElementById('stats-btn').addEventListener('click', showStats);
+    document.getElementById('close-stats-btn').addEventListener('click', hideStats);
+    document.getElementById('reset-stats-btn').addEventListener('click', () => {
+        if (confirm('Are you sure you want to reset all statistics? This cannot be undone.')) {
+            resetStats();
+        }
+    });
+
     function show(screen) {
         [startScreen, gameScreen, endScreen].forEach(s => s.classList.remove('active'));
         screen.classList.add('active');
@@ -1387,9 +1724,32 @@
             ? (responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length / 1000).toFixed(1)
             : '0.0';
 
+        // Check for personal best before updating stats
+        const isNewBest = isNewPersonalBest(score);
+        const previousBest = stats.bestStreak;
+
+        // Update statistics
+        updateStatsAfterGame(score, selectedLanguage);
+
         finalScore.textContent = score;
         document.getElementById('accuracy-stat').textContent = accuracy + '%';
         document.getElementById('avg-time-stat').textContent = avgTime + 's';
+
+        // Show personal best indicator
+        const personalBestEl = document.getElementById('personal-best');
+        const bestStreakDisplay = document.getElementById('best-streak-display');
+
+        if (isNewBest) {
+            personalBestEl.classList.add('visible');
+            bestStreakDisplay.textContent = `Previous best: ${previousBest}`;
+        } else {
+            personalBestEl.classList.remove('visible');
+            if (stats.bestStreak > 0) {
+                bestStreakDisplay.textContent = `Your best: ${stats.bestStreak}`;
+            } else {
+                bestStreakDisplay.textContent = '';
+            }
+        }
 
         if (score === 0) {
             endMessage.textContent = `The colour was ${TRANSLATIONS[selectedLanguage][currentColor]} (${currentColor})`;
