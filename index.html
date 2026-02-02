@@ -386,6 +386,76 @@
             color: #e94560;
             margin-top: 0.3rem;
         }
+
+        .progress-cycle {
+            font-size: 0.85rem;
+            color: #28a745;
+            margin-top: 0.3rem;
+        }
+
+        /* Cycle complete overlay */
+        #cycle-complete-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(26, 26, 46, 0.95);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        #cycle-complete-overlay.active {
+            display: flex;
+        }
+
+        .cycle-complete-title {
+            font-size: 3rem;
+            font-weight: 900;
+            color: #28a745;
+            margin-bottom: 1rem;
+            animation: levelUpPulse 0.5s ease-out;
+        }
+
+        .cycle-complete-message {
+            font-size: 1.3rem;
+            color: #aaa;
+            margin-bottom: 0.5rem;
+        }
+
+        .cycle-complete-colors {
+            font-size: 1.1rem;
+            color: #e83e8c;
+            margin-bottom: 0.5rem;
+        }
+
+        .new-color-badges {
+            display: flex;
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+
+        .color-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .cycle-complete-info {
+            font-size: 1rem;
+            color: #0f3460;
+            margin-bottom: 2rem;
+        }
+
+        .cycle-complete-countdown {
+            font-size: 4rem;
+            font-weight: 900;
+            color: #28a745;
+        }
     </style>
 </head>
 <body>
@@ -411,6 +481,7 @@
         <div class="progress-title">Your Progress</div>
         <div class="progress-level">Level <span id="start-level">1</span> - <span id="start-phase">Learning</span></div>
         <div class="progress-answers"><span id="start-total-answers">0</span> correct answers</div>
+        <div class="progress-cycle">Cycle <span id="start-cycle">1</span> (<span id="start-colors">5</span> colours)</div>
         <div class="progress-time">Time limit: <span id="start-time-limit">10</span>s</div>
     </div>
 
@@ -443,6 +514,15 @@
     <div class="level-up-countdown" id="level-up-countdown">3</div>
 </div>
 
+<div id="cycle-complete-overlay">
+    <div class="cycle-complete-title">Cycle Complete!</div>
+    <div class="cycle-complete-message" id="cycle-complete-message">You finished Cycle 1!</div>
+    <div class="cycle-complete-colors" id="cycle-complete-colors">New colours unlocked!</div>
+    <div class="new-color-badges" id="new-color-badges"></div>
+    <div class="cycle-complete-info">Time resets to 10 seconds</div>
+    <div class="cycle-complete-countdown" id="cycle-complete-countdown">5</div>
+</div>
+
 <div id="end-screen">
     <h1>Well Done!</h1>
     <div id="end-message"></div>
@@ -472,6 +552,20 @@
     const MAX_TIME = 10; // seconds
     const MIN_TIME = 1;  // seconds
 
+    // Colour pools by cycle - 2 new colours added each cycle
+    const CYCLE_COLORS = {
+        1: ['red', 'green', 'blue', 'yellow', 'orange'],
+        2: ['red', 'green', 'blue', 'yellow', 'orange', 'pink', 'purple'],
+        3: ['red', 'green', 'blue', 'yellow', 'orange', 'pink', 'purple', 'brown', 'grey'],
+        4: ['red', 'green', 'blue', 'yellow', 'orange', 'pink', 'purple', 'brown', 'grey', 'black', 'white']
+    };
+    const MAX_CYCLE_WITH_NEW_COLORS = 4;
+    const NEW_COLORS_PER_CYCLE = {
+        2: ['pink', 'purple'],
+        3: ['brown', 'grey'],
+        4: ['black', 'white']
+    };
+
     // ========== LEVEL SYSTEM FUNCTIONS ==========
 
     // Load saved progress from localStorage
@@ -479,19 +573,44 @@
         const saved = localStorage.getItem('waffley_progress');
         if (saved) {
             try {
-                return JSON.parse(saved);
+                const data = JSON.parse(saved);
+                return {
+                    totalAnswers: data.totalAnswers || 0,
+                    currentCycle: data.currentCycle || 1
+                };
             } catch (e) {
-                return { totalAnswers: 0 };
+                return { totalAnswers: 0, currentCycle: 1 };
             }
         }
-        return { totalAnswers: 0 };
+        return { totalAnswers: 0, currentCycle: 1 };
     }
 
     // Save progress to localStorage
     function saveProgress() {
         localStorage.setItem('waffley_progress', JSON.stringify({
-            totalAnswers: totalCorrectAnswers
+            totalAnswers: totalCorrectAnswers,
+            currentCycle: currentCycle
         }));
+    }
+
+    // Get current cycle number from total answers
+    function getCycleFromAnswers(answers) {
+        return Math.floor(answers / ANSWERS_PER_CYCLE) + 1;
+    }
+
+    // Get colours available for a given cycle
+    function getActiveColors(cycle) {
+        if (cycle >= MAX_CYCLE_WITH_NEW_COLORS) {
+            return CYCLE_COLORS[MAX_CYCLE_WITH_NEW_COLORS].slice();
+        }
+        return CYCLE_COLORS[cycle].slice();
+    }
+
+    // Check if cycle just completed
+    function checkCycleComplete(previousAnswers, currentAnswers) {
+        const previousCycle = getCycleFromAnswers(previousAnswers);
+        const newCycle = getCycleFromAnswers(currentAnswers);
+        return newCycle > previousCycle;
     }
 
     // Calculate level from total answers (1-based, 1 level = 10 answers)
@@ -594,12 +713,9 @@
         grey: '#6c757d', black: '#212529', white: '#f8f9fa'
     };
 
-    // Base colours (5 for now - will expand in Feature 6)
-    const BASE_COLORS = ['red', 'green', 'blue', 'yellow', 'orange'];
-
     // ========== GAME STATE ==========
     let selectedLanguage = 'es';
-    let activeColors = BASE_COLORS.slice();
+    let activeColors = [];
     let currentColor = '';
     let score = 0;
     let totalQuestions = 0;
@@ -610,8 +726,11 @@
     let responseTimes = [];
 
     // Level system state
-    let totalCorrectAnswers = loadProgress().totalAnswers;
+    const savedProgress = loadProgress();
+    let totalCorrectAnswers = savedProgress.totalAnswers;
+    let currentCycle = savedProgress.currentCycle;
     let levelUpPending = false;
+    let cycleCompletePending = false;
 
     // ========== DOM ELEMENTS ==========
     const startScreen = document.getElementById('start-screen');
@@ -639,6 +758,15 @@
     const startPhaseEl = document.getElementById('start-phase');
     const startTotalAnswersEl = document.getElementById('start-total-answers');
     const startTimeLimitEl = document.getElementById('start-time-limit');
+    const startCycleEl = document.getElementById('start-cycle');
+    const startColorsEl = document.getElementById('start-colors');
+
+    // Cycle complete elements
+    const cycleCompleteOverlay = document.getElementById('cycle-complete-overlay');
+    const cycleCompleteMessage = document.getElementById('cycle-complete-message');
+    const cycleCompleteColors = document.getElementById('cycle-complete-colors');
+    const newColorBadges = document.getElementById('new-color-badges');
+    const cycleCompleteCountdown = document.getElementById('cycle-complete-countdown');
 
     // ========== UI UPDATE FUNCTIONS ==========
 
@@ -649,6 +777,8 @@
         startPhaseEl.textContent = getPhaseName(levelInCycle);
         startTotalAnswersEl.textContent = totalCorrectAnswers;
         startTimeLimitEl.textContent = getTimeLimitSeconds(totalCorrectAnswers);
+        startCycleEl.textContent = currentCycle;
+        startColorsEl.textContent = getActiveColors(currentCycle).length;
     }
 
     // Update game screen level display
@@ -716,6 +846,57 @@
         }, 1000);
     }
 
+    // Show cycle complete overlay
+    function showCycleComplete(completedCycle, newCycle) {
+        cycleCompletePending = true;
+
+        cycleCompleteMessage.textContent = `You finished Cycle ${completedCycle}!`;
+
+        // Show new colours if applicable
+        const newColors = NEW_COLORS_PER_CYCLE[newCycle];
+        if (newColors) {
+            cycleCompleteColors.textContent = 'New colours unlocked!';
+            newColorBadges.innerHTML = '';
+            newColors.forEach(color => {
+                const badge = document.createElement('span');
+                badge.className = 'color-badge';
+                badge.style.backgroundColor = COLOR_CSS[color];
+                badge.style.color = (color === 'yellow' || color === 'white') ? '#222' : '#fff';
+                badge.textContent = TRANSLATIONS[selectedLanguage][color];
+                newColorBadges.appendChild(badge);
+            });
+        } else {
+            cycleCompleteColors.textContent = 'All colours mastered!';
+            newColorBadges.innerHTML = '';
+        }
+
+        cycleCompleteOverlay.classList.add('active');
+
+        // Longer countdown for cycle complete (5 seconds)
+        let count = 5;
+        cycleCompleteCountdown.textContent = count;
+
+        const countdownInterval = setInterval(() => {
+            count--;
+            if (count > 0) {
+                cycleCompleteCountdown.textContent = count;
+            } else {
+                clearInterval(countdownInterval);
+                cycleCompleteOverlay.classList.remove('active');
+                cycleCompletePending = false;
+
+                // Update cycle and regenerate with new colours
+                currentCycle = newCycle;
+                activeColors = getActiveColors(currentCycle);
+                saveProgress();
+                generateButtons();
+                updateLevelDisplay();
+
+                nextRound();
+            }
+        }, 1000);
+    }
+
     // ========== INITIALIZATION ==========
     updateStartScreenProgress();
 
@@ -742,7 +923,7 @@
     // ========== GAME FUNCTIONS ==========
 
     function startGame() {
-        activeColors = BASE_COLORS.slice();
+        activeColors = getActiveColors(currentCycle);
         timeLimit = getTimeLimit(totalCorrectAnswers);
         score = 0;
         totalQuestions = 0;
@@ -836,7 +1017,7 @@
 
     function handleAnswer(chosen) {
         if (!gameScreen.classList.contains('active')) return;
-        if (levelUpPending) return;
+        if (levelUpPending || cycleCompletePending) return;
 
         clearTimeout(timeout);
         cancelAnimationFrame(timerRAF);
@@ -847,13 +1028,18 @@
             score++;
             currentScoreEl.textContent = score;
 
-            // Track total correct answers and check for level-up
+            // Track total correct answers and check for level-up or cycle completion
             const previousAnswers = totalCorrectAnswers;
             totalCorrectAnswers++;
             saveProgress();
             updateLevelDisplay();
 
-            if (checkLevelUp(previousAnswers, totalCorrectAnswers)) {
+            // Check for cycle completion first (takes priority)
+            if (checkCycleComplete(previousAnswers, totalCorrectAnswers)) {
+                const completedCycle = getCycleFromAnswers(previousAnswers);
+                const newCycle = getCycleFromAnswers(totalCorrectAnswers);
+                showCycleComplete(completedCycle, newCycle);
+            } else if (checkLevelUp(previousAnswers, totalCorrectAnswers)) {
                 showLevelUp(getLevelWithinCycle(totalCorrectAnswers), previousAnswers, totalCorrectAnswers);
             } else {
                 nextRound();
