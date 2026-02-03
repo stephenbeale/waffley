@@ -92,9 +92,11 @@
 
         .buttons {
             display: grid;
-            grid-template-columns: repeat(3, 140px);
-            gap: 1rem;
+            grid-template-columns: repeat(3, min(140px, 28vw));
+            gap: 0.5rem;
             justify-content: center;
+            max-width: 95vw;
+            margin: 0 auto;
         }
 
         .answer-btn {
@@ -108,6 +110,11 @@
             cursor: pointer;
             transition: transform 0.1s, border-color 0.2s, background 0.2s;
             text-transform: capitalize;
+            outline: none;
+        }
+
+        .answer-btn:focus {
+            outline: none;
         }
 
         .answer-btn:hover {
