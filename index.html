@@ -891,7 +891,7 @@
     const PHASES = ['Learning', 'Practice', 'Speech'];
     const PHASE_CLASSES = ['learning', 'practice', 'speech'];
     const MAX_TIME = 10; // seconds
-    const MIN_TIME = 1;  // seconds
+    const MIN_TIME = 2;  // seconds (floor for time limit)
 
     // Colour pools by cycle - 2 new colours added each cycle
     const CYCLE_COLORS = {
@@ -1118,6 +1118,14 @@
         return CYCLE_COLORS[cycle].slice();
     }
 
+    // Shuffle activeColors array in place (Fisher-Yates)
+    function shuffleActiveColors() {
+        for (let i = activeColors.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [activeColors[i], activeColors[j]] = [activeColors[j], activeColors[i]];
+        }
+    }
+
     // Check if cycle just completed
     function checkCycleComplete(previousAnswers, currentAnswers) {
         const previousCycle = getCycleFromAnswers(previousAnswers);
@@ -1161,10 +1169,10 @@
 
     // Calculate time limit based on level within phase
     // Time resets to 10s at start of each phase (Learning, Practice, Speech)
-    // Level 1 = 10s, Level 2 = 9s, ..., Level 10 = 1s
+    // Level 1 = 10s, Level 2 = 8s, Level 3 = 6s, Level 4 = 4s, Level 5+ = 2s
     function getTimeLimit(answers) {
         const levelInPhase = getLevelWithinPhase(answers);
-        const timeInSeconds = Math.max(MIN_TIME, MAX_TIME - (levelInPhase - 1));
+        const timeInSeconds = Math.max(MIN_TIME, MAX_TIME - (levelInPhase - 1) * 2);
         return timeInSeconds * 1000; // return in milliseconds
     }
 
@@ -1803,6 +1811,9 @@
                 const newCycle = getCycleFromAnswers(totalCorrectAnswers);
                 showCycleComplete(completedCycle, newCycle);
             } else if (checkLevelUp(previousAnswers, totalCorrectAnswers)) {
+                // Shuffle colors on level-up for variety
+                shuffleActiveColors();
+                generateButtons();
                 showLevelUp(getLevelWithinCycle(totalCorrectAnswers), previousAnswers, totalCorrectAnswers);
             } else {
                 nextRound();
