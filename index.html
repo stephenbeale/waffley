@@ -1458,7 +1458,14 @@
         }
 
         if (timeChanged) {
-            levelUpTime.textContent = `Time decreased to ${newTimeSeconds} second${newTimeSeconds !== 1 ? 's' : ''}!`;
+            const previousTimeSeconds = getTimeLimitSeconds(previousAnswers);
+            if (phaseChanged && newTimeSeconds > previousTimeSeconds) {
+                // Time reset at phase boundary
+                levelUpTime.textContent = `Time resets to ${newTimeSeconds} seconds!`;
+            } else {
+                // Time decreased within phase
+                levelUpTime.textContent = `Time decreased to ${newTimeSeconds} second${newTimeSeconds !== 1 ? 's' : ''}!`;
+            }
         } else {
             levelUpTime.textContent = '';
         }
