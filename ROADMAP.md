@@ -287,30 +287,31 @@ Track and display lifetime statistics.
 
 ---
 
-## Feature 8: Audio Pronunciation
+## Feature 8: Audio Pronunciation (Optional Toggle)
 
-Play audio recording of colour word when showing a new colour to the user.
+Optional setting to play audio recording of colour word when showing a new colour.
 
-### Task 8.1: Audio Assets
+### Task 8.1: Settings Toggle
+- [ ] Add "Play Sound" toggle switch on start screen
+- [ ] Store setting in localStorage
+- [ ] Default to OFF (opt-in feature)
+- [ ] Visual indicator showing current state (speaker icon)
+
+### Task 8.2: Audio Assets
 - [ ] Record or source native speaker audio for each colour in each language
 - [ ] Store audio files (MP3/OGG) in `/audio/{lang}/{colour}.mp3` structure
 - [ ] Fallback: Use Web Speech API TTS if audio files unavailable
 
-### Task 8.2: Audio Playback System
+### Task 8.3: Audio Playback System
 - [ ] Create `playColorAudio(color, language)` function
+- [ ] Only play if toggle is enabled
 - [ ] Preload audio files for current language on game start
 - [ ] Handle audio loading errors gracefully
 
-### Task 8.3: Integration with Game Flow
-- [ ] Play audio when new colour is displayed in `nextRound()`
-- [ ] Option to replay audio (speaker icon button)
-- [ ] Settings toggle to enable/disable audio pronunciation
-- [ ] Consider delay before timer starts to allow listening
-
-### Task 8.4: Learning Mode Enhancement
-- [ ] Auto-play pronunciation in Learning Mode (levels 1-10)
-- [ ] Optional in Practice Mode
-- [ ] Disabled in Speech Mode (to avoid giving away answer)
+### Task 8.4: Integration with Game Flow
+- [ ] Play audio when new colour is displayed in `nextRound()` (if enabled)
+- [ ] Option to replay audio (speaker icon button during round)
+- [ ] Disable audio in Speech Mode (to avoid giving away answer)
 
 ---
 
