@@ -1594,6 +1594,18 @@
     // ========== INITIALIZATION ==========
     updateStartScreenProgress();
 
+    // Handle page restoration from bfcache (back-forward cache)
+    // When browser restores page from cache, reload progress from localStorage
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) {
+            // Page was restored from bfcache - reload current language's progress
+            const freshProgress = getLanguageProgress(selectedLanguage);
+            totalCorrectAnswers = freshProgress.totalAnswers;
+            currentCycle = freshProgress.currentCycle;
+            updateStartScreenProgress();
+        }
+    });
+
     // Language selection
     document.querySelectorAll('.language-btn').forEach(btn => {
         btn.addEventListener('click', () => {
