@@ -962,14 +962,13 @@
         localStorage.setItem('waffley_progress', JSON.stringify(allProgress));
     }
 
-    // Switch to a different language's progress
+    // Switch to a different language - reset to level 1
     function switchLanguageProgress(newLang) {
         // Save current language progress first
         saveProgress();
-        // Load the new language's progress
-        const newProgress = getLanguageProgress(newLang);
-        totalCorrectAnswers = newProgress.totalAnswers;
-        currentCycle = newProgress.currentCycle;
+        // Reset to level 1 for the new language
+        totalCorrectAnswers = 0;
+        currentCycle = 1;
     }
 
     // ========== STATISTICS SYSTEM ==========

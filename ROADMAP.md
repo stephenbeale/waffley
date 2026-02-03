@@ -287,12 +287,70 @@ Track and display lifetime statistics.
 
 ---
 
+## Feature 8: Audio Pronunciation
+
+Play audio recording of colour word when showing a new colour to the user.
+
+### Task 8.1: Audio Assets
+- [ ] Record or source native speaker audio for each colour in each language
+- [ ] Store audio files (MP3/OGG) in `/audio/{lang}/{colour}.mp3` structure
+- [ ] Fallback: Use Web Speech API TTS if audio files unavailable
+
+### Task 8.2: Audio Playback System
+- [ ] Create `playColorAudio(color, language)` function
+- [ ] Preload audio files for current language on game start
+- [ ] Handle audio loading errors gracefully
+
+### Task 8.3: Integration with Game Flow
+- [ ] Play audio when new colour is displayed in `nextRound()`
+- [ ] Option to replay audio (speaker icon button)
+- [ ] Settings toggle to enable/disable audio pronunciation
+- [ ] Consider delay before timer starts to allow listening
+
+### Task 8.4: Learning Mode Enhancement
+- [ ] Auto-play pronunciation in Learning Mode (levels 1-10)
+- [ ] Optional in Practice Mode
+- [ ] Disabled in Speech Mode (to avoid giving away answer)
+
+---
+
+## Feature 9: Emoji Learning Mode
+
+Expand beyond colours to teach other vocabulary using emojis as visual cues.
+
+### Task 9.1: Emoji Categories
+- [ ] Define emoji-word mappings for adjectives:
+  ```javascript
+  const EMOJI_ADJECTIVES = {
+    happy: '😊', sad: '😢', angry: '😠', tired: '😴',
+    surprised: '😮', scared: '😨', excited: '🤩', bored: '😑'
+  };
+  ```
+- [ ] Add translations for each adjective in all supported languages
+
+### Task 9.2: Category Selection
+- [ ] Add category selector on start screen (Colours, Adjectives, etc.)
+- [ ] Store selected category in game state
+- [ ] Load appropriate word set based on category
+
+### Task 9.3: Emoji Display Mode
+- [ ] Replace colour square with emoji display for non-colour categories
+- [ ] Scale emoji appropriately for visibility
+- [ ] Maintain same button/answer mechanic
+
+### Task 9.4: Future Categories
+- [ ] Animals (🐕 dog, 🐈 cat, 🐘 elephant, etc.)
+- [ ] Food (🍎 apple, 🍕 pizza, 🍞 bread, etc.)
+- [ ] Weather (☀️ sunny, 🌧️ rainy, ❄️ snowy, etc.)
+- [ ] Numbers with visual counting (1️⃣, 2️⃣, etc.)
+
+---
+
 ## Future Considerations
 
 - Achievement badges for milestones
 - Multiple save slots for different learners
 - Daily streaks/goals
 - Spaced repetition for difficult colours
-- Audio pronunciation of colour words (Text-to-Speech)
 - Leaderboard (if adding backend)
 - Export/import progress data
