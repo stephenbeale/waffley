@@ -900,6 +900,8 @@
         3: ['red', 'green', 'blue', 'yellow', 'orange', 'pink', 'purple', 'brown', 'grey'],
         4: ['red', 'green', 'blue', 'yellow', 'orange', 'pink', 'purple', 'brown', 'grey', 'black', 'white']
     };
+    // Full pool of colours to randomly select from each level
+    const ALL_COLORS = ['red', 'green', 'blue', 'yellow', 'orange', 'pink', 'purple', 'brown', 'grey'];
     const MAX_CYCLE_WITH_NEW_COLORS = 4;
     const NEW_COLORS_PER_CYCLE = {
         2: ['pink', 'purple'],
@@ -1118,12 +1120,18 @@
         return CYCLE_COLORS[cycle].slice();
     }
 
-    // Shuffle activeColors array in place (Fisher-Yates)
-    function shuffleActiveColors() {
-        for (let i = activeColors.length - 1; i > 0; i--) {
+    // Randomly select new colors from the full pool
+    // Keeps the same count as current cycle allows, but picks randomly from ALL_COLORS
+    function randomizeActiveColors() {
+        const colorCount = activeColors.length;
+        const pool = ALL_COLORS.slice();
+        // Fisher-Yates shuffle the pool
+        for (let i = pool.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
-            [activeColors[i], activeColors[j]] = [activeColors[j], activeColors[i]];
+            [pool[i], pool[j]] = [pool[j], pool[i]];
         }
+        // Take the first N colors from shuffled pool
+        activeColors = pool.slice(0, colorCount);
     }
 
     // Check if cycle just completed
@@ -1811,8 +1819,8 @@
                 const newCycle = getCycleFromAnswers(totalCorrectAnswers);
                 showCycleComplete(completedCycle, newCycle);
             } else if (checkLevelUp(previousAnswers, totalCorrectAnswers)) {
-                // Shuffle colors on level-up for variety
-                shuffleActiveColors();
+                // Randomize which colors appear on level-up for variety
+                randomizeActiveColors();
                 generateButtons();
                 showLevelUp(getLevelWithinCycle(totalCorrectAnswers), previousAnswers, totalCorrectAnswers);
             } else {
