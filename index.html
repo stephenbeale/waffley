@@ -443,6 +443,12 @@
             margin-bottom: 0.5rem;
         }
 
+        .level-up-info {
+            font-size: 0.95rem;
+            color: #16c79a;
+            margin-bottom: 0.5rem;
+        }
+
         .level-up-time {
             font-size: 1rem;
             color: #e94560;
@@ -849,6 +855,7 @@
     <div class="level-up-title" id="level-up-title">Level Up!</div>
     <div class="level-up-message" id="level-up-message">You reached Level 2</div>
     <div class="level-up-phase" id="level-up-phase"></div>
+    <div class="level-up-info" id="level-up-info"></div>
     <div class="level-up-time" id="level-up-time"></div>
     <div class="level-up-countdown" id="level-up-countdown">3</div>
 </div>
@@ -1325,6 +1332,7 @@
     const levelUpTitle = document.getElementById('level-up-title');
     const levelUpMessage = document.getElementById('level-up-message');
     const levelUpPhase = document.getElementById('level-up-phase');
+    const levelUpInfo = document.getElementById('level-up-info');
     const levelUpTime = document.getElementById('level-up-time');
     const levelUpCountdown = document.getElementById('level-up-countdown');
     const startLevelEl = document.getElementById('start-level');
@@ -1514,10 +1522,14 @@
             levelUpPhase.textContent = '';
         }
 
+        // Always show info about colors shuffling
+        levelUpInfo.textContent = 'New colours selected!';
+
+        // Always show current time limit, highlight if changed
         if (timeChanged) {
-            levelUpTime.textContent = `Time decreased to ${newTimeSeconds} second${newTimeSeconds !== 1 ? 's' : ''}!`;
+            levelUpTime.textContent = `Time: ${newTimeSeconds}s (-2 seconds)`;
         } else {
-            levelUpTime.textContent = '';
+            levelUpTime.textContent = `Time: ${newTimeSeconds}s`;
         }
 
         levelUpOverlay.classList.add('active');

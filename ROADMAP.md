@@ -8,21 +8,23 @@ The game progresses through three phases, each lasting 100 correct answers:
 
 | Phase | Answers | Timer | Button Style | Input Method |
 |-------|---------|-------|--------------|--------------|
-| **Learning Mode** | 1-100 | 10s → 1s | Colour fill + text | Click |
-| **Practice Mode** | 101-200 | 10s → 1s | Text only (no colour) | Click |
-| **Speech Mode** | 201-300 | 10s → 1s | None | Voice only |
+| **Learning Mode** | 1-100 | 10s → 2s | Colour fill + text | Click |
+| **Practice Mode** | 101-200 | 10s → 2s | Text only (no colour) | Click |
+| **Speech Mode** | 201-300 | 10s → 2s | None | Voice only |
 
 After completing all 300 answers, the cycle repeats with 2 additional colours added.
 
 **Levels:** 1 level = 10 correct answers (30 levels per cycle)
 
-**Time progression:** Starts at 10 seconds, decreases by 1 second every 10 correct answers (every level), minimum 1 second.
+**Time progression:** Starts at 10 seconds, decreases by 2 seconds every level (every 10 correct answers). Minimum 2 seconds. Time resets to 10 seconds at the start of each phase.
 
-**Colour progression:**
-- Cycle 1: 5 colours (red, green, blue, yellow, orange)
-- Cycle 2: 7 colours (+pink, purple)
-- Cycle 3: 9 colours (+brown, grey)
-- Cycle 4: 11 colours (+black, white)
+**Colour selection:** Every level, 5 colours are randomly selected from a pool of 9 colours (red, green, blue, yellow, orange, pink, purple, brown, grey). This keeps each level fresh and unpredictable.
+
+**Colour expansion (by cycle):**
+- Cycle 1: 5 colours selected from pool of 9
+- Cycle 2: 7 colours (+pink, purple in selection)
+- Cycle 3: 9 colours (+brown, grey in selection)
+- Cycle 4: 11 colours (+black, white in selection)
 - Cycle 5+: All 11 colours
 
 ---
