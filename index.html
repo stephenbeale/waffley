@@ -91,8 +91,8 @@
         #timer-bar.warning { background: #e94560; }
 
         .buttons {
-            display: grid;
-            grid-template-columns: repeat(3, min(140px, 28vw));
+            display: flex;
+            flex-wrap: wrap;
             gap: 0.5rem;
             justify-content: center;
             max-width: 95vw;
@@ -100,6 +100,7 @@
         }
 
         .answer-btn {
+            width: min(140px, 28vw);
             padding: 1rem;
             font-size: 1.1rem;
             font-weight: 600;
@@ -377,19 +378,39 @@
             }
         }
 
-        .level-progress-container {
-            width: 120px;
-            height: 6px;
+        /* Vertical level progress bar */
+        .vertical-progress-container {
+            position: fixed;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 200px;
             background: #333;
-            border-radius: 3px;
+            border-radius: 15px;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            border: 2px solid #444;
         }
 
-        .level-progress-bar {
-            height: 100%;
-            background: #0f3460;
-            border-radius: 3px;
-            transition: width 0.3s ease;
+        .vertical-progress-bar {
+            width: 100%;
+            height: 0%;
+            background: linear-gradient(to top, #16c79a, #0f3460);
+            border-radius: 0 0 13px 13px;
+            transition: height 0.3s ease;
+        }
+
+        .vertical-progress-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: #aaa;
+            white-space: nowrap;
         }
 
         .time-display {
@@ -571,19 +592,21 @@
         /* Statistics styles */
         .start-buttons {
             display: flex;
-            gap: 1rem;
+            flex-direction: column;
+            gap: 0.75rem;
             align-items: center;
         }
 
         #stats-btn {
-            padding: 0.8rem 1.5rem;
-            font-size: 1rem;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
             border: 2px solid #0f3460;
             border-radius: 8px;
             background: transparent;
             color: #0f3460;
             cursor: pointer;
             transition: all 0.2s;
+            margin-top: 0.5rem;
         }
 
         #stats-btn:hover {
@@ -787,8 +810,8 @@
 
     <div class="start-buttons">
         <button id="start-btn">Start Learning</button>
-        <button id="stats-btn">Statistics</button>
     </div>
+    <button id="stats-btn">Statistics</button>
 </div>
 
 <div id="stats-overlay">
@@ -823,12 +846,13 @@
 </div>
 
 <div id="game-screen">
+    <div class="vertical-progress-container" id="vertical-progress-container">
+        <div class="vertical-progress-bar" id="vertical-progress-bar"></div>
+        <div class="vertical-progress-label" id="vertical-progress-label">0/10</div>
+    </div>
     <div class="level-display">
         <div class="phase-badge learning" id="phase-badge">Learning</div>
         <div class="level-info">Level <span id="current-level">1</span></div>
-        <div class="level-progress-container">
-            <div class="level-progress-bar" id="level-progress-bar" style="width: 0%"></div>
-        </div>
         <div class="time-display">Time: <span id="time-display">10</span>s</div>
     </div>
     <div class="score-display">Score: <span id="current-score">0</span></div>
@@ -969,13 +993,14 @@
         localStorage.setItem('waffley_progress', JSON.stringify(allProgress));
     }
 
-    // Switch to a different language - reset to level 1
+    // Switch to a different language - load that language's saved progress
     function switchLanguageProgress(newLang) {
         // Save current language progress first
         saveProgress();
-        // Reset to level 1 for the new language
-        totalCorrectAnswers = 0;
-        currentCycle = 1;
+        // Load the new language's progress (distinct time/level per language)
+        const newProgress = getLanguageProgress(newLang);
+        totalCorrectAnswers = newProgress.totalAnswers;
+        currentCycle = newProgress.currentCycle;
     }
 
     // ========== STATISTICS SYSTEM ==========
@@ -1326,7 +1351,8 @@
     // Level system elements
     const phaseBadge = document.getElementById('phase-badge');
     const currentLevelEl = document.getElementById('current-level');
-    const levelProgressBar = document.getElementById('level-progress-bar');
+    const verticalProgressBar = document.getElementById('vertical-progress-bar');
+    const verticalProgressLabel = document.getElementById('vertical-progress-label');
     const timeDisplayEl = document.getElementById('time-display');
     const levelUpOverlay = document.getElementById('level-up-overlay');
     const levelUpTitle = document.getElementById('level-up-title');
@@ -1483,7 +1509,11 @@
         const progress = getLevelProgress(totalCorrectAnswers);
 
         currentLevelEl.textContent = levelInCycle;
-        levelProgressBar.style.width = (progress / ANSWERS_PER_LEVEL * 100) + '%';
+
+        // Update vertical progress bar
+        verticalProgressBar.style.height = (progress / ANSWERS_PER_LEVEL * 100) + '%';
+        verticalProgressLabel.textContent = `${progress}/${ANSWERS_PER_LEVEL}`;
+
         timeDisplayEl.textContent = getTimeLimitSeconds(totalCorrectAnswers);
 
         // Update phase badge
