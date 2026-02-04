@@ -8,21 +8,23 @@ The game progresses through three phases, each lasting 100 correct answers:
 
 | Phase | Answers | Timer | Button Style | Input Method |
 |-------|---------|-------|--------------|--------------|
-| **Learning Mode** | 1-100 | 10s → 1s | Colour fill + text | Click |
-| **Practice Mode** | 101-200 | 10s → 1s | Text only (no colour) | Click |
-| **Speech Mode** | 201-300 | 10s → 1s | None | Voice only |
+| **Learning Mode** | 1-100 | 10s → 2s | Colour fill + text | Click |
+| **Practice Mode** | 101-200 | 10s → 2s | Text only (no colour) | Click |
+| **Speech Mode** | 201-300 | 10s → 2s | None | Voice only |
 
 After completing all 300 answers, the cycle repeats with 2 additional colours added.
 
 **Levels:** 1 level = 10 correct answers (30 levels per cycle)
 
-**Time progression:** Starts at 10 seconds, decreases by 1 second every 10 correct answers (every level), minimum 1 second.
+**Time progression:** Starts at 10 seconds, decreases by 2 seconds every level (every 10 correct answers). Minimum 2 seconds. Time resets to 10 seconds at the start of each phase.
 
-**Colour progression:**
-- Cycle 1: 5 colours (red, green, blue, yellow, orange)
-- Cycle 2: 7 colours (+pink, purple)
-- Cycle 3: 9 colours (+brown, grey)
-- Cycle 4: 11 colours (+black, white)
+**Colour selection:** Every level, 5 colours are randomly selected from a pool of 9 colours (red, green, blue, yellow, orange, pink, purple, brown, grey). This keeps each level fresh and unpredictable.
+
+**Colour expansion (by cycle):**
+- Cycle 1: 5 colours selected from pool of 9
+- Cycle 2: 7 colours (+pink, purple in selection)
+- Cycle 3: 9 colours (+brown, grey in selection)
+- Cycle 4: 11 colours (+black, white in selection)
 - Cycle 5+: All 11 colours
 
 ---
@@ -287,12 +289,71 @@ Track and display lifetime statistics.
 
 ---
 
+## Feature 8: Audio Pronunciation (Optional Toggle)
+
+Optional setting to play audio recording of colour word when showing a new colour.
+
+### Task 8.1: Settings Toggle
+- [ ] Add "Play Sound" toggle switch on start screen
+- [ ] Store setting in localStorage
+- [ ] Default to OFF (opt-in feature)
+- [ ] Visual indicator showing current state (speaker icon)
+
+### Task 8.2: Audio Assets
+- [ ] Record or source native speaker audio for each colour in each language
+- [ ] Store audio files (MP3/OGG) in `/audio/{lang}/{colour}.mp3` structure
+- [ ] Fallback: Use Web Speech API TTS if audio files unavailable
+
+### Task 8.3: Audio Playback System
+- [ ] Create `playColorAudio(color, language)` function
+- [ ] Only play if toggle is enabled
+- [ ] Preload audio files for current language on game start
+- [ ] Handle audio loading errors gracefully
+
+### Task 8.4: Integration with Game Flow
+- [ ] Play audio when new colour is displayed in `nextRound()` (if enabled)
+- [ ] Option to replay audio (speaker icon button during round)
+- [ ] Disable audio in Speech Mode (to avoid giving away answer)
+
+---
+
+## Feature 9: Emoji Learning Mode
+
+Expand beyond colours to teach other vocabulary using emojis as visual cues.
+
+### Task 9.1: Emoji Categories
+- [ ] Define emoji-word mappings for adjectives:
+  ```javascript
+  const EMOJI_ADJECTIVES = {
+    happy: '😊', sad: '😢', angry: '😠', tired: '😴',
+    surprised: '😮', scared: '😨', excited: '🤩', bored: '😑'
+  };
+  ```
+- [ ] Add translations for each adjective in all supported languages
+
+### Task 9.2: Category Selection
+- [ ] Add category selector on start screen (Colours, Adjectives, etc.)
+- [ ] Store selected category in game state
+- [ ] Load appropriate word set based on category
+
+### Task 9.3: Emoji Display Mode
+- [ ] Replace colour square with emoji display for non-colour categories
+- [ ] Scale emoji appropriately for visibility
+- [ ] Maintain same button/answer mechanic
+
+### Task 9.4: Future Categories
+- [ ] Animals (🐕 dog, 🐈 cat, 🐘 elephant, etc.)
+- [ ] Food (🍎 apple, 🍕 pizza, 🍞 bread, etc.)
+- [ ] Weather (☀️ sunny, 🌧️ rainy, ❄️ snowy, etc.)
+- [ ] Numbers with visual counting (1️⃣, 2️⃣, etc.)
+
+---
+
 ## Future Considerations
 
 - Achievement badges for milestones
 - Multiple save slots for different learners
 - Daily streaks/goals
 - Spaced repetition for difficult colours
-- Audio pronunciation of colour words (Text-to-Speech)
 - Leaderboard (if adding backend)
 - Export/import progress data

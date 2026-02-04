@@ -443,6 +443,12 @@
             margin-bottom: 0.5rem;
         }
 
+        .level-up-info {
+            font-size: 0.95rem;
+            color: #16c79a;
+            margin-bottom: 0.5rem;
+        }
+
         .level-up-time {
             font-size: 1rem;
             color: #e94560;
@@ -849,6 +855,7 @@
     <div class="level-up-title" id="level-up-title">Level Up!</div>
     <div class="level-up-message" id="level-up-message">You reached Level 2</div>
     <div class="level-up-phase" id="level-up-phase"></div>
+    <div class="level-up-info" id="level-up-info"></div>
     <div class="level-up-time" id="level-up-time"></div>
     <div class="level-up-countdown" id="level-up-countdown">3</div>
 </div>
@@ -891,7 +898,7 @@
     const PHASES = ['Learning', 'Practice', 'Speech'];
     const PHASE_CLASSES = ['learning', 'practice', 'speech'];
     const MAX_TIME = 10; // seconds
-    const MIN_TIME = 1;  // seconds
+    const MIN_TIME = 2;  // seconds (floor for time limit)
 
     // Colour pools by cycle - 2 new colours added each cycle
     const CYCLE_COLORS = {
@@ -900,6 +907,8 @@
         3: ['red', 'green', 'blue', 'yellow', 'orange', 'pink', 'purple', 'brown', 'grey'],
         4: ['red', 'green', 'blue', 'yellow', 'orange', 'pink', 'purple', 'brown', 'grey', 'black', 'white']
     };
+    // Full pool of colours to randomly select from each level
+    const ALL_COLORS = ['red', 'green', 'blue', 'yellow', 'orange', 'pink', 'purple', 'brown', 'grey'];
     const MAX_CYCLE_WITH_NEW_COLORS = 4;
     const NEW_COLORS_PER_CYCLE = {
         2: ['pink', 'purple'],
@@ -915,29 +924,58 @@
         it: 'Italian', cy: 'Welsh', pt: 'Portuguese'
     };
 
-    // Load saved progress from localStorage
-    function loadProgress() {
+    // Load all language progress from localStorage
+    function loadAllProgress() {
         const saved = localStorage.getItem('waffley_progress');
         if (saved) {
             try {
                 const data = JSON.parse(saved);
-                return {
-                    totalAnswers: data.totalAnswers || 0,
-                    currentCycle: data.currentCycle || 1
-                };
+                // Handle migration from old single-language format
+                if (data.totalAnswers !== undefined && !data.languages) {
+                    // Migrate old format: assign old progress to Spanish (default)
+                    return {
+                        languages: {
+                            es: { totalAnswers: data.totalAnswers || 0, currentCycle: data.currentCycle || 1 }
+                        }
+                    };
+                }
+                return data;
             } catch (e) {
-                return { totalAnswers: 0, currentCycle: 1 };
+                return { languages: {} };
             }
+        }
+        return { languages: {} };
+    }
+
+    // Get progress for a specific language
+    function getLanguageProgress(lang) {
+        const allProgress = loadAllProgress();
+        if (allProgress.languages && allProgress.languages[lang]) {
+            return allProgress.languages[lang];
         }
         return { totalAnswers: 0, currentCycle: 1 };
     }
 
-    // Save progress to localStorage
+    // Save progress for the current language to localStorage
     function saveProgress() {
-        localStorage.setItem('waffley_progress', JSON.stringify({
+        const allProgress = loadAllProgress();
+        if (!allProgress.languages) {
+            allProgress.languages = {};
+        }
+        allProgress.languages[selectedLanguage] = {
             totalAnswers: totalCorrectAnswers,
             currentCycle: currentCycle
-        }));
+        };
+        localStorage.setItem('waffley_progress', JSON.stringify(allProgress));
+    }
+
+    // Switch to a different language - reset to level 1
+    function switchLanguageProgress(newLang) {
+        // Save current language progress first
+        saveProgress();
+        // Reset to level 1 for the new language
+        totalCorrectAnswers = 0;
+        currentCycle = 1;
     }
 
     // ========== STATISTICS SYSTEM ==========
@@ -1005,7 +1043,7 @@
         updateStatsDisplay();
     }
 
-    // Reset level progress (back to Level 1)
+    // Reset level progress for current language (back to Level 1)
     function resetProgress() {
         totalCorrectAnswers = 0;
         currentCycle = 1;
@@ -1014,9 +1052,21 @@
         updateStatsDisplay();
     }
 
+    // Get total correct answers across all languages
+    function getTotalCorrectAllLanguages() {
+        const allProgress = loadAllProgress();
+        let total = 0;
+        if (allProgress.languages) {
+            Object.values(allProgress.languages).forEach(langProgress => {
+                total += langProgress.totalAnswers || 0;
+            });
+        }
+        return total;
+    }
+
     // Update the statistics overlay display
     function updateStatsDisplay() {
-        document.getElementById('stats-total-correct').textContent = totalCorrectAnswers;
+        document.getElementById('stats-total-correct').textContent = getTotalCorrectAllLanguages();
         document.getElementById('stats-highest-cycle').textContent = stats.highestCycle;
         document.getElementById('stats-best-streak').textContent = stats.bestStreak;
         document.getElementById('stats-games-played').textContent = stats.gamesPlayed;
@@ -1076,6 +1126,20 @@
         return CYCLE_COLORS[cycle].slice();
     }
 
+    // Randomly select new colors from the full pool
+    // Keeps the same count as current cycle allows, but picks randomly from ALL_COLORS
+    function randomizeActiveColors() {
+        const colorCount = activeColors.length;
+        const pool = ALL_COLORS.slice();
+        // Fisher-Yates shuffle the pool
+        for (let i = pool.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [pool[i], pool[j]] = [pool[j], pool[i]];
+        }
+        // Take the first N colors from shuffled pool
+        activeColors = pool.slice(0, colorCount);
+    }
+
     // Check if cycle just completed
     function checkCycleComplete(previousAnswers, currentAnswers) {
         const previousCycle = getCycleFromAnswers(previousAnswers);
@@ -1119,10 +1183,10 @@
 
     // Calculate time limit based on level within phase
     // Time resets to 10s at start of each phase (Learning, Practice, Speech)
-    // Level 1 = 10s, Level 2 = 9s, ..., Level 10 = 1s
+    // Level 1 = 10s, Level 2 = 8s, Level 3 = 6s, Level 4 = 4s, Level 5+ = 2s
     function getTimeLimit(answers) {
         const levelInPhase = getLevelWithinPhase(answers);
-        const timeInSeconds = Math.max(MIN_TIME, MAX_TIME - (levelInPhase - 1));
+        const timeInSeconds = Math.max(MIN_TIME, MAX_TIME - (levelInPhase - 1) * 2);
         return timeInSeconds * 1000; // return in milliseconds
     }
 
@@ -1241,8 +1305,8 @@
     let timeLimit = 10000;
     let responseTimes = [];
 
-    // Level system state
-    const savedProgress = loadProgress();
+    // Level system state - load progress for default language (Spanish)
+    const savedProgress = getLanguageProgress(selectedLanguage);
     let totalCorrectAnswers = savedProgress.totalAnswers;
     let currentCycle = savedProgress.currentCycle;
     let levelUpPending = false;
@@ -1268,6 +1332,7 @@
     const levelUpTitle = document.getElementById('level-up-title');
     const levelUpMessage = document.getElementById('level-up-message');
     const levelUpPhase = document.getElementById('level-up-phase');
+    const levelUpInfo = document.getElementById('level-up-info');
     const levelUpTime = document.getElementById('level-up-time');
     const levelUpCountdown = document.getElementById('level-up-countdown');
     const startLevelEl = document.getElementById('start-level');
@@ -1457,10 +1522,14 @@
             levelUpPhase.textContent = '';
         }
 
+        // Always show info about colors shuffling
+        levelUpInfo.textContent = 'New colours selected!';
+
+        // Always show current time limit, highlight if changed
         if (timeChanged) {
-            levelUpTime.textContent = `Time decreased to ${newTimeSeconds} second${newTimeSeconds !== 1 ? 's' : ''}!`;
+            levelUpTime.textContent = `Time: ${newTimeSeconds}s (-2 seconds)`;
         } else {
-            levelUpTime.textContent = '';
+            levelUpTime.textContent = `Time: ${newTimeSeconds}s`;
         }
 
         levelUpOverlay.classList.add('active');
@@ -1552,12 +1621,31 @@
     // ========== INITIALIZATION ==========
     updateStartScreenProgress();
 
+    // Handle page restoration from bfcache (back-forward cache)
+    // When browser restores page from cache, reload progress from localStorage
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) {
+            // Page was restored from bfcache - reload current language's progress
+            const freshProgress = getLanguageProgress(selectedLanguage);
+            totalCorrectAnswers = freshProgress.totalAnswers;
+            currentCycle = freshProgress.currentCycle;
+            updateStartScreenProgress();
+        }
+    });
+
     // Language selection
     document.querySelectorAll('.language-btn').forEach(btn => {
         btn.addEventListener('click', () => {
+            const newLang = btn.dataset.lang;
+            if (newLang !== selectedLanguage) {
+                // Switch to the new language's progress
+                switchLanguageProgress(newLang);
+                selectedLanguage = newLang;
+                // Update the UI to show the new language's progress
+                updateStartScreenProgress();
+            }
             document.querySelectorAll('.language-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
-            selectedLanguage = btn.dataset.lang;
         });
     });
 
@@ -1582,7 +1670,8 @@
     });
 
     document.getElementById('reset-progress-btn').addEventListener('click', () => {
-        if (confirm('Are you sure you want to reset your level progress? You will start back at Level 1 with 10 seconds. This cannot be undone.')) {
+        const langName = LANGUAGE_NAMES[selectedLanguage];
+        if (confirm(`Are you sure you want to reset your ${langName} progress? You will start back at Level 1 with 10 seconds. Other languages are not affected.`)) {
             resetProgress();
             hideStats();
         }
@@ -1741,6 +1830,9 @@
                 const newCycle = getCycleFromAnswers(totalCorrectAnswers);
                 showCycleComplete(completedCycle, newCycle);
             } else if (checkLevelUp(previousAnswers, totalCorrectAnswers)) {
+                // Randomize which colors appear on level-up for variety
+                randomizeActiveColors();
+                generateButtons();
                 showLevelUp(getLevelWithinCycle(totalCorrectAnswers), previousAnswers, totalCorrectAnswers);
             } else {
                 nextRound();
