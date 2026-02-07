@@ -1651,15 +1651,25 @@
     // ========== INITIALIZATION ==========
     updateStartScreenProgress();
 
+    // Refresh progress from localStorage to ensure time display is current
+    function refreshProgressFromStorage() {
+        const freshProgress = getLanguageProgress(selectedLanguage);
+        totalCorrectAnswers = freshProgress.totalAnswers;
+        currentCycle = freshProgress.currentCycle;
+        updateStartScreenProgress();
+    }
+
     // Handle page restoration from bfcache (back-forward cache)
-    // When browser restores page from cache, reload progress from localStorage
     window.addEventListener('pageshow', function(event) {
         if (event.persisted) {
-            // Page was restored from bfcache - reload current language's progress
-            const freshProgress = getLanguageProgress(selectedLanguage);
-            totalCorrectAnswers = freshProgress.totalAnswers;
-            currentCycle = freshProgress.currentCycle;
-            updateStartScreenProgress();
+            refreshProgressFromStorage();
+        }
+    });
+
+    // Refresh when user tabs back to the page
+    document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible' && startScreen.classList.contains('active')) {
+            refreshProgressFromStorage();
         }
     });
 
@@ -1686,7 +1696,8 @@
             stopListening();
             recognition = null;
         }
-        updateStartScreenProgress();
+        // Refresh progress from storage to ensure time is current
+        refreshProgressFromStorage();
         show(startScreen);
     });
 
