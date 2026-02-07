@@ -203,6 +203,67 @@
             letter-spacing: 0.1em;
         }
 
+        /* Audio toggle switch */
+        .audio-toggle-container {
+            margin-bottom: 1.5rem;
+        }
+
+        .audio-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .audio-toggle input {
+            display: none;
+        }
+
+        .audio-toggle-slider {
+            width: 44px;
+            height: 24px;
+            background: #444;
+            border-radius: 12px;
+            position: relative;
+            transition: background 0.3s;
+        }
+
+        .audio-toggle-slider::before {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: #fff;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            transition: transform 0.3s;
+        }
+
+        .audio-toggle input:checked + .audio-toggle-slider {
+            background: #16c79a;
+        }
+
+        .audio-toggle input:checked + .audio-toggle-slider::before {
+            transform: translateX(20px);
+        }
+
+        .audio-toggle-icon {
+            font-size: 1.2rem;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+
+        .audio-toggle input:checked ~ .audio-toggle-icon {
+            opacity: 1;
+        }
+
+        .audio-toggle-label {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
         .score-display {
             position: absolute;
             top: 1rem;
@@ -800,6 +861,15 @@
         <button class="language-btn" data-lang="pt">Portuguese</button>
     </div>
 
+    <div class="audio-toggle-container">
+        <label class="audio-toggle">
+            <input type="checkbox" id="audio-toggle-input">
+            <span class="audio-toggle-slider"></span>
+            <span class="audio-toggle-icon">🔊</span>
+            <span class="audio-toggle-label">Play pronunciation</span>
+        </label>
+    </div>
+
     <div class="progress-display" id="progress-display">
         <div class="progress-title">Your Progress</div>
         <div class="progress-level">Level <span id="start-level">1</span> - <span id="start-phase">Learning</span></div>
@@ -1337,6 +1407,37 @@
     let levelUpPending = false;
     let cycleCompletePending = false;
 
+    // ========== AUDIO PRONUNCIATION ==========
+    let audioEnabled = localStorage.getItem('waffley_audio') === 'true';
+    const speechSynthesis = window.speechSynthesis;
+    const ttsSupported = 'speechSynthesis' in window;
+
+    function saveAudioSetting(enabled) {
+        localStorage.setItem('waffley_audio', enabled ? 'true' : 'false');
+        audioEnabled = enabled;
+    }
+
+    function speakColor(color, language) {
+        if (!audioEnabled || !ttsSupported) return;
+        // Don't speak in Speech Mode (would give away the answer)
+        const levelInCycle = getLevelWithinCycle(totalCorrectAnswers);
+        if (getPhase(levelInCycle) === 2) return;
+
+        const word = TRANSLATIONS[language][color];
+        if (!word) return;
+
+        // Cancel any ongoing speech
+        speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(word);
+        utterance.lang = SPEECH_LANG_CODES[language] || 'es-ES';
+        utterance.rate = 0.9;
+        utterance.pitch = 1;
+        utterance.volume = 1;
+
+        speechSynthesis.speak(utterance);
+    }
+
     // ========== DOM ELEMENTS ==========
     const startScreen = document.getElementById('start-screen');
     const gameScreen = document.getElementById('game-screen');
@@ -1347,6 +1448,7 @@
     const currentScoreEl = document.getElementById('current-score');
     const finalScore = document.getElementById('final-score');
     const endMessage = document.getElementById('end-message');
+    const audioToggleInput = document.getElementById('audio-toggle-input');
 
     // Level system elements
     const phaseBadge = document.getElementById('phase-badge');
@@ -1651,6 +1753,12 @@
     // ========== INITIALIZATION ==========
     updateStartScreenProgress();
 
+    // Initialize audio toggle from saved setting
+    audioToggleInput.checked = audioEnabled;
+    audioToggleInput.addEventListener('change', function() {
+        saveAudioSetting(this.checked);
+    });
+
     // Refresh progress from localStorage to ensure time display is current
     function refreshProgressFromStorage() {
         const freshProgress = getLanguageProgress(selectedLanguage);
@@ -1814,6 +1922,9 @@
 
         currentColor = newColor;
         colorDisplay.style.backgroundColor = COLOR_CSS[currentColor];
+
+        // Speak the color word if audio is enabled
+        speakColor(currentColor, selectedLanguage);
 
         shuffleButtons();
 
