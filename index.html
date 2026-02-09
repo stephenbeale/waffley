@@ -264,7 +264,15 @@
         }
 
         .audio-toggle input {
-            display: none;
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .audio-toggle input:focus-visible + .audio-toggle-slider {
+            outline: 2px solid #16c79a;
+            outline-offset: 2px;
         }
 
         .audio-toggle-slider {
