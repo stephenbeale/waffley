@@ -68,6 +68,15 @@
             border-radius: 20px;
             margin-bottom: 2rem;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .color-display.emoji-display {
+            font-size: 6rem;
+            background: transparent !important;
+            box-shadow: none;
         }
 
         #timer-bar-container {
@@ -201,6 +210,44 @@
             margin-bottom: 0.5rem;
             text-transform: uppercase;
             letter-spacing: 0.1em;
+        }
+
+        .category-selector {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            justify-content: center;
+        }
+
+        .category-btn {
+            padding: 0.6rem 1.2rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: 2px solid #444;
+            border-radius: 6px;
+            background: transparent;
+            color: #aaa;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .category-btn:hover {
+            border-color: #666;
+            color: #fff;
+        }
+
+        .category-btn.selected {
+            border-color: #16c79a;
+            background: #16c79a;
+            color: #fff;
+        }
+
+        /* Emoji display (replaces colour square for emoji categories) */
+        .emoji-display {
+            font-size: 5rem;
+            line-height: 1;
+            text-align: center;
+            margin: 1rem 0;
         }
 
         /* Audio toggle switch */
@@ -861,6 +908,12 @@
         <button class="language-btn" data-lang="pt">Portuguese</button>
     </div>
 
+    <div class="setting-label">Category</div>
+    <div class="category-selector">
+        <button class="category-btn selected" data-category="colours">🎨 Colours</button>
+        <button class="category-btn" data-category="adjectives">😊 Adjectives</button>
+    </div>
+
     <div class="audio-toggle-container">
         <label class="audio-toggle">
             <input type="checkbox" id="audio-toggle-input">
@@ -1221,18 +1274,26 @@
         return CYCLE_COLORS[cycle].slice();
     }
 
-    // Randomly select new colors from the full pool
-    // Keeps the same count as current cycle allows, but picks randomly from ALL_COLORS
+    // Randomly select new items from the full pool
     function randomizeActiveColors() {
-        const colorCount = activeColors.length;
+        const count = activeColors.length;
         const pool = ALL_COLORS.slice();
         // Fisher-Yates shuffle the pool
         for (let i = pool.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [pool[i], pool[j]] = [pool[j], pool[i]];
         }
-        // Take the first N colors from shuffled pool
-        activeColors = pool.slice(0, colorCount);
+        activeColors = pool.slice(0, count);
+
+        // Also shuffle emoji items if in emoji mode
+        if (selectedCategory !== 'colours' && EMOJI_DATA[selectedCategory]) {
+            const emojiPool = EMOJI_DATA[selectedCategory].items.slice();
+            for (let i = emojiPool.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [emojiPool[i], emojiPool[j]] = [emojiPool[j], emojiPool[i]];
+            }
+            EMOJI_DATA[selectedCategory].items = emojiPool;
+        }
     }
 
     // Check if cycle just completed
@@ -1342,6 +1403,48 @@
         grey: '#6c757d', black: '#212529', white: '#f8f9fa'
     };
 
+    // ========== EMOJI CATEGORIES ==========
+    const CATEGORIES = {
+        colours: { label: 'Colours', icon: '🎨' },
+        adjectives: { label: 'Adjectives', icon: '😊' }
+    };
+
+    const EMOJI_DATA = {
+        adjectives: {
+            items: ['happy', 'sad', 'angry', 'tired', 'surprised', 'scared', 'excited', 'bored', 'cold'],
+            emojis: {
+                happy: '😊', sad: '😢', angry: '😠', tired: '😴',
+                surprised: '😮', scared: '😨', excited: '🤩', bored: '😑', cold: '🥶'
+            },
+            translations: {
+                es: {
+                    happy: 'Feliz', sad: 'Triste', angry: 'Enfadado', tired: 'Cansado',
+                    surprised: 'Sorprendido', scared: 'Asustado', excited: 'Emocionado', bored: 'Aburrido', cold: 'Frío'
+                },
+                fr: {
+                    happy: 'Heureux', sad: 'Triste', angry: 'En colère', tired: 'Fatigué',
+                    surprised: 'Surpris', scared: 'Effrayé', excited: 'Excité', bored: 'Ennuyé', cold: 'Froid'
+                },
+                de: {
+                    happy: 'Glücklich', sad: 'Traurig', angry: 'Wütend', tired: 'Müde',
+                    surprised: 'Überrascht', scared: 'Ängstlich', excited: 'Aufgeregt', bored: 'Gelangweilt', cold: 'Kalt'
+                },
+                it: {
+                    happy: 'Felice', sad: 'Triste', angry: 'Arrabbiato', tired: 'Stanco',
+                    surprised: 'Sorpreso', scared: 'Spaventato', excited: 'Entusiasta', bored: 'Annoiato', cold: 'Freddo'
+                },
+                cy: {
+                    happy: 'Hapus', sad: 'Trist', angry: 'Blin', tired: 'Blinedig',
+                    surprised: 'Syn', scared: 'Ofnus', excited: 'Cyffrous', bored: 'Diflas', cold: 'Oer'
+                },
+                pt: {
+                    happy: 'Feliz', sad: 'Triste', angry: 'Zangado', tired: 'Cansado',
+                    surprised: 'Surpreso', scared: 'Assustado', excited: 'Entusiasmado', bored: 'Aborrecido', cold: 'Frio'
+                }
+            }
+        }
+    };
+
     // ========== SPEECH RECOGNITION ==========
     const SPEECH_LANG_CODES = {
         es: 'es-ES', fr: 'fr-FR', de: 'de-DE',
@@ -1406,6 +1509,29 @@
     let currentCycle = savedProgress.currentCycle;
     let levelUpPending = false;
     let cycleCompletePending = false;
+    let selectedCategory = 'colours';
+
+    // Helper: get current items and translations based on category
+    function getCategoryItems() {
+        if (selectedCategory === 'colours') {
+            return activeColors;
+        }
+        return EMOJI_DATA[selectedCategory].items.slice(0, activeColors.length);
+    }
+
+    function getCategoryTranslation(item) {
+        if (selectedCategory === 'colours') {
+            return TRANSLATIONS[selectedLanguage][item];
+        }
+        return EMOJI_DATA[selectedCategory].translations[selectedLanguage][item];
+    }
+
+    function getCategoryDisplay(item) {
+        if (selectedCategory === 'colours') {
+            return null; // use CSS background color
+        }
+        return EMOJI_DATA[selectedCategory].emojis[item];
+    }
 
     // ========== AUDIO PRONUNCIATION ==========
     let audioEnabled = localStorage.getItem('waffley_audio') === 'true';
@@ -1423,7 +1549,7 @@
         const levelInCycle = getLevelWithinCycle(totalCorrectAnswers);
         if (getPhase(levelInCycle) === 2) return;
 
-        const word = TRANSLATIONS[language][color];
+        const word = getCategoryTranslation(color);
         if (!word) return;
 
         // Cancel any ongoing speech
@@ -1797,6 +1923,15 @@
         });
     });
 
+    // Category selection
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            selectedCategory = btn.dataset.category;
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        });
+    });
+
     document.getElementById('start-btn').addEventListener('click', startGame);
     document.getElementById('restart-btn').addEventListener('click', () => {
         // Clean up speech recognition
@@ -1856,6 +1991,10 @@
         buttonsContainer.innerHTML = '';
         const levelInCycle = getLevelWithinCycle(totalCorrectAnswers);
         const phase = getPhase(levelInCycle);
+        const items = getCategoryItems();
+        const isEmojiMode = selectedCategory !== 'colours';
+        const promptText = isEmojiMode ? 'What does this emoji mean?' : 'What colour is this?';
+        const speechPrompt = isEmojiMode ? 'Say the word!' : 'Say the colour!';
 
         // Speech mode: hide buttons and show speech UI
         if (phase === 2) {
@@ -1863,40 +2002,40 @@
                 buttonsContainer.style.display = 'none';
                 speechUI.classList.add('active');
                 speechWarning.classList.remove('visible');
-                promptLabel.textContent = 'Say the colour!';
+                promptLabel.textContent = speechPrompt;
             } else {
                 // Fall back to Practice mode if speech not supported
                 showSpeechFallback();
             }
         } else {
-            buttonsContainer.style.display = 'grid';
+            buttonsContainer.style.display = 'flex';
             speechUI.classList.remove('active');
             speechWarning.classList.remove('visible');
-            promptLabel.textContent = 'What colour is this?';
+            promptLabel.textContent = promptText;
         }
 
-        activeColors.forEach(color => {
+        items.forEach(item => {
             const btn = document.createElement('button');
             btn.className = 'answer-btn';
-            btn.dataset.color = color;
-            btn.textContent = TRANSLATIONS[selectedLanguage][color];
+            btn.dataset.color = item;
+            btn.textContent = getCategoryTranslation(item);
 
-            // Apply styling based on current phase
-            if (phase === 0) {
-                // Learning mode: show colored backgrounds
+            // Apply styling based on current phase and category
+            if (phase === 0 && !isEmojiMode) {
+                // Learning mode: show colored backgrounds (colours only)
                 btn.classList.add('learning-mode');
-                btn.style.backgroundColor = COLOR_CSS[color];
+                btn.style.backgroundColor = COLOR_CSS[item];
                 // Ensure text is readable on light colors
-                if (color === 'yellow' || color === 'white') {
+                if (item === 'yellow' || item === 'white') {
                     btn.style.color = '#222';
                     btn.style.textShadow = 'none';
                 }
             } else {
-                // Practice mode (and Speech mode fallback): neutral backgrounds
+                // Practice mode, Speech fallback, or emoji categories: neutral backgrounds
                 btn.classList.add('practice-mode');
             }
 
-            btn.addEventListener('click', () => handleAnswer(color));
+            btn.addEventListener('click', () => handleAnswer(item));
             buttonsContainer.appendChild(btn);
         });
     }
@@ -1914,16 +2053,28 @@
         // Update time limit based on current level
         timeLimit = getTimeLimit(totalCorrectAnswers);
 
-        // Pick a random color different from current
+        // Pick a random item different from current
+        const items = getCategoryItems();
         let newColor;
         do {
-            newColor = activeColors[Math.floor(Math.random() * activeColors.length)];
-        } while (newColor === currentColor && activeColors.length > 1);
+            newColor = items[Math.floor(Math.random() * items.length)];
+        } while (newColor === currentColor && items.length > 1);
 
         currentColor = newColor;
-        colorDisplay.style.backgroundColor = COLOR_CSS[currentColor];
 
-        // Speak the color word if audio is enabled
+        // Display: emoji or colour
+        const emoji = getCategoryDisplay(currentColor);
+        if (emoji) {
+            colorDisplay.style.backgroundColor = 'transparent';
+            colorDisplay.textContent = emoji;
+            colorDisplay.classList.add('emoji-display');
+        } else {
+            colorDisplay.textContent = '';
+            colorDisplay.classList.remove('emoji-display');
+            colorDisplay.style.backgroundColor = COLOR_CSS[currentColor];
+        }
+
+        // Speak the word if audio is enabled
         speakColor(currentColor, selectedLanguage);
 
         shuffleButtons();
@@ -2036,7 +2187,11 @@
         }
 
         if (score === 0) {
-            endMessage.textContent = `The colour was ${TRANSLATIONS[selectedLanguage][currentColor]} (${currentColor})`;
+            const answerWord = getCategoryTranslation(currentColor);
+            const answerEmoji = getCategoryDisplay(currentColor);
+            endMessage.textContent = answerEmoji
+                ? `The answer was ${answerWord} ${answerEmoji} (${currentColor})`
+                : `The colour was ${answerWord} (${currentColor})`;
         } else if (score < 5) {
             endMessage.textContent = 'Good start! Keep practising!';
         } else if (score < 10) {
