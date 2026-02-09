@@ -1780,13 +1780,27 @@
     }
 
     function matchColorFromSpeech(word) {
-        const aliases = COLOR_ALIASES[selectedLanguage];
-        if (!aliases) return null;
+        const items = getCategoryItems();
+        const lowerWord = word.toLowerCase();
 
-        for (const color of activeColors) {
-            const colorAliases = aliases[color];
-            if (colorAliases && colorAliases.some(alias => alias.toLowerCase() === word.toLowerCase())) {
-                return color;
+        // For colours, check the dedicated aliases first
+        if (selectedCategory === 'colours') {
+            const aliases = COLOR_ALIASES[selectedLanguage];
+            if (aliases) {
+                for (const color of items) {
+                    const colorAliases = aliases[color];
+                    if (colorAliases && colorAliases.some(alias => alias.toLowerCase() === lowerWord)) {
+                        return color;
+                    }
+                }
+            }
+        }
+
+        // Match against category translations (works for all categories)
+        for (const item of items) {
+            const translation = getCategoryTranslation(item);
+            if (translation && translation.toLowerCase() === lowerWord) {
+                return item;
             }
         }
         return null;
