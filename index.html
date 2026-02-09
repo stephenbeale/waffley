@@ -912,6 +912,9 @@
     <div class="category-selector">
         <button class="category-btn selected" data-category="colours">🎨 Colours</button>
         <button class="category-btn" data-category="adjectives">😊 Adjectives</button>
+        <button class="category-btn" data-category="animals">🐾 Animals</button>
+        <button class="category-btn" data-category="food">🍎 Food</button>
+        <button class="category-btn" data-category="weather">☀️ Weather</button>
     </div>
 
     <div class="audio-toggle-container">
@@ -1406,7 +1409,10 @@
     // ========== EMOJI CATEGORIES ==========
     const CATEGORIES = {
         colours: { label: 'Colours', icon: '🎨' },
-        adjectives: { label: 'Adjectives', icon: '😊' }
+        adjectives: { label: 'Adjectives', icon: '😊' },
+        animals: { label: 'Animals', icon: '🐾' },
+        food: { label: 'Food', icon: '🍎' },
+        weather: { label: 'Weather', icon: '☀️' }
     };
 
     const EMOJI_DATA = {
@@ -1440,6 +1446,105 @@
                 pt: {
                     happy: 'Feliz', sad: 'Triste', angry: 'Zangado', tired: 'Cansado',
                     surprised: 'Surpreso', scared: 'Assustado', excited: 'Entusiasmado', bored: 'Aborrecido', cold: 'Frio'
+                }
+            }
+        },
+        animals: {
+            items: ['dog', 'cat', 'elephant', 'bird', 'fish', 'horse', 'rabbit', 'bear', 'monkey'],
+            emojis: {
+                dog: '🐕', cat: '🐈', elephant: '🐘', bird: '🐦',
+                fish: '🐟', horse: '🐴', rabbit: '🐇', bear: '🐻', monkey: '🐒'
+            },
+            translations: {
+                es: {
+                    dog: 'Perro', cat: 'Gato', elephant: 'Elefante', bird: 'Pájaro',
+                    fish: 'Pez', horse: 'Caballo', rabbit: 'Conejo', bear: 'Oso', monkey: 'Mono'
+                },
+                fr: {
+                    dog: 'Chien', cat: 'Chat', elephant: 'Éléphant', bird: 'Oiseau',
+                    fish: 'Poisson', horse: 'Cheval', rabbit: 'Lapin', bear: 'Ours', monkey: 'Singe'
+                },
+                de: {
+                    dog: 'Hund', cat: 'Katze', elephant: 'Elefant', bird: 'Vogel',
+                    fish: 'Fisch', horse: 'Pferd', rabbit: 'Kaninchen', bear: 'Bär', monkey: 'Affe'
+                },
+                it: {
+                    dog: 'Cane', cat: 'Gatto', elephant: 'Elefante', bird: 'Uccello',
+                    fish: 'Pesce', horse: 'Cavallo', rabbit: 'Coniglio', bear: 'Orso', monkey: 'Scimmia'
+                },
+                cy: {
+                    dog: 'Ci', cat: 'Cath', elephant: 'Eliffant', bird: 'Aderyn',
+                    fish: 'Pysgodyn', horse: 'Ceffyl', rabbit: 'Cwningen', bear: 'Arth', monkey: 'Mwnci'
+                },
+                pt: {
+                    dog: 'Cão', cat: 'Gato', elephant: 'Elefante', bird: 'Pássaro',
+                    fish: 'Peixe', horse: 'Cavalo', rabbit: 'Coelho', bear: 'Urso', monkey: 'Macaco'
+                }
+            }
+        },
+        food: {
+            items: ['apple', 'pizza', 'bread', 'cheese', 'egg', 'cake', 'grape', 'banana', 'rice'],
+            emojis: {
+                apple: '🍎', pizza: '🍕', bread: '🍞', cheese: '🧀',
+                egg: '🥚', cake: '🎂', grape: '🍇', banana: '🍌', rice: '🍚'
+            },
+            translations: {
+                es: {
+                    apple: 'Manzana', pizza: 'Pizza', bread: 'Pan', cheese: 'Queso',
+                    egg: 'Huevo', cake: 'Pastel', grape: 'Uva', banana: 'Plátano', rice: 'Arroz'
+                },
+                fr: {
+                    apple: 'Pomme', pizza: 'Pizza', bread: 'Pain', cheese: 'Fromage',
+                    egg: 'Œuf', cake: 'Gâteau', grape: 'Raisin', banana: 'Banane', rice: 'Riz'
+                },
+                de: {
+                    apple: 'Apfel', pizza: 'Pizza', bread: 'Brot', cheese: 'Käse',
+                    egg: 'Ei', cake: 'Kuchen', grape: 'Traube', banana: 'Banane', rice: 'Reis'
+                },
+                it: {
+                    apple: 'Mela', pizza: 'Pizza', bread: 'Pane', cheese: 'Formaggio',
+                    egg: 'Uovo', cake: 'Torta', grape: 'Uva', banana: 'Banana', rice: 'Riso'
+                },
+                cy: {
+                    apple: 'Afal', pizza: 'Pizza', bread: 'Bara', cheese: 'Caws',
+                    egg: 'Wy', cake: 'Cacen', grape: 'Grawnwin', banana: 'Banana', rice: 'Reis'
+                },
+                pt: {
+                    apple: 'Maçã', pizza: 'Pizza', bread: 'Pão', cheese: 'Queijo',
+                    egg: 'Ovo', cake: 'Bolo', grape: 'Uva', banana: 'Banana', rice: 'Arroz'
+                }
+            }
+        },
+        weather: {
+            items: ['sunny', 'rainy', 'snowy', 'windy', 'cloudy', 'stormy', 'hot', 'foggy', 'rainbow'],
+            emojis: {
+                sunny: '☀️', rainy: '🌧️', snowy: '❄️', windy: '💨',
+                cloudy: '☁️', stormy: '⛈️', hot: '🔥', foggy: '🌫️', rainbow: '🌈'
+            },
+            translations: {
+                es: {
+                    sunny: 'Soleado', rainy: 'Lluvioso', snowy: 'Nevado', windy: 'Ventoso',
+                    cloudy: 'Nublado', stormy: 'Tormentoso', hot: 'Caliente', foggy: 'Neblinoso', rainbow: 'Arcoíris'
+                },
+                fr: {
+                    sunny: 'Ensoleillé', rainy: 'Pluvieux', snowy: 'Neigeux', windy: 'Venteux',
+                    cloudy: 'Nuageux', stormy: 'Orageux', hot: 'Chaud', foggy: 'Brumeux', rainbow: 'Arc-en-ciel'
+                },
+                de: {
+                    sunny: 'Sonnig', rainy: 'Regnerisch', snowy: 'Schneeig', windy: 'Windig',
+                    cloudy: 'Bewölkt', stormy: 'Stürmisch', hot: 'Heiß', foggy: 'Neblig', rainbow: 'Regenbogen'
+                },
+                it: {
+                    sunny: 'Soleggiato', rainy: 'Piovoso', snowy: 'Nevoso', windy: 'Ventoso',
+                    cloudy: 'Nuvoloso', stormy: 'Tempestoso', hot: 'Caldo', foggy: 'Nebbioso', rainbow: 'Arcobaleno'
+                },
+                cy: {
+                    sunny: 'Heulog', rainy: 'Glawog', snowy: 'Eirlyd', windy: 'Gwyntog',
+                    cloudy: 'Cymylog', stormy: 'Stormus', hot: 'Poeth', foggy: 'Niwlog', rainbow: 'Enfys'
+                },
+                pt: {
+                    sunny: 'Ensolarado', rainy: 'Chuvoso', snowy: 'Nevado', windy: 'Ventoso',
+                    cloudy: 'Nublado', stormy: 'Tempestuoso', hot: 'Quente', foggy: 'Nevoeiro', rainbow: 'Arco-íris'
                 }
             }
         }
