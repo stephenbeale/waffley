@@ -1615,13 +1615,15 @@
     let timeLimit = 10000;
     let responseTimes = [];
 
+    // Category must be declared before getLanguageProgress (which uses it as default)
+    let selectedCategory = 'colours';
+
     // Level system state - load progress for default language (Spanish)
     const savedProgress = getLanguageProgress(selectedLanguage);
     let totalCorrectAnswers = savedProgress.totalAnswers;
     let currentCycle = savedProgress.currentCycle;
     let levelUpPending = false;
     let cycleCompletePending = false;
-    let selectedCategory = 'colours';
 
     // Helper: get current items and translations based on category
     function getCategoryItems() {
