@@ -1097,22 +1097,29 @@
         return { languages: {} };
     }
 
-    // Get progress for a specific language
-    function getLanguageProgress(lang) {
+    // Progress key combines language + category for separate tracking
+    function getProgressKey(lang, category) {
+        return category === 'colours' ? lang : `${lang}_${category}`;
+    }
+
+    // Get progress for a specific language and category
+    function getLanguageProgress(lang, category) {
+        const key = getProgressKey(lang, category || selectedCategory);
         const allProgress = loadAllProgress();
-        if (allProgress.languages && allProgress.languages[lang]) {
-            return allProgress.languages[lang];
+        if (allProgress.languages && allProgress.languages[key]) {
+            return allProgress.languages[key];
         }
         return { totalAnswers: 0, currentCycle: 1 };
     }
 
-    // Save progress for the current language to localStorage
+    // Save progress for the current language + category to localStorage
     function saveProgress() {
+        const key = getProgressKey(selectedLanguage, selectedCategory);
         const allProgress = loadAllProgress();
         if (!allProgress.languages) {
             allProgress.languages = {};
         }
-        allProgress.languages[selectedLanguage] = {
+        allProgress.languages[key] = {
             totalAnswers: totalCorrectAnswers,
             currentCycle: currentCycle
         };
@@ -1121,10 +1128,10 @@
 
     // Switch to a different language - load that language's saved progress
     function switchLanguageProgress(newLang) {
-        // Save current language progress first
+        // Save current language + category progress first
         saveProgress();
-        // Load the new language's progress (distinct time/level per language)
-        const newProgress = getLanguageProgress(newLang);
+        // Load the new language's progress for current category
+        const newProgress = getLanguageProgress(newLang, selectedCategory);
         totalCorrectAnswers = newProgress.totalAnswers;
         currentCycle = newProgress.currentCycle;
     }
@@ -2031,7 +2038,16 @@
     // Category selection
     document.querySelectorAll('.category-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            selectedCategory = btn.dataset.category;
+            const newCategory = btn.dataset.category;
+            if (newCategory !== selectedCategory) {
+                // Save current category progress, switch, load new
+                saveProgress();
+                selectedCategory = newCategory;
+                const newProgress = getLanguageProgress(selectedLanguage, newCategory);
+                totalCorrectAnswers = newProgress.totalAnswers;
+                currentCycle = newProgress.currentCycle;
+                updateStartScreenProgress();
+            }
             document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
         });
