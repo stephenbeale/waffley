@@ -1660,6 +1660,41 @@
     const speechSynthesis = window.speechSynthesis;
     const ttsSupported = 'speechSynthesis' in window;
 
+    // Cache best voice per language for consistent, high-quality TTS
+    const voiceCache = {};
+
+    function getBestVoice(langCode) {
+        if (voiceCache[langCode]) return voiceCache[langCode];
+
+        const voices = speechSynthesis.getVoices();
+        if (!voices.length) return null;
+
+        const langPrefix = langCode.split('-')[0];
+
+        // Find voices matching this language
+        const matching = voices.filter(v =>
+            v.lang === langCode || v.lang.startsWith(langPrefix + '-')
+        );
+        if (!matching.length) return null;
+
+        // Prefer online/cloud voices (higher quality), then native-named voices
+        const online = matching.filter(v => !v.localService);
+        if (online.length) {
+            voiceCache[langCode] = online[0];
+            return online[0];
+        }
+
+        voiceCache[langCode] = matching[0];
+        return matching[0];
+    }
+
+    // Voices load asynchronously in some browsers - refresh cache when ready
+    if (ttsSupported) {
+        speechSynthesis.onvoiceschanged = () => {
+            Object.keys(voiceCache).forEach(k => delete voiceCache[k]);
+        };
+    }
+
     function saveAudioSetting(enabled) {
         localStorage.setItem('waffley_audio', enabled ? 'true' : 'false');
         audioEnabled = enabled;
@@ -1677,9 +1712,17 @@
         // Cancel any ongoing speech
         speechSynthesis.cancel();
 
+        const langCode = SPEECH_LANG_CODES[language] || 'es-ES';
         const utterance = new SpeechSynthesisUtterance(word);
-        utterance.lang = SPEECH_LANG_CODES[language] || 'es-ES';
-        utterance.rate = 0.9;
+        utterance.lang = langCode;
+
+        // Use the best available voice for this language
+        const voice = getBestVoice(langCode);
+        if (voice) {
+            utterance.voice = voice;
+        }
+
+        utterance.rate = 0.85;
         utterance.pitch = 1;
         utterance.volume = 1;
 
