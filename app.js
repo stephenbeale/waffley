@@ -120,18 +120,32 @@
         return sessionScore > 0 && sessionScore > stats.bestStreak;
     }
 
-    // Reset all statistics
+    // Reset all statistics and all progress
     function resetStats() {
         stats = getDefaultStats();
         saveStats();
+        // Also clear all progress for all languages/categories
+        localStorage.removeItem('waffley_progress');
+        totalCorrectAnswers = 0;
+        currentCycle = 1;
+        updateStartScreenProgress();
         updateStatsDisplay();
     }
 
-    // Reset level progress for current language (back to Level 1)
+    // Reset level progress for current language (all categories back to Level 1)
     function resetProgress() {
+        const allProgress = loadAllProgress();
+        if (allProgress.languages) {
+            // Remove all keys for the selected language
+            const categories = ['colours', 'adjectives', 'animals', 'food', 'weather'];
+            categories.forEach(cat => {
+                const key = getProgressKey(selectedLanguage, cat);
+                delete allProgress.languages[key];
+            });
+            localStorage.setItem('waffley_progress', JSON.stringify(allProgress));
+        }
         totalCorrectAnswers = 0;
         currentCycle = 1;
-        saveProgress();
         updateStartScreenProgress();
         updateStatsDisplay();
     }
