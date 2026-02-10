@@ -1730,13 +1730,19 @@
         );
         if (!matching.length) return null;
 
-        // Prefer online/cloud voices (higher quality), then native-named voices
-        const online = matching.filter(v => !v.localService);
-        if (online.length) {
-            voiceCache[langCode] = online[0];
-            return online[0];
+        // Score voices: prefer natural/neural > online/cloud > local
+        function voiceScore(v) {
+            const name = v.name.toLowerCase();
+            // Natural/Neural voices (Edge, Chrome 110+) sound most human
+            if (name.includes('natural') || name.includes('neural')) return 3;
+            // Online/cloud voices are next best
+            if (!v.localService) return 2;
+            // Local enhanced voices (e.g. "enhanced" on macOS)
+            if (name.includes('enhanced') || name.includes('premium')) return 1;
+            return 0;
         }
 
+        matching.sort((a, b) => voiceScore(b) - voiceScore(a));
         voiceCache[langCode] = matching[0];
         return matching[0];
     }
@@ -1785,7 +1791,7 @@
                 utterance.voice = voice;
             }
 
-            utterance.rate = 0.85;
+            utterance.rate = 0.8;
             utterance.pitch = 1;
             utterance.volume = 1;
 
