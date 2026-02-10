@@ -328,6 +328,12 @@
             color: #e94560;
         }
 
+        .game-language-flag {
+            font-size: 1.4rem;
+            margin-right: 0.3rem;
+            vertical-align: middle;
+        }
+
         #game-screen {
             position: relative;
         }
@@ -908,12 +914,12 @@
 
     <div class="setting-label">I want to learn</div>
     <div class="language-selector">
-        <button class="language-btn selected" data-lang="es">Spanish</button>
-        <button class="language-btn" data-lang="fr">French</button>
-        <button class="language-btn" data-lang="de">German</button>
-        <button class="language-btn" data-lang="it">Italian</button>
-        <button class="language-btn" data-lang="cy">Welsh</button>
-        <button class="language-btn" data-lang="pt">Portuguese</button>
+        <button class="language-btn selected" data-lang="es">🇪🇸 Spanish</button>
+        <button class="language-btn" data-lang="fr">🇫🇷 French</button>
+        <button class="language-btn" data-lang="de">🇩🇪 German</button>
+        <button class="language-btn" data-lang="it">🇮🇹 Italian</button>
+        <button class="language-btn" data-lang="cy">🏴󠁧󠁢󠁷󠁬󠁳󠁿 Welsh</button>
+        <button class="language-btn" data-lang="pt">🇵🇹 Portuguese</button>
     </div>
 
     <div class="setting-label">Category</div>
@@ -989,7 +995,7 @@
         <div class="level-info">Level <span id="current-level">1</span></div>
         <div class="time-display">Time: <span id="time-display">10</span>s</div>
     </div>
-    <div class="score-display">Score: <span id="current-score">0</span></div>
+    <div class="score-display"><span class="game-language-flag" id="game-language-flag">🇪🇸</span> Score: <span id="current-score">0</span></div>
     <div class="prompt-label" id="prompt-label">What colour is this?</div>
     <div class="color-display" id="color-display"></div>
     <div class="speech-ui" id="speech-ui">
@@ -1080,6 +1086,11 @@
     const LANGUAGE_NAMES = {
         es: 'Spanish', fr: 'French', de: 'German',
         it: 'Italian', cy: 'Welsh', pt: 'Portuguese'
+    };
+
+    const LANGUAGE_FLAGS = {
+        es: '🇪🇸', fr: '🇫🇷', de: '🇩🇪',
+        it: '🇮🇹', cy: '🏴󠁧󠁢󠁷󠁬󠁳󠁿', pt: '🇵🇹'
     };
 
     // Load all language progress from localStorage
@@ -1740,6 +1751,7 @@
     const finalScore = document.getElementById('final-score');
     const endMessage = document.getElementById('end-message');
     const audioToggleInput = document.getElementById('audio-toggle-input');
+    const gameLangFlag = document.getElementById('game-language-flag');
 
     // Level system elements
     const phaseBadge = document.getElementById('phase-badge');
@@ -2169,6 +2181,7 @@
             recognition = initSpeechRecognition();
         }
 
+        gameLangFlag.textContent = LANGUAGE_FLAGS[selectedLanguage] || '';
         generateButtons();
         updateLevelDisplay();
         show(gameScreen);
