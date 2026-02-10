@@ -19,7 +19,7 @@
             user-select: none;
         }
 
-        #start-screen, #game-screen, #end-screen {
+        #language-screen, #topic-screen, #game-screen, #end-screen {
             display: none;
             flex-direction: column;
             align-items: center;
@@ -29,7 +29,7 @@
             padding: 2rem;
         }
 
-        #start-screen.active, #game-screen.active, #end-screen.active {
+        #language-screen.active, #topic-screen.active, #game-screen.active, #end-screen.active {
             display: flex;
         }
 
@@ -77,6 +77,16 @@
             font-size: 6rem;
             background: transparent !important;
             box-shadow: none;
+        }
+
+        .reinforcement-label {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #fff;
+            margin-top: 0.5rem;
+            min-height: 1.8rem;
+            text-transform: capitalize;
+            opacity: 0.85;
         }
 
         #timer-bar-container {
@@ -182,8 +192,8 @@
         }
 
         .language-btn {
-            padding: 0.6rem 1.2rem;
-            font-size: 0.95rem;
+            padding: 0.8rem 1.5rem;
+            font-size: 1.1rem;
             font-weight: 600;
             border: 2px solid #444;
             border-radius: 6px;
@@ -201,6 +211,30 @@
         .language-btn.selected {
             border-color: #0f3460;
             background: #0f3460;
+            color: #fff;
+        }
+
+        .topic-header {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: #fff;
+        }
+
+        .back-btn {
+            padding: 0.5rem 1.2rem;
+            font-size: 0.9rem;
+            border: 2px solid #444;
+            border-radius: 6px;
+            background: transparent;
+            color: #aaa;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 1rem;
+        }
+
+        .back-btn:hover {
+            border-color: #666;
             color: #fff;
         }
 
@@ -905,7 +939,7 @@
 </head>
 <body>
 
-<div id="start-screen" class="active">
+<div id="language-screen" class="active">
     <h1>Waffley</h1>
     <p class="instructions">
         Learn colour words in a new language!<br><br>
@@ -914,21 +948,12 @@
 
     <div class="setting-label">I want to learn</div>
     <div class="language-selector">
-        <button class="language-btn selected" data-lang="es">🇪🇸 Spanish</button>
+        <button class="language-btn" data-lang="es">🇪🇸 Spanish</button>
         <button class="language-btn" data-lang="fr">🇫🇷 French</button>
         <button class="language-btn" data-lang="de">🇩🇪 German</button>
         <button class="language-btn" data-lang="it">🇮🇹 Italian</button>
         <button class="language-btn" data-lang="cy">🏴󠁧󠁢󠁷󠁬󠁳󠁿 Welsh</button>
         <button class="language-btn" data-lang="pt">🇵🇹 Portuguese</button>
-    </div>
-
-    <div class="setting-label">Category</div>
-    <div class="category-selector">
-        <button class="category-btn selected" data-category="colours">🎨 Colours</button>
-        <button class="category-btn" data-category="adjectives">😊 Adjectives</button>
-        <button class="category-btn" data-category="animals">🐾 Animals</button>
-        <button class="category-btn" data-category="food">🍎 Food</button>
-        <button class="category-btn" data-category="weather">☀️ Weather</button>
     </div>
 
     <div class="audio-toggle-container">
@@ -938,6 +963,21 @@
             <span class="audio-toggle-icon">🔊</span>
             <span class="audio-toggle-label">Play pronunciation</span>
         </label>
+    </div>
+
+    <button id="stats-btn">Statistics</button>
+</div>
+
+<div id="topic-screen">
+    <div class="topic-header" id="topic-header">🇪🇸 Spanish</div>
+
+    <div class="setting-label">Category</div>
+    <div class="category-selector">
+        <button class="category-btn selected" data-category="colours">🎨 Colours</button>
+        <button class="category-btn" data-category="adjectives">😊 Adjectives</button>
+        <button class="category-btn" data-category="animals">🐾 Animals</button>
+        <button class="category-btn" data-category="food">🍎 Food</button>
+        <button class="category-btn" data-category="weather">☀️ Weather</button>
     </div>
 
     <div class="progress-display" id="progress-display">
@@ -951,7 +991,7 @@
     <div class="start-buttons">
         <button id="start-btn">Start Learning</button>
     </div>
-    <button id="stats-btn">Statistics</button>
+    <button class="back-btn" id="back-btn">Back</button>
 </div>
 
 <div id="stats-overlay">
@@ -998,6 +1038,7 @@
     <div class="score-display"><span class="game-language-flag" id="game-language-flag">🇪🇸</span> Score: <span id="current-score">0</span></div>
     <div class="prompt-label" id="prompt-label">What colour is this?</div>
     <div class="color-display" id="color-display"></div>
+    <div class="reinforcement-label" id="reinforcement-label"></div>
     <div class="speech-ui" id="speech-ui">
         <div class="mic-indicator">
             <div class="mic-icon" id="mic-icon"></div>
@@ -1667,7 +1708,8 @@
     }
 
     // ========== AUDIO PRONUNCIATION ==========
-    let audioEnabled = localStorage.getItem('waffley_audio') === 'true';
+    const savedAudio = localStorage.getItem('waffley_audio');
+    let audioEnabled = savedAudio === null ? true : savedAudio === 'true';
     const speechSynthesis = window.speechSynthesis;
     const ttsSupported = 'speechSynthesis' in window;
 
@@ -1704,12 +1746,16 @@
         speechSynthesis.onvoiceschanged = () => {
             Object.keys(voiceCache).forEach(k => delete voiceCache[k]);
         };
+        // Eagerly trigger voice loading
+        speechSynthesis.getVoices();
     }
 
     function saveAudioSetting(enabled) {
         localStorage.setItem('waffley_audio', enabled ? 'true' : 'false');
         audioEnabled = enabled;
     }
+
+    let speakTimeout = null;
 
     function speakColor(color, language) {
         if (!audioEnabled || !ttsSupported) return;
@@ -1720,30 +1766,39 @@
         const word = getCategoryTranslation(color);
         if (!word) return;
 
-        // Cancel any ongoing speech
+        // Cancel any ongoing speech and pending speak calls
+        if (speakTimeout) clearTimeout(speakTimeout);
         speechSynthesis.cancel();
 
         const langCode = SPEECH_LANG_CODES[language] || 'es-ES';
-        const utterance = new SpeechSynthesisUtterance(word);
-        utterance.lang = langCode;
 
-        // Use the best available voice for this language
-        const voice = getBestVoice(langCode);
-        if (voice) {
-            utterance.voice = voice;
-        }
+        // Small delay after cancel() to work around Chrome TTS race condition
+        // where the engine may use the wrong voice if speak() follows cancel() immediately
+        speakTimeout = setTimeout(() => {
+            const utterance = new SpeechSynthesisUtterance(word);
+            utterance.lang = langCode;
 
-        utterance.rate = 0.85;
-        utterance.pitch = 1;
-        utterance.volume = 1;
+            // Always try to set an explicit voice - relying only on lang attribute
+            // causes some browsers to fall back to English pronunciation
+            const voice = getBestVoice(langCode);
+            if (voice) {
+                utterance.voice = voice;
+            }
 
-        speechSynthesis.speak(utterance);
+            utterance.rate = 0.85;
+            utterance.pitch = 1;
+            utterance.volume = 1;
+
+            speechSynthesis.speak(utterance);
+        }, 50);
     }
 
     // ========== DOM ELEMENTS ==========
-    const startScreen = document.getElementById('start-screen');
+    const languageScreen = document.getElementById('language-screen');
+    const topicScreen = document.getElementById('topic-screen');
     const gameScreen = document.getElementById('game-screen');
     const endScreen = document.getElementById('end-screen');
+    const topicHeader = document.getElementById('topic-header');
     const colorDisplay = document.getElementById('color-display');
     const timerBar = document.getElementById('timer-bar');
     const buttonsContainer = document.getElementById('buttons-container');
@@ -1752,6 +1807,7 @@
     const endMessage = document.getElementById('end-message');
     const audioToggleInput = document.getElementById('audio-toggle-input');
     const gameLangFlag = document.getElementById('game-language-flag');
+    const reinforcementLabel = document.getElementById('reinforcement-label');
 
     // Level system elements
     const phaseBadge = document.getElementById('phase-badge');
@@ -2093,24 +2149,25 @@
 
     // Refresh when user tabs back to the page
     document.addEventListener('visibilitychange', function() {
-        if (document.visibilityState === 'visible' && startScreen.classList.contains('active')) {
+        if (document.visibilityState === 'visible' && topicScreen.classList.contains('active')) {
             refreshProgressFromStorage();
         }
     });
 
-    // Language selection
+    // Language selection - clicking a language advances to topic screen
     document.querySelectorAll('.language-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const newLang = btn.dataset.lang;
             if (newLang !== selectedLanguage) {
-                // Switch to the new language's progress
                 switchLanguageProgress(newLang);
                 selectedLanguage = newLang;
-                // Update the UI to show the new language's progress
-                updateStartScreenProgress();
             }
             document.querySelectorAll('.language-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
+            // Update topic screen header with selected language
+            topicHeader.textContent = `${LANGUAGE_FLAGS[selectedLanguage]} ${LANGUAGE_NAMES[selectedLanguage]}`;
+            updateStartScreenProgress();
+            show(topicScreen);
         });
     });
 
@@ -2141,7 +2198,7 @@
         }
         // Refresh progress from storage to ensure time is current
         refreshProgressFromStorage();
-        show(startScreen);
+        show(topicScreen);
     });
 
     // Statistics button handlers
@@ -2153,6 +2210,11 @@
         }
     });
 
+    // Back button on topic screen
+    document.getElementById('back-btn').addEventListener('click', () => {
+        show(languageScreen);
+    });
+
     document.getElementById('reset-progress-btn').addEventListener('click', () => {
         const langName = LANGUAGE_NAMES[selectedLanguage];
         if (confirm(`Are you sure you want to reset your ${langName} progress? You will start back at Level 1 with 10 seconds. Other languages are not affected.`)) {
@@ -2162,7 +2224,7 @@
     });
 
     function show(screen) {
-        [startScreen, gameScreen, endScreen].forEach(s => s.classList.remove('active'));
+        [languageScreen, topicScreen, gameScreen, endScreen].forEach(s => s.classList.remove('active'));
         screen.classList.add('active');
     }
 
@@ -2273,6 +2335,14 @@
             colorDisplay.textContent = '';
             colorDisplay.classList.remove('emoji-display');
             colorDisplay.style.backgroundColor = COLOR_CSS[currentColor];
+        }
+
+        // Show reinforcement label in level 1 of learning phase for non-colour categories
+        const levelInCycle = getLevelWithinCycle(totalCorrectAnswers);
+        if (selectedCategory !== 'colours' && getPhase(levelInCycle) === 0 && getLevelWithinPhase(totalCorrectAnswers) === 1) {
+            reinforcementLabel.textContent = getCategoryTranslation(currentColor);
+        } else {
+            reinforcementLabel.textContent = '';
         }
 
         // Speak the word if audio is enabled
