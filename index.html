@@ -1746,16 +1746,12 @@
         speechSynthesis.onvoiceschanged = () => {
             Object.keys(voiceCache).forEach(k => delete voiceCache[k]);
         };
-        // Eagerly trigger voice loading
-        speechSynthesis.getVoices();
     }
 
     function saveAudioSetting(enabled) {
         localStorage.setItem('waffley_audio', enabled ? 'true' : 'false');
         audioEnabled = enabled;
     }
-
-    let speakTimeout = null;
 
     function speakColor(color, language) {
         if (!audioEnabled || !ttsSupported) return;
@@ -1766,31 +1762,24 @@
         const word = getCategoryTranslation(color);
         if (!word) return;
 
-        // Cancel any ongoing speech and pending speak calls
-        if (speakTimeout) clearTimeout(speakTimeout);
+        // Cancel any ongoing speech
         speechSynthesis.cancel();
 
         const langCode = SPEECH_LANG_CODES[language] || 'es-ES';
+        const utterance = new SpeechSynthesisUtterance(word);
+        utterance.lang = langCode;
 
-        // Small delay after cancel() to work around Chrome TTS race condition
-        // where the engine may use the wrong voice if speak() follows cancel() immediately
-        speakTimeout = setTimeout(() => {
-            const utterance = new SpeechSynthesisUtterance(word);
-            utterance.lang = langCode;
+        // Use the best available voice for this language
+        const voice = getBestVoice(langCode);
+        if (voice) {
+            utterance.voice = voice;
+        }
 
-            // Always try to set an explicit voice - relying only on lang attribute
-            // causes some browsers to fall back to English pronunciation
-            const voice = getBestVoice(langCode);
-            if (voice) {
-                utterance.voice = voice;
-            }
+        utterance.rate = 0.85;
+        utterance.pitch = 1;
+        utterance.volume = 1;
 
-            utterance.rate = 0.85;
-            utterance.pitch = 1;
-            utterance.volume = 1;
-
-            speechSynthesis.speak(utterance);
-        }, 50);
+        speechSynthesis.speak(utterance);
     }
 
     // ========== DOM ELEMENTS ==========
