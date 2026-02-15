@@ -394,6 +394,15 @@
         speechSynthesis.speak(utterance);
     }
 
+    function warmUpSpeech() {
+        if (!audioEnabled || !ttsSupported) return;
+        speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance('');
+        utterance.lang = SPEECH_LANG_CODES[selectedLanguage] || 'es-ES';
+        utterance.volume = 0;
+        speechSynthesis.speak(utterance);
+    }
+
     // ========== DOM ELEMENTS ==========
     const languageScreen = document.getElementById('language-screen');
     const topicScreen = document.getElementById('topic-screen');
@@ -648,6 +657,7 @@
             count--;
             if (count > 0) {
                 levelUpCountdown.textContent = count;
+                if (count === 1) warmUpSpeech();
             } else {
                 clearInterval(countdownInterval);
                 levelUpOverlay.classList.remove('active');
@@ -707,6 +717,7 @@
             count--;
             if (count > 0) {
                 cycleCompleteCountdown.textContent = count;
+                if (count === 1) warmUpSpeech();
             } else {
                 clearInterval(countdownInterval);
                 cycleCompleteOverlay.classList.remove('active');
@@ -790,7 +801,10 @@
         });
     });
 
-    document.getElementById('start-btn').addEventListener('click', startGame);
+    document.getElementById('start-btn').addEventListener('click', () => {
+        warmUpSpeech();
+        startGame();
+    });
     document.getElementById('restart-btn').addEventListener('click', () => {
         // Clean up speech recognition
         if (recognition) {
