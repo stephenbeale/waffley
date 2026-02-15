@@ -1044,7 +1044,7 @@
                 showSpeechFallback();
             }
         } else {
-            buttonsContainer.style.display = 'flex';
+            buttonsContainer.style.display = 'grid';
             speechUI.classList.remove('active');
             speechWarning.classList.remove('visible');
             promptLabel.textContent = promptText;
