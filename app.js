@@ -403,6 +403,46 @@
         speechSynthesis.speak(utterance);
     }
 
+    // ========== SOUND EFFECTS (Web Audio API) ==========
+    let audioCtx = null;
+
+    function getAudioContext() {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        return audioCtx;
+    }
+
+    function playCorrectSound() {
+        if (!audioEnabled) return;
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(523, ctx.currentTime);      // C5
+        osc.frequency.setValueAtTime(659, ctx.currentTime + 0.1); // E5
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.2);
+    }
+
+    function playWrongSound() {
+        if (!audioEnabled) return;
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(200, ctx.currentTime);
+        osc.frequency.setValueAtTime(150, ctx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.3);
+    }
+
     // ========== DOM ELEMENTS ==========
     const languageScreen = document.getElementById('language-screen');
     const topicScreen = document.getElementById('topic-screen');
@@ -1006,6 +1046,7 @@
             responseTimes.push(performance.now() - timerStart);
             score++;
             currentScoreEl.textContent = score;
+            playCorrectSound();
 
             // Track total correct answers and check for level-up or cycle completion
             const previousAnswers = totalCorrectAnswers;
@@ -1032,6 +1073,7 @@
     }
 
     function endGame() {
+        playWrongSound();
         clearTimeout(timeout);
         cancelAnimationFrame(timerRAF);
 
