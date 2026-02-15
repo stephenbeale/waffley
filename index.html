@@ -94,7 +94,7 @@
     <button class="back-btn" id="back-btn">Back</button>
 </div>
 
-<div id="stats-overlay">
+<div id="stats-overlay" role="dialog" aria-label="Statistics">
     <div class="stats-title">Your Statistics</div>
     <div class="stats-grid">
         <div class="stats-card">
@@ -127,10 +127,10 @@
 
 <div id="game-screen">
     <div class="game-controls">
-        <button class="game-control-btn" id="pause-btn" title="Pause">⏸</button>
-        <button class="game-control-btn" id="quit-btn" title="Quit">✕</button>
+        <button class="game-control-btn" id="pause-btn" title="Pause" aria-label="Pause game">⏸</button>
+        <button class="game-control-btn" id="quit-btn" title="Quit" aria-label="Quit game">✕</button>
     </div>
-    <div class="vertical-progress-container" id="vertical-progress-container">
+    <div class="vertical-progress-container" id="vertical-progress-container" role="progressbar" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" aria-label="Mastery progress">
         <div class="vertical-progress-bar" id="vertical-progress-bar"></div>
         <div class="vertical-progress-label" id="vertical-progress-label">0/0</div>
     </div>
@@ -141,7 +141,7 @@
     </div>
     <div class="score-display"><span class="game-language-flag" id="game-language-flag">🇪🇸</span> Score: <span id="current-score">0</span></div>
     <div class="prompt-label" id="prompt-label">What colour is this?</div>
-    <div class="color-display" id="color-display"></div>
+    <div class="color-display" id="color-display" aria-label="Identify this item" role="img"></div>
     <div class="reinforcement-label" id="reinforcement-label"></div>
     <div class="speech-ui" id="speech-ui">
         <div class="mic-indicator">
@@ -154,13 +154,13 @@
         Voice input requires a browser with Web Speech API support (Chrome, Edge) and microphone permission.
         Falling back to Practice Mode buttons.
     </div>
-    <div id="timer-bar-container">
+    <div id="timer-bar-container" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-label="Time remaining">
         <div id="timer-bar"></div>
     </div>
     <div class="buttons" id="buttons-container"></div>
 </div>
 
-<div id="pause-overlay">
+<div id="pause-overlay" role="dialog" aria-label="Game paused">
     <div class="pause-title">Paused</div>
     <div class="pause-buttons">
         <button id="resume-btn">Resume</button>
@@ -168,7 +168,7 @@
     </div>
 </div>
 
-<div id="level-up-overlay">
+<div id="level-up-overlay" role="dialog" aria-label="Level up">
     <div class="level-up-title" id="level-up-title">Level Up!</div>
     <div class="level-up-streak" id="level-up-streak"></div>
     <div class="level-up-message" id="level-up-message">You reached Level 2</div>
@@ -179,7 +179,7 @@
     <div class="level-up-countdown" id="level-up-countdown">3</div>
 </div>
 
-<div id="cycle-complete-overlay">
+<div id="cycle-complete-overlay" role="dialog" aria-label="Cycle complete">
     <div class="cycle-complete-title">Cycle Complete!</div>
     <div class="cycle-complete-message" id="cycle-complete-message">You finished Cycle 1!</div>
     <div class="cycle-complete-colors" id="cycle-complete-colors">New colours unlocked!</div>

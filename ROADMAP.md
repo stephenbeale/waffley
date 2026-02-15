@@ -52,7 +52,7 @@ Planned features and improvements for Waffley.
 - [x] **Restore focus indicators**
   Replace `outline: none` on `.answer-btn:focus` with a visible custom focus style for keyboard users.
 
-- [ ] **Add ARIA labels to interactive elements**
+- [x] **Add ARIA labels to interactive elements**
   Add `role="dialog"` on overlays, `aria-label` on the colour display, `role="progressbar"` with value attributes on progress bars.
 
 - [ ] **Guard against timer race conditions**

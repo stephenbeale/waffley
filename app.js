@@ -671,6 +671,11 @@
         verticalProgressBar.style.height = pct + '%';
         verticalProgressLabel.textContent = `${mastered}/${total}`;
 
+        // Update ARIA attributes on progress container
+        const progressContainer = document.getElementById('vertical-progress-container');
+        progressContainer.setAttribute('aria-valuemax', total);
+        progressContainer.setAttribute('aria-valuenow', mastered);
+
         timeDisplayEl.textContent = getTimeLimitSeconds();
 
         // Update phase badge
