@@ -49,7 +49,7 @@ Planned features and improvements for Waffley.
 
 ### Priority 1 — Fix what's broken
 
-- [ ] **Restore focus indicators**
+- [x] **Restore focus indicators**
   Replace `outline: none` on `.answer-btn:focus` with a visible custom focus style for keyboard users.
 
 - [ ] **Add ARIA labels to interactive elements**
