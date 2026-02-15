@@ -16,11 +16,14 @@ Planned features and improvements for Waffley.
 - [ ] **Mastery-based level progression**
   Level-up should only happen once every word in the current set has been answered correctly at least twice, however long it takes. Remove the fixed answer-count threshold and instead track per-word correct counts within the level. The timer still applies per round, but the level continues until mastery is achieved.
 
-- [ ] **Show the user the plan and progress**
+- [x] **Show the user the plan and progress**
   Tell the user what the learning plan is and make their progression through it clearer.
 
-- [ ] **Make the 3 stages clearer**
+- [x] **Make the 3 stages clearer**
   Make the 3 stages of Learning, Practising and Output (speech) clearer to the user so they understand the journey.
+
+- [ ] **Add a Typing phase before Speech**
+  Introduce a new phase between Practice and Speech where users type the answer instead of selecting it. This bridges the gap between recognition (picking from options) and production (speaking aloud), reinforcing spelling and recall before the user is asked to speak.
 
 - [ ] **Level selection for new languages**
   Give users the option to choose their starting level when beginning a new language or when continuing.
