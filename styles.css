@@ -350,7 +350,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 
 .score-display {
     position: absolute;
-    top: 1rem;
+    top: 3.5rem;
     right: 1rem;
     font-size: 1.5rem;
     font-weight: 700;
@@ -568,6 +568,103 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     font-size: 0.8rem;
     color: #aaa;
     margin-top: 0.3rem;
+}
+
+/* Game controls (pause/quit) */
+.game-controls {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    gap: 0.5rem;
+    z-index: 10;
+}
+
+.game-control-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: transparent;
+    border: 2px solid #444;
+    color: #aaa;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    padding: 0;
+    line-height: 1;
+}
+
+.game-control-btn:hover {
+    border-color: #888;
+    color: #fff;
+}
+
+/* Pause overlay */
+#pause-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(26, 26, 46, 0.95);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+#pause-overlay.active {
+    display: flex;
+}
+
+.pause-title {
+    font-size: 3rem;
+    font-weight: 900;
+    color: #fff;
+    margin-bottom: 2rem;
+}
+
+.pause-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+}
+
+#resume-btn {
+    padding: 1rem 3rem;
+    font-size: 1.3rem;
+    border: none;
+    border-radius: 8px;
+    background: #e94560;
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.2s;
+}
+
+#resume-btn:hover {
+    background: #c73651;
+    transform: scale(1.05);
+}
+
+.pause-quit-btn {
+    padding: 0.5rem 1.2rem;
+    font-size: 0.9rem;
+    border: 2px solid #444;
+    border-radius: 6px;
+    background: transparent;
+    color: #aaa;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.pause-quit-btn:hover {
+    border-color: #666;
+    color: #fff;
 }
 
 /* Level-up overlay */

@@ -330,6 +330,8 @@
     let timeout = 0;
     let timeLimit = 10000;
     let responseTimes = [];
+    let paused = false;
+    let pausedTimeRemaining = 0;
 
     // Category must be declared before getLanguageProgress (which uses it as default)
     let selectedCategory = 'colours';
@@ -483,6 +485,13 @@
     const cycleCompleteColors = document.getElementById('cycle-complete-colors');
     const newColorBadges = document.getElementById('new-color-badges');
     const cycleCompleteCountdown = document.getElementById('cycle-complete-countdown');
+
+    // Game control elements
+    const pauseBtn = document.getElementById('pause-btn');
+    const quitBtn = document.getElementById('quit-btn');
+    const pauseOverlay = document.getElementById('pause-overlay');
+    const resumeBtn = document.getElementById('resume-btn');
+    const quitFromPauseBtn = document.getElementById('quit-from-pause-btn');
 
     // Speech mode elements
     const promptLabel = document.getElementById('prompt-label');
@@ -906,6 +915,92 @@
         screen.classList.add('active');
     }
 
+    // ========== PAUSE / QUIT ==========
+
+    function pauseGame() {
+        if (paused || !gameScreen.classList.contains('active')) return;
+        if (levelUpPending || cycleCompletePending) return;
+
+        paused = true;
+        pausedTimeRemaining = timeLimit - (performance.now() - timerStart);
+        if (pausedTimeRemaining < 0) pausedTimeRemaining = 0;
+
+        clearTimeout(timeout);
+        cancelAnimationFrame(timerRAF);
+
+        // Freeze the timer bar at its current position
+        const computed = timerBar.getBoundingClientRect().width;
+        const containerWidth = timerBar.parentElement.getBoundingClientRect().width;
+        const pct = containerWidth > 0 ? (computed / containerWidth * 100) : 0;
+        timerBar.style.transition = 'none';
+        timerBar.style.width = pct + '%';
+
+        // Stop speech recognition if active
+        if (recognition && isListening) {
+            stopListening();
+        }
+
+        pauseOverlay.classList.add('active');
+    }
+
+    function resumeGame() {
+        if (!paused) return;
+
+        paused = false;
+        pauseOverlay.classList.remove('active');
+
+        // Restart timer bar from frozen position
+        void timerBar.offsetWidth; // force reflow
+        timerBar.style.transition = `width ${pausedTimeRemaining}ms linear, background 0.3s linear`;
+        timerBar.style.width = '0%';
+
+        // Reset timer tracking with remaining time
+        timerStart = performance.now();
+        timeLimit = pausedTimeRemaining;
+
+        timeout = setTimeout(() => {
+            totalQuestions++;
+            endGame();
+        }, pausedTimeRemaining);
+
+        cancelAnimationFrame(timerRAF);
+        timerRAF = requestAnimationFrame(function tick() {
+            const elapsed = performance.now() - timerStart;
+            if (elapsed > timeLimit * 0.6) timerBar.classList.add('warning');
+            if (elapsed < timeLimit) timerRAF = requestAnimationFrame(tick);
+        });
+
+        // Resume speech listening if in speech mode
+        if (isSpeechMode() && speechSupported && recognition) {
+            startListening();
+        }
+    }
+
+    function quitGame() {
+        clearTimeout(timeout);
+        cancelAnimationFrame(timerRAF);
+
+        // Stop speech recognition
+        if (recognition) {
+            stopListening();
+            recognition = null;
+        }
+
+        // Hide pause overlay if visible
+        if (paused) {
+            pauseOverlay.classList.remove('active');
+            paused = false;
+        }
+
+        show(topicScreen);
+        updateStartScreenProgress();
+    }
+
+    pauseBtn.addEventListener('click', pauseGame);
+    quitBtn.addEventListener('click', quitGame);
+    resumeBtn.addEventListener('click', resumeGame);
+    quitFromPauseBtn.addEventListener('click', quitGame);
+
     // ========== GAME FUNCTIONS ==========
 
     function startGame() {
@@ -1059,7 +1154,7 @@
 
     function handleAnswer(chosen) {
         if (!gameScreen.classList.contains('active')) return;
-        if (levelUpPending || cycleCompletePending) return;
+        if (levelUpPending || cycleCompletePending || paused) return;
 
         clearTimeout(timeout);
         cancelAnimationFrame(timerRAF);

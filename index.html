@@ -126,6 +126,10 @@
 </div>
 
 <div id="game-screen">
+    <div class="game-controls">
+        <button class="game-control-btn" id="pause-btn" title="Pause">⏸</button>
+        <button class="game-control-btn" id="quit-btn" title="Quit">✕</button>
+    </div>
     <div class="vertical-progress-container" id="vertical-progress-container">
         <div class="vertical-progress-bar" id="vertical-progress-bar"></div>
         <div class="vertical-progress-label" id="vertical-progress-label">0/10</div>
@@ -154,6 +158,14 @@
         <div id="timer-bar"></div>
     </div>
     <div class="buttons" id="buttons-container"></div>
+</div>
+
+<div id="pause-overlay">
+    <div class="pause-title">Paused</div>
+    <div class="pause-buttons">
+        <button id="resume-btn">Resume</button>
+        <button id="quit-from-pause-btn" class="pause-quit-btn">Quit to Menu</button>
+    </div>
 </div>
 
 <div id="level-up-overlay">
