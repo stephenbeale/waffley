@@ -55,7 +55,7 @@ Planned features and improvements for Waffley.
 - [x] **Add ARIA labels to interactive elements**
   Add `role="dialog"` on overlays, `aria-label` on the colour display, `role="progressbar"` with value attributes on progress bars.
 
-- [ ] **Guard against timer race conditions**
+- [x] **Guard against timer race conditions**
   Add a `roundActive` flag checked by both `handleAnswer` and the timeout callback to prevent `endGame()` firing twice.
 
 ### Priority 2 — Reduce technical debt

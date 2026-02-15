@@ -344,6 +344,7 @@
     let responseTimes = [];
     let paused = false;
     let pausedTimeRemaining = 0;
+    let roundActive = false;
 
     // Category must be declared before getLanguageProgress (which uses it as default)
     let selectedCategory = 'colours';
@@ -973,6 +974,8 @@
         timeLimit = pausedTimeRemaining;
 
         timeout = setTimeout(() => {
+            if (!roundActive) return;
+            roundActive = false;
             totalQuestions++;
             endGame();
         }, pausedTimeRemaining);
@@ -1100,6 +1103,7 @@
     }
 
     function nextRound() {
+        roundActive = true;
         // Update time limit based on current level
         timeLimit = getTimeLimit();
 
@@ -1157,6 +1161,8 @@
         });
 
         timeout = setTimeout(() => {
+            if (!roundActive) return;
+            roundActive = false;
             totalQuestions++;
             endGame();
         }, timeLimit);
@@ -1170,6 +1176,8 @@
     function handleAnswer(chosen) {
         if (!gameScreen.classList.contains('active')) return;
         if (levelUpPending || cycleCompletePending || paused) return;
+        if (!roundActive) return;
+        roundActive = false;
 
         clearTimeout(timeout);
         cancelAnimationFrame(timerRAF);
