@@ -56,9 +56,9 @@
             allProgress.languages = {};
         }
         allProgress.languages[key] = {
-            totalAnswers: totalCorrectAnswers,
-            currentCycle: currentCycle,
-            levelsCompleted: levelsCompleted
+            totalAnswers: game.totalCorrectAnswers,
+            currentCycle: game.currentCycle,
+            levelsCompleted: game.levelsCompleted
         };
         localStorage.setItem('waffley_progress', JSON.stringify(allProgress));
     }
@@ -69,9 +69,9 @@
         saveProgress();
         // Load the new language's progress for current category
         const newProgress = getLanguageProgress(newLang, selectedCategory);
-        totalCorrectAnswers = newProgress.totalAnswers;
-        currentCycle = newProgress.currentCycle;
-        levelsCompleted = newProgress.levelsCompleted || 0;
+        game.totalCorrectAnswers = newProgress.totalAnswers;
+        game.currentCycle = newProgress.currentCycle;
+        game.levelsCompleted = newProgress.levelsCompleted || 0;
     }
 
     // ========== STATISTICS SYSTEM ==========
@@ -113,8 +113,8 @@
         }
 
         // Update highest cycle
-        if (currentCycle > stats.highestCycle) {
-            stats.highestCycle = currentCycle;
+        if (game.currentCycle > stats.highestCycle) {
+            stats.highestCycle = game.currentCycle;
         }
 
         // Update language stats
@@ -138,9 +138,9 @@
         saveStats();
         // Also clear all progress for all languages/categories
         localStorage.removeItem('waffley_progress');
-        totalCorrectAnswers = 0;
-        currentCycle = 1;
-        levelsCompleted = 0;
+        game.totalCorrectAnswers = 0;
+        game.currentCycle = 1;
+        game.levelsCompleted = 0;
         updateStartScreenProgress();
         updateStatsDisplay();
     }
@@ -157,9 +157,9 @@
             });
             localStorage.setItem('waffley_progress', JSON.stringify(allProgress));
         }
-        totalCorrectAnswers = 0;
-        currentCycle = 1;
-        levelsCompleted = 0;
+        game.totalCorrectAnswers = 0;
+        game.currentCycle = 1;
+        game.levelsCompleted = 0;
         updateStartScreenProgress();
         updateStatsDisplay();
     }
@@ -237,14 +237,14 @@
 
     // Randomly select new items from the full pool
     function randomizeActiveColors() {
-        const count = activeColors.length;
+        const count = game.activeColors.length;
         const pool = ALL_COLORS.slice();
         // Fisher-Yates shuffle the pool
         for (let i = pool.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [pool[i], pool[j]] = [pool[j], pool[i]];
         }
-        activeColors = pool.slice(0, count);
+        game.activeColors = pool.slice(0, count);
 
         // Also shuffle emoji items if in emoji mode
         if (selectedCategory !== 'colours' && EMOJI_DATA[selectedCategory]) {
@@ -261,17 +261,17 @@
 
     // Get current phase (0=Learning, 1=Practice, 2=Speech) from levelsCompleted
     function getPhaseFromProgress() {
-        return Math.floor(levelsCompleted / LEVELS_PER_PHASE) % 3;
+        return Math.floor(game.levelsCompleted / LEVELS_PER_PHASE) % 3;
     }
 
     // Get level within current phase (1-10)
     function getLevelInPhase() {
-        return (levelsCompleted % LEVELS_PER_PHASE) + 1;
+        return (game.levelsCompleted % LEVELS_PER_PHASE) + 1;
     }
 
     // Get level within current cycle (1-30)
     function getLevelInCycle() {
-        return (levelsCompleted % LEVELS_PER_CYCLE) + 1;
+        return (game.levelsCompleted % LEVELS_PER_CYCLE) + 1;
     }
 
     // Calculate time limit based on level within phase
@@ -290,27 +290,27 @@
 
     // Build mastery map from current category items
     function initLevelMastery() {
-        levelMastery = {};
+        game.levelMastery = {};
         const items = getCategoryItems();
-        items.forEach(item => { levelMastery[item] = 0; });
+        items.forEach(item => { game.levelMastery[item] = 0; });
     }
 
     // Record a correct answer for mastery tracking
     function recordMasteryAnswer(item) {
-        if (levelMastery[item] !== undefined) {
-            levelMastery[item]++;
+        if (game.levelMastery[item] !== undefined) {
+            game.levelMastery[item]++;
         }
     }
 
     // Check if all items in the current level have been mastered
     function isLevelMastered() {
-        const values = Object.values(levelMastery);
+        const values = Object.values(game.levelMastery);
         return values.length > 0 && values.every(c => c >= MASTERY_THRESHOLD);
     }
 
     // Get mastery progress for UI display
     function getMasteryProgress() {
-        const values = Object.values(levelMastery);
+        const values = Object.values(game.levelMastery);
         const mastered = values.filter(c => c >= MASTERY_THRESHOLD).length;
         return { mastered, total: values.length };
     }
@@ -319,9 +319,9 @@
     function willTimeChange() {
         const currentTime = getTimeLimit();
         // Temporarily compute what time would be after levelling up
-        levelsCompleted++;
+        game.levelsCompleted++;
         const newTime = getTimeLimit();
-        levelsCompleted--;
+        game.levelsCompleted--;
         return currentTime !== newTime;
     }
 
@@ -333,37 +333,45 @@
 
     // ========== GAME STATE ==========
     let selectedLanguage = 'es';
-    let activeColors = [];
-    let currentColor = '';
-    let score = 0;
-    let totalQuestions = 0;
-    let timerStart = 0;
-    let timerRAF = 0;
-    let timeout = 0;
-    let timeLimit = 10000;
-    let responseTimes = [];
-    let paused = false;
-    let pausedTimeRemaining = 0;
-    let roundActive = false;
-
-    // Category must be declared before getLanguageProgress (which uses it as default)
     let selectedCategory = 'colours';
 
-    // Level system state - load progress for default language (Spanish)
     const savedProgress = getLanguageProgress(selectedLanguage);
-    let totalCorrectAnswers = savedProgress.totalAnswers;
-    let currentCycle = savedProgress.currentCycle;
-    let levelsCompleted = savedProgress.levelsCompleted || 0;
-    let levelMastery = {};  // { itemKey: correctCount } — resets each level
-    let levelUpPending = false;
-    let cycleCompletePending = false;
+    const game = {
+        // Session state
+        activeColors: [],
+        currentColor: '',
+        score: 0,
+        totalQuestions: 0,
+        responseTimes: [],
+        roundActive: false,
+        paused: false,
+        pausedTimeRemaining: 0,
+
+        // Timer
+        timerStart: 0,
+        timerRAF: 0,
+        timeout: 0,
+        timeLimit: 10000,
+
+        // Progress (persisted to localStorage)
+        totalCorrectAnswers: savedProgress.totalAnswers,
+        currentCycle: savedProgress.currentCycle,
+        levelsCompleted: savedProgress.levelsCompleted || 0,
+
+        // Mastery
+        levelMastery: {},
+
+        // Overlay flags
+        levelUpPending: false,
+        cycleCompletePending: false,
+    };
 
     // Helper: get current items and translations based on category
     function getCategoryItems() {
         if (selectedCategory === 'colours') {
-            return activeColors;
+            return game.activeColors;
         }
-        return EMOJI_DATA[selectedCategory].items.slice(0, activeColors.length);
+        return EMOJI_DATA[selectedCategory].items.slice(0, game.activeColors.length);
     }
 
     function getCategoryTranslation(item) {
@@ -526,7 +534,7 @@
         recog.lang = SPEECH_LANG_CODES[selectedLanguage] || 'es-ES';
 
         recog.onresult = (event) => {
-            if (levelUpPending || cycleCompletePending) return;
+            if (game.levelUpPending || game.cycleCompletePending) return;
 
             const result = event.results[event.results.length - 1];
             const transcript = result[0].transcript.trim().toLowerCase();
@@ -557,7 +565,7 @@
         recog.onend = () => {
             isListening = false;
             // Restart if still in speech mode and game is active
-            if (getPhaseFromProgress() === 2 && gameScreen.classList.contains('active') && !levelUpPending && !cycleCompletePending) {
+            if (getPhaseFromProgress() === 2 && gameScreen.classList.contains('active') && !game.levelUpPending && !game.cycleCompletePending) {
                 setTimeout(() => {
                     if (gameScreen.classList.contains('active') && !isListening) {
                         startListening();
@@ -655,9 +663,9 @@
             }
         });
 
-        startTotalAnswersEl.textContent = totalCorrectAnswers;
+        startTotalAnswersEl.textContent = game.totalCorrectAnswers;
         startTimeLimitEl.textContent = getTimeLimitSeconds();
-        startCycleEl.textContent = currentCycle;
+        startCycleEl.textContent = game.currentCycle;
     }
 
     // Update game screen level display
@@ -686,7 +694,7 @@
 
     // Show level-up overlay
     function showLevelUp(newLevelInCycle, previousPhase, timeChanged) {
-        levelUpPending = true;
+        game.levelUpPending = true;
 
         // Stop listening during overlay
         if (recognition) {
@@ -698,7 +706,7 @@
         const newTimeSeconds = getTimeLimitSeconds();
 
         levelUpTitle.textContent = phaseChanged ? 'Phase Complete!' : 'Level Up!';
-        document.getElementById('level-up-streak').textContent = 'Current streak: ' + score;
+        document.getElementById('level-up-streak').textContent = 'Current streak: ' + game.score;
         levelUpMessage.textContent = `You reached Level ${newLevelInCycle}`;
 
         const phaseBadgeOverlay = document.getElementById('level-up-phase-badge');
@@ -745,7 +753,7 @@
             } else {
                 clearInterval(countdownInterval);
                 levelUpOverlay.classList.remove('active');
-                levelUpPending = false;
+                game.levelUpPending = false;
 
                 // Regenerate buttons if phase changed (Learning -> Practice -> Speech styling)
                 if (phaseChanged) {
@@ -763,7 +771,7 @@
 
     // Show cycle complete overlay
     function showCycleComplete(completedCycle, newCycle) {
-        cycleCompletePending = true;
+        game.cycleCompletePending = true;
 
         // Stop listening during overlay
         if (recognition) {
@@ -805,11 +813,11 @@
             } else {
                 clearInterval(countdownInterval);
                 cycleCompleteOverlay.classList.remove('active');
-                cycleCompletePending = false;
+                game.cycleCompletePending = false;
 
                 // Update cycle and regenerate with new colours
-                currentCycle = newCycle;
-                activeColors = getActiveColors(currentCycle);
+                game.currentCycle = newCycle;
+                game.activeColors = getActiveColors(game.currentCycle);
                 initLevelMastery();
                 saveProgress();
                 generateButtons();
@@ -832,9 +840,9 @@
     // Refresh progress from localStorage to ensure time display is current
     function refreshProgressFromStorage() {
         const freshProgress = getLanguageProgress(selectedLanguage);
-        totalCorrectAnswers = freshProgress.totalAnswers;
-        currentCycle = freshProgress.currentCycle;
-        levelsCompleted = freshProgress.levelsCompleted || 0;
+        game.totalCorrectAnswers = freshProgress.totalAnswers;
+        game.currentCycle = freshProgress.currentCycle;
+        game.levelsCompleted = freshProgress.levelsCompleted || 0;
         updateStartScreenProgress();
     }
 
@@ -878,9 +886,9 @@
                 saveProgress();
                 selectedCategory = newCategory;
                 const newProgress = getLanguageProgress(selectedLanguage, newCategory);
-                totalCorrectAnswers = newProgress.totalAnswers;
-                currentCycle = newProgress.currentCycle;
-                levelsCompleted = newProgress.levelsCompleted || 0;
+                game.totalCorrectAnswers = newProgress.totalAnswers;
+                game.currentCycle = newProgress.currentCycle;
+                game.levelsCompleted = newProgress.levelsCompleted || 0;
                 updateStartScreenProgress();
             }
             document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
@@ -933,15 +941,15 @@
     // ========== PAUSE / QUIT ==========
 
     function pauseGame() {
-        if (paused || !gameScreen.classList.contains('active')) return;
-        if (levelUpPending || cycleCompletePending) return;
+        if (game.paused || !gameScreen.classList.contains('active')) return;
+        if (game.levelUpPending || game.cycleCompletePending) return;
 
-        paused = true;
-        pausedTimeRemaining = timeLimit - (performance.now() - timerStart);
-        if (pausedTimeRemaining < 0) pausedTimeRemaining = 0;
+        game.paused = true;
+        game.pausedTimeRemaining = game.timeLimit - (performance.now() - game.timerStart);
+        if (game.pausedTimeRemaining < 0) game.pausedTimeRemaining = 0;
 
-        clearTimeout(timeout);
-        cancelAnimationFrame(timerRAF);
+        clearTimeout(game.timeout);
+        cancelAnimationFrame(game.timerRAF);
 
         // Freeze the timer bar at its current position
         const computed = timerBar.getBoundingClientRect().width;
@@ -959,32 +967,32 @@
     }
 
     function resumeGame() {
-        if (!paused) return;
+        if (!game.paused) return;
 
-        paused = false;
+        game.paused = false;
         pauseOverlay.classList.remove('active');
 
         // Restart timer bar from frozen position
         void timerBar.offsetWidth; // force reflow
-        timerBar.style.transition = `width ${pausedTimeRemaining}ms linear, background 0.3s linear`;
+        timerBar.style.transition = `width ${game.pausedTimeRemaining}ms linear, background 0.3s linear`;
         timerBar.style.width = '0%';
 
         // Reset timer tracking with remaining time
-        timerStart = performance.now();
-        timeLimit = pausedTimeRemaining;
+        game.timerStart = performance.now();
+        game.timeLimit = game.pausedTimeRemaining;
 
-        timeout = setTimeout(() => {
-            if (!roundActive) return;
-            roundActive = false;
-            totalQuestions++;
+        game.timeout = setTimeout(() => {
+            if (!game.roundActive) return;
+            game.roundActive = false;
+            game.totalQuestions++;
             endGame();
-        }, pausedTimeRemaining);
+        }, game.pausedTimeRemaining);
 
-        cancelAnimationFrame(timerRAF);
-        timerRAF = requestAnimationFrame(function tick() {
-            const elapsed = performance.now() - timerStart;
-            if (elapsed > timeLimit * 0.6) timerBar.classList.add('warning');
-            if (elapsed < timeLimit) timerRAF = requestAnimationFrame(tick);
+        cancelAnimationFrame(game.timerRAF);
+        game.timerRAF = requestAnimationFrame(function tick() {
+            const elapsed = performance.now() - game.timerStart;
+            if (elapsed > game.timeLimit * 0.6) timerBar.classList.add('warning');
+            if (elapsed < game.timeLimit) game.timerRAF = requestAnimationFrame(tick);
         });
 
         // Resume speech listening if in speech mode
@@ -994,8 +1002,8 @@
     }
 
     function quitGame() {
-        clearTimeout(timeout);
-        cancelAnimationFrame(timerRAF);
+        clearTimeout(game.timeout);
+        cancelAnimationFrame(game.timerRAF);
 
         // Stop speech recognition
         if (recognition) {
@@ -1004,9 +1012,9 @@
         }
 
         // Hide pause overlay if visible
-        if (paused) {
+        if (game.paused) {
             pauseOverlay.classList.remove('active');
-            paused = false;
+            game.paused = false;
         }
 
         show(topicScreen);
@@ -1021,12 +1029,12 @@
     // ========== GAME FUNCTIONS ==========
 
     function startGame() {
-        activeColors = getActiveColors(currentCycle);
+        game.activeColors = getActiveColors(game.currentCycle);
         initLevelMastery();
-        timeLimit = getTimeLimit();
-        score = 0;
-        totalQuestions = 0;
-        responseTimes = [];
+        game.timeLimit = getTimeLimit();
+        game.score = 0;
+        game.totalQuestions = 0;
+        game.responseTimes = [];
         currentScoreEl.textContent = '0';
 
         // Initialize speech recognition if entering speech mode
@@ -1103,23 +1111,23 @@
     }
 
     function nextRound() {
-        roundActive = true;
+        game.roundActive = true;
         // Update time limit based on current level
-        timeLimit = getTimeLimit();
+        game.timeLimit = getTimeLimit();
 
         // Pick a random item, prioritizing un-mastered items
         const items = getCategoryItems();
-        const unmastered = items.filter(item => (levelMastery[item] || 0) < MASTERY_THRESHOLD);
+        const unmastered = items.filter(item => (game.levelMastery[item] || 0) < MASTERY_THRESHOLD);
         const pool = unmastered.length > 0 ? unmastered : items;
         let newColor;
         do {
             newColor = pool[Math.floor(Math.random() * pool.length)];
-        } while (newColor === currentColor && pool.length > 1);
+        } while (newColor === game.currentColor && pool.length > 1);
 
-        currentColor = newColor;
+        game.currentColor = newColor;
 
         // Display: emoji or colour
-        const emoji = getCategoryDisplay(currentColor);
+        const emoji = getCategoryDisplay(game.currentColor);
         if (emoji) {
             colorDisplay.style.backgroundColor = 'transparent';
             colorDisplay.textContent = emoji;
@@ -1127,18 +1135,18 @@
         } else {
             colorDisplay.textContent = '';
             colorDisplay.classList.remove('emoji-display');
-            colorDisplay.style.backgroundColor = COLOR_CSS[currentColor];
+            colorDisplay.style.backgroundColor = COLOR_CSS[game.currentColor];
         }
 
         // Show reinforcement label in level 1 of learning phase for non-colour categories
         if (selectedCategory !== 'colours' && getPhaseFromProgress() === 0 && getLevelInPhase() === 1) {
-            reinforcementLabel.textContent = getCategoryTranslation(currentColor);
+            reinforcementLabel.textContent = getCategoryTranslation(game.currentColor);
         } else {
             reinforcementLabel.textContent = '';
         }
 
         // Speak the word if audio is enabled
-        speakColor(currentColor, selectedLanguage);
+        speakColor(game.currentColor, selectedLanguage);
 
         shuffleButtons();
 
@@ -1147,25 +1155,25 @@
         timerBar.style.width = '100%';
         timerBar.classList.remove('warning');
         void timerBar.offsetWidth;
-        timerBar.style.transition = `width ${timeLimit}ms linear, background 0.3s linear`;
+        timerBar.style.transition = `width ${game.timeLimit}ms linear, background 0.3s linear`;
         timerBar.style.width = '0%';
 
-        timerStart = performance.now();
-        cancelAnimationFrame(timerRAF);
-        clearTimeout(timeout);
+        game.timerStart = performance.now();
+        cancelAnimationFrame(game.timerRAF);
+        clearTimeout(game.timeout);
 
-        timerRAF = requestAnimationFrame(function tick() {
-            const elapsed = performance.now() - timerStart;
-            if (elapsed > timeLimit * 0.6) timerBar.classList.add('warning');
-            if (elapsed < timeLimit) timerRAF = requestAnimationFrame(tick);
+        game.timerRAF = requestAnimationFrame(function tick() {
+            const elapsed = performance.now() - game.timerStart;
+            if (elapsed > game.timeLimit * 0.6) timerBar.classList.add('warning');
+            if (elapsed < game.timeLimit) game.timerRAF = requestAnimationFrame(tick);
         });
 
-        timeout = setTimeout(() => {
-            if (!roundActive) return;
-            roundActive = false;
-            totalQuestions++;
+        game.timeout = setTimeout(() => {
+            if (!game.roundActive) return;
+            game.roundActive = false;
+            game.totalQuestions++;
             endGame();
-        }, timeLimit);
+        }, game.timeLimit);
 
         // Start listening in speech mode
         if (isSpeechMode() && speechSupported && recognition) {
@@ -1175,22 +1183,22 @@
 
     function handleAnswer(chosen) {
         if (!gameScreen.classList.contains('active')) return;
-        if (levelUpPending || cycleCompletePending || paused) return;
-        if (!roundActive) return;
-        roundActive = false;
+        if (game.levelUpPending || game.cycleCompletePending || game.paused) return;
+        if (!game.roundActive) return;
+        game.roundActive = false;
 
-        clearTimeout(timeout);
-        cancelAnimationFrame(timerRAF);
-        totalQuestions++;
+        clearTimeout(game.timeout);
+        cancelAnimationFrame(game.timerRAF);
+        game.totalQuestions++;
 
-        if (chosen === currentColor) {
-            responseTimes.push(performance.now() - timerStart);
-            score++;
-            currentScoreEl.textContent = score;
+        if (chosen === game.currentColor) {
+            game.responseTimes.push(performance.now() - game.timerStart);
+            game.score++;
+            currentScoreEl.textContent = game.score;
             playCorrectSound();
 
             // Track total correct answers (for stats) and mastery
-            totalCorrectAnswers++;
+            game.totalCorrectAnswers++;
             recordMasteryAnswer(chosen);
             saveProgress();
             updateLevelDisplay();
@@ -1199,13 +1207,13 @@
             if (isLevelMastered()) {
                 const previousPhase = getPhaseFromProgress();
                 const timeChanged = willTimeChange();
-                levelsCompleted++;
+                game.levelsCompleted++;
                 saveProgress();
 
                 // Check for cycle completion (levelsCompleted crossed a cycle boundary)
-                if (levelsCompleted % LEVELS_PER_CYCLE === 0) {
-                    const completedCycle = currentCycle;
-                    const newCycle = currentCycle + 1;
+                if (game.levelsCompleted % LEVELS_PER_CYCLE === 0) {
+                    const completedCycle = game.currentCycle;
+                    const newCycle = game.currentCycle + 1;
                     showCycleComplete(completedCycle, newCycle);
                 } else {
                     // Normal level-up: randomize items and reset mastery
@@ -1225,27 +1233,27 @@
 
     function endGame() {
         playWrongSound();
-        clearTimeout(timeout);
-        cancelAnimationFrame(timerRAF);
+        clearTimeout(game.timeout);
+        cancelAnimationFrame(game.timerRAF);
 
         // Stop speech recognition
         if (recognition) {
             stopListening();
         }
 
-        const accuracy = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
-        const avgTime = responseTimes.length > 0
-            ? (responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length / 1000).toFixed(1)
+        const accuracy = game.totalQuestions > 0 ? Math.round((game.score / game.totalQuestions) * 100) : 0;
+        const avgTime = game.responseTimes.length > 0
+            ? (game.responseTimes.reduce((a, b) => a + b, 0) / game.responseTimes.length / 1000).toFixed(1)
             : '0.0';
 
         // Check for personal best before updating stats
-        const isNewBest = isNewPersonalBest(score);
+        const isNewBest = isNewPersonalBest(game.score);
         const previousBest = stats.bestStreak;
 
         // Update statistics
-        updateStatsAfterGame(score, selectedLanguage);
+        updateStatsAfterGame(game.score, selectedLanguage);
 
-        finalScore.textContent = score;
+        finalScore.textContent = game.score;
         document.getElementById('accuracy-stat').textContent = accuracy + '%';
         document.getElementById('avg-time-stat').textContent = avgTime + 's';
 
@@ -1265,17 +1273,17 @@
             }
         }
 
-        if (score === 0) {
-            const answerWord = getCategoryTranslation(currentColor);
-            const answerEmoji = getCategoryDisplay(currentColor);
+        if (game.score === 0) {
+            const answerWord = getCategoryTranslation(game.currentColor);
+            const answerEmoji = getCategoryDisplay(game.currentColor);
             endMessage.textContent = answerEmoji
-                ? `The answer was ${answerWord} ${answerEmoji} (${currentColor})`
-                : `The colour was ${answerWord} (${currentColor})`;
-        } else if (score < 5) {
+                ? `The answer was ${answerWord} ${answerEmoji} (${game.currentColor})`
+                : `The colour was ${answerWord} (${game.currentColor})`;
+        } else if (game.score < 5) {
             endMessage.textContent = 'Good start! Keep practising!';
-        } else if (score < 10) {
+        } else if (game.score < 10) {
             endMessage.textContent = 'Nice work! You\'re getting the hang of it!';
-        } else if (score < 20) {
+        } else if (game.score < 20) {
             endMessage.textContent = 'Excellent! Your vocabulary is growing!';
         } else {
             endMessage.textContent = 'Amazing! You\'re a colour word master!';

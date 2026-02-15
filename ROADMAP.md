@@ -60,7 +60,7 @@ Planned features and improvements for Waffley.
 
 ### Priority 2 — Reduce technical debt
 
-- [ ] **Extract game state into a state object**
+- [x] **Extract game state into a state object**
   Replace 15 mutable global variables with a single `gameState` object or simple state machine (`IDLE -> PLAYING -> LEVEL_UP -> GAME_OVER`).
 
 - [ ] **Unify category data model**
