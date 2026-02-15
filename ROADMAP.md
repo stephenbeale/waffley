@@ -66,7 +66,7 @@ Planned features and improvements for Waffley.
 - [x] **Unify category data model**
   Make colours an entry in `EMOJI_DATA` (or a unified `CATEGORY_DATA`) with a `displayType: 'color'` property. Eliminate all `selectedCategory === 'colours'` conditionals.
 
-- [ ] **Stop mutating the data layer**
+- [x] **Stop mutating the data layer**
   Clone data before shuffling. Never write back into `EMOJI_DATA`.
 
 ### Priority 3 — Improve maintainability

@@ -235,26 +235,23 @@
         return CYCLE_COLORS[cycle].slice();
     }
 
+    // Shuffle helper (Fisher-Yates on a copy)
+    function shuffle(arr) {
+        const copy = arr.slice();
+        for (let i = copy.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [copy[i], copy[j]] = [copy[j], copy[i]];
+        }
+        return copy;
+    }
+
     // Randomly select new items from the full pool
     function randomizeActiveColors() {
         const count = game.activeColors.length;
-        const pool = ALL_COLORS.slice();
-        // Fisher-Yates shuffle the pool
-        for (let i = pool.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [pool[i], pool[j]] = [pool[j], pool[i]];
-        }
-        game.activeColors = pool.slice(0, count);
-
-        // Also shuffle emoji items if in emoji mode
-        if (!isColorCategory()) {
-            const data = getCategoryData();
-            const emojiPool = data.items.slice();
-            for (let i = emojiPool.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [emojiPool[i], emojiPool[j]] = [emojiPool[j], emojiPool[i]];
-            }
-            data.items = emojiPool;
+        if (isColorCategory()) {
+            game.activeItems = shuffle(ALL_COLORS).slice(0, count);
+        } else {
+            game.activeItems = shuffle(getCategoryData().items).slice(0, count);
         }
     }
 
@@ -339,7 +336,8 @@
     const savedProgress = getLanguageProgress(selectedLanguage);
     const game = {
         // Session state
-        activeColors: [],
+        activeColors: [],   // pool of colour keys for this cycle
+        activeItems: [],    // shuffled subset for current level (colours or emoji items)
         currentColor: '',
         score: 0,
         totalQuestions: 0,
@@ -377,10 +375,7 @@
     }
 
     function getCategoryItems() {
-        if (isColorCategory()) {
-            return game.activeColors;
-        }
-        return getCategoryData().items.slice(0, game.activeColors.length);
+        return game.activeItems;
     }
 
     function getCategoryTranslation(item) {
@@ -825,6 +820,11 @@
                 // Update cycle and regenerate with new colours
                 game.currentCycle = newCycle;
                 game.activeColors = getActiveColors(game.currentCycle);
+                if (isColorCategory()) {
+                    game.activeItems = game.activeColors.slice();
+                } else {
+                    game.activeItems = getCategoryData().items.slice(0, game.activeColors.length);
+                }
                 initLevelMastery();
                 saveProgress();
                 generateButtons();
@@ -1037,6 +1037,11 @@
 
     function startGame() {
         game.activeColors = getActiveColors(game.currentCycle);
+        if (isColorCategory()) {
+            game.activeItems = game.activeColors.slice();
+        } else {
+            game.activeItems = getCategoryData().items.slice(0, game.activeColors.length);
+        }
         initLevelMastery();
         game.timeLimit = getTimeLimit();
         game.score = 0;
