@@ -7,7 +7,7 @@ Planned features and improvements for Waffley.
 - [ ] **Sound effects for correct/incorrect answers**
   Play a positive sound effect for every correct answer and a buzzer sound for incorrect answers.
 
-- [ ] **Fix audio delay on first question of each level**
+- [x] **Fix audio delay on first question of each level**
   The pronunciation audio for the first question after a level-up has a noticeable delay compared to subsequent questions. Add an earlier offset/pre-trigger for the first round's audio so it fires promptly.
 
 - [ ] **Clearer level-up cards**
