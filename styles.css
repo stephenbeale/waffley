@@ -638,6 +638,8 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 #resume-btn {
     padding: 1rem 3rem;
     font-size: 1.3rem;
+    font-family: inherit;
+    font-weight: 600;
     border: none;
     border-radius: 8px;
     background: #e94560;
@@ -654,6 +656,8 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 .pause-quit-btn {
     padding: 0.5rem 1.2rem;
     font-size: 0.9rem;
+    font-family: inherit;
+    font-weight: 600;
     border: 2px solid #444;
     border-radius: 6px;
     background: transparent;
