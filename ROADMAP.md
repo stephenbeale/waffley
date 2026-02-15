@@ -10,7 +10,7 @@ Planned features and improvements for Waffley.
 - [x] **Fix audio delay on first question of each level**
   The pronunciation audio for the first question after a level-up has a noticeable delay compared to subsequent questions. Add an earlier offset/pre-trigger for the first round's audio so it fires promptly.
 
-- [ ] **Clearer level-up cards**
+- [x] **Clearer level-up cards**
   Make the cards shown between levels clearer and more informative.
 
 - [ ] **Show the user the plan and progress**

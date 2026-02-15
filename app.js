@@ -671,12 +671,15 @@
             phaseBadgeOverlay.textContent = PHASES[phase];
             phaseBadgeOverlay.className = 'phase-badge ' + PHASE_CLASSES[phase];
             phaseBadgeOverlay.style.display = '';
-            levelUpPhase.textContent = `Welcome to ${PHASES[phase]} Mode!`;
-            // Add extra info for speech mode
-            if (phase === 2) {
-                levelUpPhase.textContent += speechSupported
-                    ? ' Speak the colour words to answer!'
-                    : ' (Voice not supported - using buttons)';
+            if (phase === 1) {
+                levelUpPhase.textContent = 'Now try without the words!';
+            } else if (phase === 2) {
+                const item = selectedCategory === 'colours' ? 'the colour' : 'the word';
+                levelUpPhase.textContent = speechSupported
+                    ? `Now it's your turn to speak ${item}!`
+                    : `Speech mode (voice not supported - using buttons)`;
+            } else {
+                levelUpPhase.textContent = `Welcome to ${PHASES[phase]} Mode!`;
             }
         } else {
             phaseBadgeOverlay.style.display = 'none';
