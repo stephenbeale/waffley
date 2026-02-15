@@ -695,6 +695,10 @@
         phaseBadge.className = 'phase-badge ' + PHASE_CLASSES[phase];
     }
 
+    // Track overlay countdown intervals so nav buttons can cancel them
+    let levelUpCountdownInterval = null;
+    let cycleCompleteCountdownInterval = null;
+
     // Show level-up overlay
     function showLevelUp(newLevelInCycle, previousPhase, timeChanged) {
         game.levelUpPending = true;
@@ -748,13 +752,14 @@
         let count = 3;
         levelUpCountdown.textContent = count;
 
-        const countdownInterval = setInterval(() => {
+        levelUpCountdownInterval = setInterval(() => {
             count--;
             if (count > 0) {
                 levelUpCountdown.textContent = count;
                 if (count === 1) warmUpSpeech();
             } else {
-                clearInterval(countdownInterval);
+                clearInterval(levelUpCountdownInterval);
+                levelUpCountdownInterval = null;
                 levelUpOverlay.classList.remove('active');
                 game.levelUpPending = false;
 
@@ -808,13 +813,14 @@
         let count = 5;
         cycleCompleteCountdown.textContent = count;
 
-        const countdownInterval = setInterval(() => {
+        cycleCompleteCountdownInterval = setInterval(() => {
             count--;
             if (count > 0) {
                 cycleCompleteCountdown.textContent = count;
                 if (count === 1) warmUpSpeech();
             } else {
-                clearInterval(countdownInterval);
+                clearInterval(cycleCompleteCountdownInterval);
+                cycleCompleteCountdownInterval = null;
                 cycleCompleteOverlay.classList.remove('active');
                 game.cycleCompletePending = false;
 
@@ -1034,6 +1040,27 @@
     quitBtn.addEventListener('click', quitGame);
     resumeBtn.addEventListener('click', resumeGame);
     quitFromPauseBtn.addEventListener('click', quitGame);
+
+    // Overlay nav buttons — quit to menu from level-up or cycle-complete
+    document.getElementById('level-up-menu-btn').addEventListener('click', function() {
+        if (levelUpCountdownInterval) {
+            clearInterval(levelUpCountdownInterval);
+            levelUpCountdownInterval = null;
+        }
+        levelUpOverlay.classList.remove('active');
+        game.levelUpPending = false;
+        quitGame();
+    });
+
+    document.getElementById('cycle-complete-menu-btn').addEventListener('click', function() {
+        if (cycleCompleteCountdownInterval) {
+            clearInterval(cycleCompleteCountdownInterval);
+            cycleCompleteCountdownInterval = null;
+        }
+        cycleCompleteOverlay.classList.remove('active');
+        game.cycleCompletePending = false;
+        quitGame();
+    });
 
     // ========== GAME FUNCTIONS ==========
 
