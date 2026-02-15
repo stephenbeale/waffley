@@ -74,7 +74,7 @@
         grey: '#6c757d', black: '#212529', white: '#f8f9fa'
     };
 
-    // ========== EMOJI CATEGORIES ==========
+    // ========== CATEGORIES ==========
     const CATEGORIES = {
         colours: { label: 'Colours', icon: '🎨' },
         adjectives: { label: 'Adjectives', icon: '😊' },
@@ -83,10 +83,17 @@
         weather: { label: 'Weather', icon: '☀️' }
     };
 
-    const EMOJI_DATA = {
+    const CATEGORY_DATA = {
+        colours: {
+            displayType: 'color',
+            items: ['red', 'green', 'blue', 'yellow', 'orange', 'pink', 'purple', 'brown', 'grey', 'black', 'white'],
+            display: COLOR_CSS,
+            translations: TRANSLATIONS
+        },
         adjectives: {
+            displayType: 'emoji',
             items: ['happy', 'sad', 'angry', 'tired', 'surprised', 'scared', 'excited', 'bored', 'cold'],
-            emojis: {
+            display: {
                 happy: '😊', sad: '😢', angry: '😠', tired: '😴',
                 surprised: '😮', scared: '😨', excited: '🤩', bored: '😑', cold: '🥶'
             },
@@ -118,8 +125,9 @@
             }
         },
         animals: {
+            displayType: 'emoji',
             items: ['dog', 'cat', 'elephant', 'bird', 'fish', 'horse', 'rabbit', 'bear', 'monkey'],
-            emojis: {
+            display: {
                 dog: '🐕', cat: '🐈', elephant: '🐘', bird: '🐦',
                 fish: '🐟', horse: '🐴', rabbit: '🐇', bear: '🐻', monkey: '🐒'
             },
@@ -151,8 +159,9 @@
             }
         },
         food: {
+            displayType: 'emoji',
             items: ['apple', 'pizza', 'bread', 'cheese', 'egg', 'cake', 'grape', 'banana', 'rice'],
-            emojis: {
+            display: {
                 apple: '🍎', pizza: '🍕', bread: '🍞', cheese: '🧀',
                 egg: '🥚', cake: '🎂', grape: '🍇', banana: '🍌', rice: '🍚'
             },
@@ -184,8 +193,9 @@
             }
         },
         weather: {
+            displayType: 'emoji',
             items: ['sunny', 'rainy', 'snowy', 'windy', 'cloudy', 'stormy', 'hot', 'foggy', 'rainbow'],
-            emojis: {
+            display: {
                 sunny: '☀️', rainy: '🌧️', snowy: '❄️', windy: '💨',
                 cloudy: '☁️', stormy: '⛈️', hot: '🔥', foggy: '🌫️', rainbow: '🌈'
             },

@@ -63,7 +63,7 @@ Planned features and improvements for Waffley.
 - [x] **Extract game state into a state object**
   Replace 15 mutable global variables with a single `gameState` object or simple state machine (`IDLE -> PLAYING -> LEVEL_UP -> GAME_OVER`).
 
-- [ ] **Unify category data model**
+- [x] **Unify category data model**
   Make colours an entry in `EMOJI_DATA` (or a unified `CATEGORY_DATA`) with a `displayType: 'color'` property. Eliminate all `selectedCategory === 'colours'` conditionals.
 
 - [ ] **Stop mutating the data layer**

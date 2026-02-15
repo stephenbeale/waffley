@@ -247,13 +247,14 @@
         game.activeColors = pool.slice(0, count);
 
         // Also shuffle emoji items if in emoji mode
-        if (selectedCategory !== 'colours' && EMOJI_DATA[selectedCategory]) {
-            const emojiPool = EMOJI_DATA[selectedCategory].items.slice();
+        if (!isColorCategory()) {
+            const data = getCategoryData();
+            const emojiPool = data.items.slice();
             for (let i = emojiPool.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [emojiPool[i], emojiPool[j]] = [emojiPool[j], emojiPool[i]];
             }
-            EMOJI_DATA[selectedCategory].items = emojiPool;
+            data.items = emojiPool;
         }
     }
 
@@ -366,26 +367,32 @@
         cycleCompletePending: false,
     };
 
-    // Helper: get current items and translations based on category
+    // Helper: get current category data
+    function getCategoryData() {
+        return CATEGORY_DATA[selectedCategory];
+    }
+
+    function isColorCategory() {
+        return getCategoryData().displayType === 'color';
+    }
+
     function getCategoryItems() {
-        if (selectedCategory === 'colours') {
+        if (isColorCategory()) {
             return game.activeColors;
         }
-        return EMOJI_DATA[selectedCategory].items.slice(0, game.activeColors.length);
+        return getCategoryData().items.slice(0, game.activeColors.length);
     }
 
     function getCategoryTranslation(item) {
-        if (selectedCategory === 'colours') {
-            return TRANSLATIONS[selectedLanguage][item];
-        }
-        return EMOJI_DATA[selectedCategory].translations[selectedLanguage][item];
+        return getCategoryData().translations[selectedLanguage][item];
     }
 
     function getCategoryDisplay(item) {
-        if (selectedCategory === 'colours') {
+        const data = getCategoryData();
+        if (data.displayType === 'color') {
             return null; // use CSS background color
         }
-        return EMOJI_DATA[selectedCategory].emojis[item];
+        return data.display[item];
     }
 
     // ========== AUDIO PRONUNCIATION ==========
@@ -582,7 +589,7 @@
         const lowerWord = word.toLowerCase();
 
         // For colours, check the dedicated aliases first
-        if (selectedCategory === 'colours') {
+        if (isColorCategory()) {
             const aliases = COLOR_ALIASES[selectedLanguage];
             if (aliases) {
                 for (const color of items) {
@@ -717,7 +724,7 @@
             if (phase === 1) {
                 levelUpPhase.textContent = 'Now try without the words!';
             } else if (phase === 2) {
-                const item = selectedCategory === 'colours' ? 'the colour' : 'the word';
+                const item = isColorCategory() ? 'the colour' : 'the word';
                 levelUpPhase.textContent = speechSupported
                     ? `Now it's your turn to speak ${item}!`
                     : `Speech mode (voice not supported - using buttons)`;
@@ -789,9 +796,9 @@
             newColors.forEach(color => {
                 const badge = document.createElement('span');
                 badge.className = 'color-badge';
-                badge.style.backgroundColor = COLOR_CSS[color];
+                badge.style.backgroundColor = CATEGORY_DATA.colours.display[color];
                 badge.style.color = (color === 'yellow' || color === 'white') ? '#222' : '#fff';
-                badge.textContent = TRANSLATIONS[selectedLanguage][color];
+                badge.textContent = CATEGORY_DATA.colours.translations[selectedLanguage][color];
                 newColorBadges.appendChild(badge);
             });
         } else {
@@ -1053,7 +1060,7 @@
         buttonsContainer.innerHTML = '';
         const phase = getPhaseFromProgress();
         const items = getCategoryItems();
-        const isEmojiMode = selectedCategory !== 'colours';
+        const isEmojiMode = !isColorCategory();
         const promptText = isEmojiMode ? 'What does this emoji mean?' : 'What colour is this?';
         const speechPrompt = isEmojiMode ? 'Say the word!' : 'Say the colour!';
 
@@ -1085,7 +1092,7 @@
             if (phase === 0 && !isEmojiMode) {
                 // Learning mode: show colored backgrounds (colours only)
                 btn.classList.add('learning-mode');
-                btn.style.backgroundColor = COLOR_CSS[item];
+                btn.style.backgroundColor = getCategoryData().display[item];
                 // Ensure text is readable on light colors
                 if (item === 'yellow' || item === 'white') {
                     btn.style.color = '#222';
@@ -1126,7 +1133,7 @@
 
         game.currentColor = newColor;
 
-        // Display: emoji or colour
+        // Display: emoji or colour swatch
         const emoji = getCategoryDisplay(game.currentColor);
         if (emoji) {
             colorDisplay.style.backgroundColor = 'transparent';
@@ -1135,11 +1142,11 @@
         } else {
             colorDisplay.textContent = '';
             colorDisplay.classList.remove('emoji-display');
-            colorDisplay.style.backgroundColor = COLOR_CSS[game.currentColor];
+            colorDisplay.style.backgroundColor = getCategoryData().display[game.currentColor];
         }
 
         // Show reinforcement label in level 1 of learning phase for non-colour categories
-        if (selectedCategory !== 'colours' && getPhaseFromProgress() === 0 && getLevelInPhase() === 1) {
+        if (!isColorCategory() && getPhaseFromProgress() === 0 && getLevelInPhase() === 1) {
             reinforcementLabel.textContent = getCategoryTranslation(game.currentColor);
         } else {
             reinforcementLabel.textContent = '';
