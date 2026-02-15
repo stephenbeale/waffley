@@ -31,6 +31,12 @@ Planned features and improvements for Waffley.
 - [ ] **Add plurals with and without articles**
   Introduce plural forms at higher levels, with and without articles (e.g. "dos plátanos", "due torte", "una torta"). Display quantities using repeated emojis (e.g. two emojis for plural).
 
+- [ ] **Add back and pause buttons to game UI**
+  Add a back button during gameplay so users can exit to the menu without having to lose. Add a pause button that stops the timer. Users should never feel trapped in a round.
+
+- [ ] **Add navigation options to level-up and cycle-complete cards**
+  On the overlay cards shown between rounds (level-up, cycle complete), give users options to quit to menu, change language, or change category — not just auto-continue. Users should be able to choose where they go at all times.
+
 ---
 
 ## Code Quality & Architecture
