@@ -4,7 +4,7 @@ Planned features and improvements for Waffley.
 
 ---
 
-- [ ] **Sound effects for correct/incorrect answers**
+- [x] **Sound effects for correct/incorrect answers**
   Play a positive sound effect for every correct answer and a buzzer sound for incorrect answers.
 
 - [x] **Fix audio delay on first question of each level**
@@ -21,6 +21,15 @@ Planned features and improvements for Waffley.
 
 - [ ] **Level selection for new languages**
   Give users the option to choose their starting level when beginning a new language or when continuing.
+
+- [ ] **Expand vocabulary items in each set**
+  Add more items to each category so there is greater variety as the user progresses.
+
+- [ ] **Introduce articles at higher levels**
+  At higher levels, require the article with the noun (e.g. "la torta", "el plátano", "die Katze"). Teaches gender alongside vocabulary.
+
+- [ ] **Add plurals with and without articles**
+  Introduce plural forms at higher levels, with and without articles (e.g. "dos plátanos", "due torte", "una torta"). Display quantities using repeated emojis (e.g. two emojis for plural).
 
 ---
 
