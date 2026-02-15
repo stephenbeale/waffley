@@ -10,8 +10,11 @@ Planned features and improvements for Waffley.
 - [x] **Fix audio delay on first question of each level**
   The pronunciation audio for the first question after a level-up has a noticeable delay compared to subsequent questions. Add an earlier offset/pre-trigger for the first round's audio so it fires promptly.
 
-- [ ] **Clearer level-up cards**
+- [x] **Clearer level-up cards**
   Make the cards shown between levels clearer and more informative.
+
+- [ ] **Mastery-based level progression**
+  Level-up should only happen once every word in the current set has been answered correctly at least twice, however long it takes. Remove the fixed answer-count threshold and instead track per-word correct counts within the level. The timer still applies per round, but the level continues until mastery is achieved.
 
 - [ ] **Show the user the plan and progress**
   Tell the user what the learning plan is and make their progression through it clearer.

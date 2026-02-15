@@ -663,17 +663,26 @@
         const newTimeSeconds = getTimeLimitSeconds(currentAnswers);
 
         levelUpTitle.textContent = phaseChanged ? 'Phase Complete!' : 'Level Up!';
+        document.getElementById('level-up-streak').textContent = 'Current streak: ' + score;
         levelUpMessage.textContent = `You reached Level ${newLevelInCycle}`;
 
+        const phaseBadgeOverlay = document.getElementById('level-up-phase-badge');
         if (phaseChanged) {
-            levelUpPhase.textContent = `Welcome to ${PHASES[phase]} Mode!`;
-            // Add extra info for speech mode
-            if (phase === 2) {
-                levelUpPhase.textContent += speechSupported
-                    ? ' Speak the colour words to answer!'
-                    : ' (Voice not supported - using buttons)';
+            phaseBadgeOverlay.textContent = PHASES[phase];
+            phaseBadgeOverlay.className = 'phase-badge ' + PHASE_CLASSES[phase];
+            phaseBadgeOverlay.style.display = '';
+            if (phase === 1) {
+                levelUpPhase.textContent = 'Now try without the words!';
+            } else if (phase === 2) {
+                const item = selectedCategory === 'colours' ? 'the colour' : 'the word';
+                levelUpPhase.textContent = speechSupported
+                    ? `Now it's your turn to speak ${item}!`
+                    : `Speech mode (voice not supported - using buttons)`;
+            } else {
+                levelUpPhase.textContent = `Welcome to ${PHASES[phase]} Mode!`;
             }
         } else {
+            phaseBadgeOverlay.style.display = 'none';
             levelUpPhase.textContent = '';
         }
 
