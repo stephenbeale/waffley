@@ -58,6 +58,9 @@ Planned features and improvements for Waffley.
 - [x] **Guard against timer race conditions**
   Add a `roundActive` flag checked by both `handleAnswer` and the timeout callback to prevent `endGame()` firing twice.
 
+- [ ] **Focus overlay buttons when shown**
+  When the pause overlay (and other dialog overlays) appear, move focus to the first button inside. Currently focus remains on the game buttons in the background, which is poor for accessibility and keyboard navigation.
+
 ### Priority 2 — Reduce technical debt
 
 - [x] **Extract game state into a state object**
