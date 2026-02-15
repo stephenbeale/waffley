@@ -472,12 +472,10 @@
     const levelUpInfo = document.getElementById('level-up-info');
     const levelUpTime = document.getElementById('level-up-time');
     const levelUpCountdown = document.getElementById('level-up-countdown');
-    const startLevelEl = document.getElementById('start-level');
-    const startPhaseEl = document.getElementById('start-phase');
+    const journeyTracker = document.getElementById('journey-tracker');
     const startTotalAnswersEl = document.getElementById('start-total-answers');
     const startTimeLimitEl = document.getElementById('start-time-limit');
     const startCycleEl = document.getElementById('start-cycle');
-    const startColorsEl = document.getElementById('start-colors');
 
     // Cycle complete elements
     const cycleCompleteOverlay = document.getElementById('cycle-complete-overlay');
@@ -619,12 +617,28 @@
     // Update start screen progress display
     function updateStartScreenProgress() {
         const levelInCycle = getLevelWithinCycle(totalCorrectAnswers);
-        startLevelEl.textContent = levelInCycle;
-        startPhaseEl.textContent = getPhaseName(levelInCycle);
+        const currentPhase = getPhase(levelInCycle);
+        const levelInPhase = getLevelWithinPhase(totalCorrectAnswers);
+
+        const phases = journeyTracker.querySelectorAll('.journey-phase');
+        phases.forEach(el => {
+            const p = parseInt(el.dataset.phase);
+            el.classList.remove('active', 'completed');
+            const progressEl = el.querySelector('.journey-phase-progress');
+            if (p < currentPhase) {
+                el.classList.add('completed');
+                progressEl.textContent = `${LEVELS_PER_PHASE} of ${LEVELS_PER_PHASE} levels`;
+            } else if (p === currentPhase) {
+                el.classList.add('active');
+                progressEl.textContent = `Level ${levelInPhase} of ${LEVELS_PER_PHASE}`;
+            } else {
+                progressEl.textContent = '';
+            }
+        });
+
         startTotalAnswersEl.textContent = totalCorrectAnswers;
         startTimeLimitEl.textContent = getTimeLimitSeconds(totalCorrectAnswers);
         startCycleEl.textContent = currentCycle;
-        startColorsEl.textContent = getActiveColors(currentCycle).length;
     }
 
     // Update game screen level display

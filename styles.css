@@ -646,7 +646,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     border-radius: 8px;
     padding: 1rem 1.5rem;
     margin-bottom: 1.5rem;
-    text-align: center;
+    text-align: left;
     min-width: 250px;
 }
 
@@ -655,31 +655,127 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     color: #666;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
+    text-align: center;
 }
 
-.progress-level {
-    font-size: 1.5rem;
+.journey-tracker {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.journey-phase {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    opacity: 0.35;
+}
+
+.journey-phase.active {
+    opacity: 1;
+}
+
+.journey-phase.completed {
+    opacity: 0.7;
+}
+
+.journey-dot {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    border-radius: 50%;
+    border: 2px solid #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    margin-top: 2px;
+}
+
+.journey-phase.active .journey-dot {
+    background: #fd7e14;
+    border-color: #fd7e14;
+    box-shadow: 0 0 8px rgba(253, 126, 20, 0.4);
+}
+
+.journey-phase.active[data-phase="0"] .journey-dot {
+    background: #28a745;
+    border-color: #28a745;
+    box-shadow: 0 0 8px rgba(40, 167, 69, 0.4);
+}
+
+.journey-phase.active[data-phase="2"] .journey-dot {
+    background: #e83e8c;
+    border-color: #e83e8c;
+    box-shadow: 0 0 8px rgba(232, 62, 140, 0.4);
+}
+
+.journey-phase.completed .journey-dot {
+    background: #28a745;
+    border-color: #28a745;
+}
+
+.journey-phase.completed .journey-dot::after {
+    content: '\2713';
+    color: #fff;
+    font-weight: 700;
+}
+
+.journey-phase.active .journey-dot::after {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: #fff;
+    border-radius: 50%;
+}
+
+.journey-connector {
+    width: 2px;
+    height: 16px;
+    background: #333;
+    margin-left: 11px;
+}
+
+.journey-phase.completed + .journey-connector {
+    background: #28a745;
+}
+
+.journey-phase-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.journey-phase-name {
+    font-size: 1rem;
     font-weight: 700;
     color: #fff;
 }
 
-.progress-answers {
-    font-size: 0.9rem;
+.journey-phase-desc {
+    font-size: 0.75rem;
+    color: #888;
+}
+
+.journey-phase-progress {
+    font-size: 0.75rem;
     color: #aaa;
-    margin-top: 0.3rem;
+    margin-top: 1px;
 }
 
-.progress-time {
-    font-size: 0.85rem;
-    color: #e94560;
-    margin-top: 0.3rem;
+.journey-stats {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.8rem;
+    color: #888;
 }
 
-.progress-cycle {
-    font-size: 0.85rem;
-    color: #28a745;
-    margin-top: 0.3rem;
+.journey-stats-sep {
+    color: #555;
 }
 
 /* Cycle complete overlay */
