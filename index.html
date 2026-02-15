@@ -50,11 +50,42 @@
     </div>
 
     <div class="progress-display" id="progress-display">
-        <div class="progress-title">Your Progress</div>
-        <div class="progress-level">Level <span id="start-level">1</span> - <span id="start-phase">Learning</span></div>
-        <div class="progress-answers"><span id="start-total-answers">0</span> correct answers</div>
-        <div class="progress-cycle">Cycle <span id="start-cycle">1</span> (<span id="start-colors">5</span> colours)</div>
-        <div class="progress-time">Time limit: <span id="start-time-limit">10</span>s</div>
+        <div class="progress-title">Your Journey</div>
+        <div class="journey-tracker" id="journey-tracker">
+            <div class="journey-phase" data-phase="0">
+                <div class="journey-dot"></div>
+                <div class="journey-phase-info">
+                    <div class="journey-phase-name">Learning</div>
+                    <div class="journey-phase-desc">Words shown with answers</div>
+                    <div class="journey-phase-progress"></div>
+                </div>
+            </div>
+            <div class="journey-connector"></div>
+            <div class="journey-phase" data-phase="1">
+                <div class="journey-dot"></div>
+                <div class="journey-phase-info">
+                    <div class="journey-phase-name">Practice</div>
+                    <div class="journey-phase-desc">Answer from memory</div>
+                    <div class="journey-phase-progress"></div>
+                </div>
+            </div>
+            <div class="journey-connector"></div>
+            <div class="journey-phase" data-phase="2">
+                <div class="journey-dot"></div>
+                <div class="journey-phase-info">
+                    <div class="journey-phase-name">Speech</div>
+                    <div class="journey-phase-desc">Speak the answer</div>
+                    <div class="journey-phase-progress"></div>
+                </div>
+            </div>
+        </div>
+        <div class="journey-stats">
+            <span>Cycle <span id="start-cycle">1</span></span>
+            <span class="journey-stats-sep">&middot;</span>
+            <span><span id="start-total-answers">0</span> answers</span>
+            <span class="journey-stats-sep">&middot;</span>
+            <span>Time: <span id="start-time-limit">10</span>s</span>
+        </div>
     </div>
 
     <div class="start-buttons">
