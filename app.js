@@ -663,9 +663,14 @@
         const newTimeSeconds = getTimeLimitSeconds(currentAnswers);
 
         levelUpTitle.textContent = phaseChanged ? 'Phase Complete!' : 'Level Up!';
+        document.getElementById('level-up-streak').textContent = 'Current streak: ' + score;
         levelUpMessage.textContent = `You reached Level ${newLevelInCycle}`;
 
+        const phaseBadgeOverlay = document.getElementById('level-up-phase-badge');
         if (phaseChanged) {
+            phaseBadgeOverlay.textContent = PHASES[phase];
+            phaseBadgeOverlay.className = 'phase-badge ' + PHASE_CLASSES[phase];
+            phaseBadgeOverlay.style.display = '';
             levelUpPhase.textContent = `Welcome to ${PHASES[phase]} Mode!`;
             // Add extra info for speech mode
             if (phase === 2) {
@@ -674,6 +679,7 @@
                     : ' (Voice not supported - using buttons)';
             }
         } else {
+            phaseBadgeOverlay.style.display = 'none';
             levelUpPhase.textContent = '';
         }
 
