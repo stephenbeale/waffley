@@ -13,7 +13,7 @@ Planned features and improvements for Waffley.
 - [x] **Clearer level-up cards**
   Make the cards shown between levels clearer and more informative.
 
-- [ ] **Mastery-based level progression**
+- [x] **Mastery-based level progression**
   Level-up should only happen once every word in the current set has been answered correctly at least twice, however long it takes. Remove the fixed answer-count threshold and instead track per-word correct counts within the level. The timer still applies per round, but the level continues until mastery is achieved.
 
 - [x] **Show the user the plan and progress**
