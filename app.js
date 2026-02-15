@@ -215,6 +215,7 @@
     function showStats() {
         updateStatsDisplay();
         document.getElementById('stats-overlay').classList.add('active');
+        document.getElementById('close-stats-btn').focus();
     }
 
     // Hide statistics overlay
@@ -971,6 +972,7 @@
         }
 
         pauseOverlay.classList.add('active');
+        resumeBtn.focus();
     }
 
     function resumeGame() {
