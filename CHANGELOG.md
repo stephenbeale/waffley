@@ -32,6 +32,9 @@ All notable changes to Waffley are documented here. Format follows [Keep a Chang
 - Mobile-responsive buttons — compact padding and gap on small viewports
 - Mastered items stay visible (no greying) but excluded from questions
 
+### Refactored
+- Converted to ES modules — data.js exports all constants, app.js imports them, single module entry point
+
 ### Fixed
 - Button overflow on mobile — screens now scroll, compact layout on small viewports
 - Progression tone pitch carried over between levels — now resets each level-up

@@ -45,15 +45,17 @@ Each form is tracked independently for mastery.
 
 Open `index.html` in a browser. No build step or server required.
 
+**Note:** Uses ES modules — must be served via HTTP (e.g. `npx serve .` or VS Code Live Server). Opening `index.html` directly as a file won't work due to CORS restrictions on module imports.
+
 For speech recognition, use Chrome or Edge and allow microphone access.
 
 ## Project Structure
 
 ```
-index.html   — Application markup
+index.html   — Application markup (single module entry point)
 styles.css   — Styling
-data.js      — Category data, translations, forms, speech config
-app.js       — Game logic, state management, UI updates
+data.js      — Category data, translations, forms, speech config (ES module exports)
+app.js       — Game logic, state management, UI updates (ES module, imports data.js)
 ROADMAP.md   — Feature roadmap and technical debt tracking
 CLAUDE.md    — Project documentation for AI-assisted development
 ```
