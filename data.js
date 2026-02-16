@@ -23,6 +23,11 @@
         4: ['black', 'white']
     };
 
+    // Noun categories that support articles and plurals
+    const NOUN_CATEGORIES = ['animals', 'food', 'weather'];
+    const ARTICLE_CYCLE = 2;
+    const PLURAL_CYCLE = 3;
+
     // Language display names
     const LANGUAGE_NAMES = {
         es: 'Spanish', fr: 'French', de: 'German',
@@ -156,6 +161,74 @@
                     dog: 'Cão', cat: 'Gato', elephant: 'Elefante', bird: 'Pássaro',
                     fish: 'Peixe', horse: 'Cavalo', rabbit: 'Coelho', bear: 'Urso', monkey: 'Macaco'
                 }
+            },
+            forms: {
+                es: {
+                    dog: { article: 'El', plural: 'Perros', pluralArticle: 'Los' },
+                    cat: { article: 'El', plural: 'Gatos', pluralArticle: 'Los' },
+                    elephant: { article: 'El', plural: 'Elefantes', pluralArticle: 'Los' },
+                    bird: { article: 'El', plural: 'Pájaros', pluralArticle: 'Los' },
+                    fish: { article: 'El', plural: 'Peces', pluralArticle: 'Los' },
+                    horse: { article: 'El', plural: 'Caballos', pluralArticle: 'Los' },
+                    rabbit: { article: 'El', plural: 'Conejos', pluralArticle: 'Los' },
+                    bear: { article: 'El', plural: 'Osos', pluralArticle: 'Los' },
+                    monkey: { article: 'El', plural: 'Monos', pluralArticle: 'Los' }
+                },
+                fr: {
+                    dog: { article: 'Le', plural: 'Chiens', pluralArticle: 'Les' },
+                    cat: { article: 'Le', plural: 'Chats', pluralArticle: 'Les' },
+                    elephant: { article: "L'", plural: 'Éléphants', pluralArticle: 'Les' },
+                    bird: { article: "L'", plural: 'Oiseaux', pluralArticle: 'Les' },
+                    fish: { article: 'Le', plural: 'Poissons', pluralArticle: 'Les' },
+                    horse: { article: 'Le', plural: 'Chevaux', pluralArticle: 'Les' },
+                    rabbit: { article: 'Le', plural: 'Lapins', pluralArticle: 'Les' },
+                    bear: { article: "L'", plural: 'Ours', pluralArticle: 'Les' },
+                    monkey: { article: 'Le', plural: 'Singes', pluralArticle: 'Les' }
+                },
+                de: {
+                    dog: { article: 'Der', plural: 'Hunde', pluralArticle: 'Die' },
+                    cat: { article: 'Die', plural: 'Katzen', pluralArticle: 'Die' },
+                    elephant: { article: 'Der', plural: 'Elefanten', pluralArticle: 'Die' },
+                    bird: { article: 'Der', plural: 'Vögel', pluralArticle: 'Die' },
+                    fish: { article: 'Der', plural: 'Fische', pluralArticle: 'Die' },
+                    horse: { article: 'Das', plural: 'Pferde', pluralArticle: 'Die' },
+                    rabbit: { article: 'Das', plural: 'Kaninchen', pluralArticle: 'Die' },
+                    bear: { article: 'Der', plural: 'Bären', pluralArticle: 'Die' },
+                    monkey: { article: 'Der', plural: 'Affen', pluralArticle: 'Die' }
+                },
+                it: {
+                    dog: { article: 'Il', plural: 'Cani', pluralArticle: 'I' },
+                    cat: { article: 'Il', plural: 'Gatti', pluralArticle: 'I' },
+                    elephant: { article: "L'", plural: 'Elefanti', pluralArticle: 'Gli' },
+                    bird: { article: "L'", plural: 'Uccelli', pluralArticle: 'Gli' },
+                    fish: { article: 'Il', plural: 'Pesci', pluralArticle: 'I' },
+                    horse: { article: 'Il', plural: 'Cavalli', pluralArticle: 'I' },
+                    rabbit: { article: 'Il', plural: 'Conigli', pluralArticle: 'I' },
+                    bear: { article: "L'", plural: 'Orsi', pluralArticle: 'Gli' },
+                    monkey: { article: 'La', plural: 'Scimmie', pluralArticle: 'Le' }
+                },
+                cy: {
+                    dog: { article: 'Y', plural: 'Cŵn', pluralArticle: 'Y' },
+                    cat: { article: 'Y', plural: 'Cathod', pluralArticle: 'Y' },
+                    elephant: { article: 'Yr', plural: 'Eliffantod', pluralArticle: 'Yr' },
+                    bird: { article: 'Yr', plural: 'Adar', pluralArticle: 'Yr' },
+                    fish: { article: 'Y', plural: 'Pysgod', pluralArticle: 'Y' },
+                    horse: { article: 'Y', plural: 'Ceffylau', pluralArticle: 'Y' },
+                    rabbit: { article: 'Y', plural: 'Cwningod', pluralArticle: 'Y' },
+                    bear: { article: 'Yr', plural: 'Eirth', pluralArticle: 'Yr' },
+                    monkey: { article: 'Y', plural: 'Mwnciod', pluralArticle: 'Y' }
+                },
+                pt: {
+                    dog: { article: 'O', plural: 'Cães', pluralArticle: 'Os' },
+                    cat: { article: 'O', plural: 'Gatos', pluralArticle: 'Os' },
+                    elephant: { article: 'O', plural: 'Elefantes', pluralArticle: 'Os' },
+                    bird: { article: 'O', plural: 'Pássaros', pluralArticle: 'Os' },
+                    fish: { article: 'O', plural: 'Peixes', pluralArticle: 'Os' },
+                    horse: { article: 'O', plural: 'Cavalos', pluralArticle: 'Os' },
+                    rabbit: { article: 'O', plural: 'Coelhos', pluralArticle: 'Os' },
+                    bear: { article: 'O', plural: 'Ursos', pluralArticle: 'Os' },
+                    monkey: { article: 'O', plural: 'Macacos', pluralArticle: 'Os' }
+                }
             }
         },
         food: {
@@ -190,6 +263,74 @@
                     apple: 'Maçã', pizza: 'Pizza', bread: 'Pão', cheese: 'Queijo',
                     egg: 'Ovo', cake: 'Bolo', grape: 'Uva', banana: 'Banana', rice: 'Arroz'
                 }
+            },
+            forms: {
+                es: {
+                    apple: { article: 'La', plural: 'Manzanas', pluralArticle: 'Las' },
+                    pizza: { article: 'La', plural: 'Pizzas', pluralArticle: 'Las' },
+                    bread: { article: 'El', plural: 'Panes', pluralArticle: 'Los' },
+                    cheese: { article: 'El', plural: 'Quesos', pluralArticle: 'Los' },
+                    egg: { article: 'El', plural: 'Huevos', pluralArticle: 'Los' },
+                    cake: { article: 'El', plural: 'Pasteles', pluralArticle: 'Los' },
+                    grape: { article: 'La', plural: 'Uvas', pluralArticle: 'Las' },
+                    banana: { article: 'El', plural: 'Plátanos', pluralArticle: 'Los' },
+                    rice: { article: 'El', plural: 'Arroces', pluralArticle: 'Los' }
+                },
+                fr: {
+                    apple: { article: 'La', plural: 'Pommes', pluralArticle: 'Les' },
+                    pizza: { article: 'La', plural: 'Pizzas', pluralArticle: 'Les' },
+                    bread: { article: 'Le', plural: 'Pains', pluralArticle: 'Les' },
+                    cheese: { article: 'Le', plural: 'Fromages', pluralArticle: 'Les' },
+                    egg: { article: "L'", plural: 'Œufs', pluralArticle: 'Les' },
+                    cake: { article: 'Le', plural: 'Gâteaux', pluralArticle: 'Les' },
+                    grape: { article: 'Le', plural: 'Raisins', pluralArticle: 'Les' },
+                    banana: { article: 'La', plural: 'Bananes', pluralArticle: 'Les' },
+                    rice: { article: 'Le', plural: 'Riz', pluralArticle: 'Les' }
+                },
+                de: {
+                    apple: { article: 'Der', plural: 'Äpfel', pluralArticle: 'Die' },
+                    pizza: { article: 'Die', plural: 'Pizzen', pluralArticle: 'Die' },
+                    bread: { article: 'Das', plural: 'Brote', pluralArticle: 'Die' },
+                    cheese: { article: 'Der', plural: 'Käse', pluralArticle: 'Die' },
+                    egg: { article: 'Das', plural: 'Eier', pluralArticle: 'Die' },
+                    cake: { article: 'Der', plural: 'Kuchen', pluralArticle: 'Die' },
+                    grape: { article: 'Die', plural: 'Trauben', pluralArticle: 'Die' },
+                    banana: { article: 'Die', plural: 'Bananen', pluralArticle: 'Die' },
+                    rice: { article: 'Der', plural: 'Reis', pluralArticle: 'Die' }
+                },
+                it: {
+                    apple: { article: 'La', plural: 'Mele', pluralArticle: 'Le' },
+                    pizza: { article: 'La', plural: 'Pizze', pluralArticle: 'Le' },
+                    bread: { article: 'Il', plural: 'Pani', pluralArticle: 'I' },
+                    cheese: { article: 'Il', plural: 'Formaggi', pluralArticle: 'I' },
+                    egg: { article: "L'", plural: 'Uova', pluralArticle: 'Le' },
+                    cake: { article: 'La', plural: 'Torte', pluralArticle: 'Le' },
+                    grape: { article: "L'", plural: 'Uve', pluralArticle: 'Le' },
+                    banana: { article: 'La', plural: 'Banane', pluralArticle: 'Le' },
+                    rice: { article: 'Il', plural: 'Risi', pluralArticle: 'I' }
+                },
+                cy: {
+                    apple: { article: 'Yr', plural: 'Afalau', pluralArticle: 'Yr' },
+                    pizza: { article: 'Y', plural: 'Pizzas', pluralArticle: 'Y' },
+                    bread: { article: 'Y', plural: 'Barâu', pluralArticle: 'Y' },
+                    cheese: { article: 'Y', plural: 'Cawsiau', pluralArticle: 'Y' },
+                    egg: { article: 'Yr', plural: 'Wyau', pluralArticle: 'Yr' },
+                    cake: { article: 'Y', plural: 'Cacennau', pluralArticle: 'Y' },
+                    grape: { article: 'Y', plural: 'Grawnwin', pluralArticle: 'Y' },
+                    banana: { article: 'Y', plural: 'Bananas', pluralArticle: 'Y' },
+                    rice: { article: 'Y', plural: 'Reis', pluralArticle: 'Y' }
+                },
+                pt: {
+                    apple: { article: 'A', plural: 'Maçãs', pluralArticle: 'As' },
+                    pizza: { article: 'A', plural: 'Pizzas', pluralArticle: 'As' },
+                    bread: { article: 'O', plural: 'Pães', pluralArticle: 'Os' },
+                    cheese: { article: 'O', plural: 'Queijos', pluralArticle: 'Os' },
+                    egg: { article: 'O', plural: 'Ovos', pluralArticle: 'Os' },
+                    cake: { article: 'O', plural: 'Bolos', pluralArticle: 'Os' },
+                    grape: { article: 'A', plural: 'Uvas', pluralArticle: 'As' },
+                    banana: { article: 'A', plural: 'Bananas', pluralArticle: 'As' },
+                    rice: { article: 'O', plural: 'Arrozes', pluralArticle: 'Os' }
+                }
             }
         },
         weather: {
@@ -223,6 +364,74 @@
                 pt: {
                     sunny: 'Ensolarado', rainy: 'Chuvoso', snowy: 'Nevado', windy: 'Ventoso',
                     cloudy: 'Nublado', stormy: 'Tempestuoso', hot: 'Quente', foggy: 'Nevoeiro', rainbow: 'Arco-íris'
+                }
+            },
+            forms: {
+                es: {
+                    sunny: { article: 'El', plural: 'Soles', pluralArticle: 'Los' },
+                    rainy: { article: 'La', plural: 'Lluvias', pluralArticle: 'Las' },
+                    snowy: { article: 'La', plural: 'Nieves', pluralArticle: 'Las' },
+                    windy: { article: 'El', plural: 'Vientos', pluralArticle: 'Los' },
+                    cloudy: { article: 'La', plural: 'Nubes', pluralArticle: 'Las' },
+                    stormy: { article: 'La', plural: 'Tormentas', pluralArticle: 'Las' },
+                    hot: { article: 'El', plural: 'Calores', pluralArticle: 'Los' },
+                    foggy: { article: 'La', plural: 'Nieblas', pluralArticle: 'Las' },
+                    rainbow: { article: 'El', plural: 'Arcoíris', pluralArticle: 'Los' }
+                },
+                fr: {
+                    sunny: { article: 'Le', plural: 'Soleils', pluralArticle: 'Les' },
+                    rainy: { article: 'La', plural: 'Pluies', pluralArticle: 'Les' },
+                    snowy: { article: 'La', plural: 'Neiges', pluralArticle: 'Les' },
+                    windy: { article: 'Le', plural: 'Vents', pluralArticle: 'Les' },
+                    cloudy: { article: 'Le', plural: 'Nuages', pluralArticle: 'Les' },
+                    stormy: { article: "L'", plural: 'Orages', pluralArticle: 'Les' },
+                    hot: { article: 'La', plural: 'Chaleurs', pluralArticle: 'Les' },
+                    foggy: { article: 'Le', plural: 'Brouillards', pluralArticle: 'Les' },
+                    rainbow: { article: "L'", plural: 'Arcs-en-ciel', pluralArticle: 'Les' }
+                },
+                de: {
+                    sunny: { article: 'Die', plural: 'Sonnen', pluralArticle: 'Die' },
+                    rainy: { article: 'Der', plural: 'Regen', pluralArticle: 'Die' },
+                    snowy: { article: 'Der', plural: 'Schnee', pluralArticle: 'Die' },
+                    windy: { article: 'Der', plural: 'Winde', pluralArticle: 'Die' },
+                    cloudy: { article: 'Die', plural: 'Wolken', pluralArticle: 'Die' },
+                    stormy: { article: 'Der', plural: 'Stürme', pluralArticle: 'Die' },
+                    hot: { article: 'Die', plural: 'Hitze', pluralArticle: 'Die' },
+                    foggy: { article: 'Der', plural: 'Nebel', pluralArticle: 'Die' },
+                    rainbow: { article: 'Der', plural: 'Regenbögen', pluralArticle: 'Die' }
+                },
+                it: {
+                    sunny: { article: 'Il', plural: 'Soli', pluralArticle: 'I' },
+                    rainy: { article: 'La', plural: 'Piogge', pluralArticle: 'Le' },
+                    snowy: { article: 'La', plural: 'Nevi', pluralArticle: 'Le' },
+                    windy: { article: 'Il', plural: 'Venti', pluralArticle: 'I' },
+                    cloudy: { article: 'La', plural: 'Nuvole', pluralArticle: 'Le' },
+                    stormy: { article: 'La', plural: 'Tempeste', pluralArticle: 'Le' },
+                    hot: { article: 'Il', plural: 'Calori', pluralArticle: 'I' },
+                    foggy: { article: 'La', plural: 'Nebbie', pluralArticle: 'Le' },
+                    rainbow: { article: "L'", plural: 'Arcobaleni', pluralArticle: 'Gli' }
+                },
+                cy: {
+                    sunny: { article: 'Yr', plural: 'Heuliau', pluralArticle: 'Yr' },
+                    rainy: { article: 'Y', plural: 'Glawogydd', pluralArticle: 'Y' },
+                    snowy: { article: 'Yr', plural: 'Eira', pluralArticle: 'Yr' },
+                    windy: { article: 'Y', plural: 'Gwyntoedd', pluralArticle: 'Y' },
+                    cloudy: { article: 'Y', plural: 'Cymylau', pluralArticle: 'Y' },
+                    stormy: { article: 'Y', plural: 'Stormydd', pluralArticle: 'Y' },
+                    hot: { article: 'Y', plural: 'Gwres', pluralArticle: 'Y' },
+                    foggy: { article: 'Y', plural: 'Niwloedd', pluralArticle: 'Y' },
+                    rainbow: { article: 'Yr', plural: 'Enfysau', pluralArticle: 'Yr' }
+                },
+                pt: {
+                    sunny: { article: 'O', plural: 'Sóis', pluralArticle: 'Os' },
+                    rainy: { article: 'A', plural: 'Chuvas', pluralArticle: 'As' },
+                    snowy: { article: 'A', plural: 'Neves', pluralArticle: 'As' },
+                    windy: { article: 'O', plural: 'Ventos', pluralArticle: 'Os' },
+                    cloudy: { article: 'A', plural: 'Nuvens', pluralArticle: 'As' },
+                    stormy: { article: 'A', plural: 'Tempestades', pluralArticle: 'As' },
+                    hot: { article: 'O', plural: 'Calores', pluralArticle: 'Os' },
+                    foggy: { article: 'O', plural: 'Nevoeiros', pluralArticle: 'Os' },
+                    rainbow: { article: 'O', plural: 'Arco-íris', pluralArticle: 'Os' }
                 }
             }
         }
