@@ -58,7 +58,7 @@ Planned features and improvements for Waffley.
 - [x] **Correct answer sound pitch increase**
   Make the correct answer sound slightly higher pitch with each consecutive correct answer, resetting on a wrong answer. Creates a satisfying escalation effect.
 
-- [ ] **Keep mastered item buttons visible but exclude from questions**
+- [x] **Keep mastered item buttons visible but exclude from questions**
   Instead of hiding buttons after 3 consecutive correct answers, keep them visible but ensure they can't be selected as the question. This keeps all options in view for a more natural feel.
 
 - [ ] **Silent visual-only round after pronunciation**

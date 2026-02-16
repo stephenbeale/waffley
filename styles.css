@@ -158,9 +158,12 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     background: #3a3a5e;
 }
 
-/* Mastered items hidden completely from the grid */
+/* Mastered items stay visible but greyed out */
 .answer-btn.mastered-out {
-    display: none;
+    opacity: 0.3;
+    pointer-events: none;
+    filter: grayscale(1);
+    transition: opacity 0.5s, filter 0.5s;
 }
 
 #end-screen h1 { font-size: 2rem; }
