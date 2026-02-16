@@ -52,7 +52,7 @@ Planned features and improvements for Waffley.
 - [x] **Show wrong attempts in speech mode**
   When the user gets a speech recognition answer wrong, show a scrolling record of past attempts with a cross next to each, so they can see what was heard and adjust their pronunciation.
 
-- [ ] **Smooth vertical progress bar**
+- [x] **Smooth vertical progress bar**
   The mastery progress bar jumps between values instead of animating smoothly. Add a CSS transition so it rises gradually when items are mastered.
 
 - [x] **Correct answer sound pitch increase**
