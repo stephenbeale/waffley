@@ -621,6 +621,7 @@
     const micIcon = document.getElementById('mic-icon');
     const micStatus = document.getElementById('mic-status');
     const voiceFeedback = document.getElementById('voice-feedback');
+    const speechAttempts = document.getElementById('speech-attempts');
     const speechWarning = document.getElementById('speech-warning');
 
     // Typing mode elements
@@ -671,6 +672,13 @@
                 const matchedColor = matchColorFromSpeech(lastWord, transcript);
                 if (matchedColor) {
                     handleAnswer(matchedColor);
+                } else {
+                    // Log wrong attempt
+                    const entry = document.createElement('div');
+                    entry.className = 'speech-attempt';
+                    entry.textContent = displayText;
+                    speechAttempts.appendChild(entry);
+                    speechAttempts.scrollTop = speechAttempts.scrollHeight;
                 }
             }
         };
@@ -750,6 +758,7 @@
             micIcon.classList.add('listening');
             micStatus.textContent = 'Listening...';
             voiceFeedback.textContent = '';
+            speechAttempts.innerHTML = '';
         } catch (e) {
             console.log('Speech recognition start error:', e);
         }
@@ -1582,6 +1591,9 @@
 
         // Speak the word if audio is enabled
         speakColor(game.currentColor, selectedLanguage);
+
+        // Clear speech wrong attempts for the new round
+        speechAttempts.innerHTML = '';
 
         shuffleButtons();
 

@@ -5,6 +5,7 @@ All notable changes to Waffley are documented here. Format follows [Keep a Chang
 ## [Unreleased]
 
 ### Added
+- Speech wrong attempts history — scrolling list of failed speech recognition attempts with cross marks
 - Session mastery removal — items fade out after 3 consecutive correct answers, restored at next level
 - Speed round mercy — when failing at 2-second speed, choose to retry, add 2 seconds, or end game
 - Feminine adjective forms from Cycle 2 — gendered prompts with 👨/👩 indicators (ES, FR, IT, PT)

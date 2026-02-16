@@ -49,7 +49,7 @@ Planned features and improvements for Waffley.
 - [x] **Improve typing mode for mobile**
   Make emoji/colour display smaller so the keyboard overlay doesn't obscure the text input. Move the timer bar between the display and the input. Add accent shortcut buttons above the text input for easy character entry. Show a hint on typing phase start and level-up cards that accents can be found by holding the relevant key on keyboard.
 
-- [ ] **Show wrong attempts in speech mode**
+- [x] **Show wrong attempts in speech mode**
   When the user gets a speech recognition answer wrong, show a scrolling record of past attempts with a cross next to each, so they can see what was heard and adjust their pronunciation.
 
 - [ ] **Smooth vertical progress bar**
@@ -57,6 +57,27 @@ Planned features and improvements for Waffley.
 
 - [x] **Correct answer sound pitch increase**
   Make the correct answer sound slightly higher pitch with each consecutive correct answer, resetting on a wrong answer. Creates a satisfying escalation effect.
+
+- [ ] **Keep mastered item buttons visible but exclude from questions**
+  Instead of hiding buttons after 3 consecutive correct answers, keep them visible but ensure they can't be selected as the question. This keeps all options in view for a more natural feel.
+
+- [ ] **Silent visual-only round after pronunciation**
+  After pronunciation has been on, add a round of purely visual answers with no sound, so the user must recognise the emoji without an audio prompt.
+
+- [ ] **Fix button overflow on mobile**
+  Button options spill off the screen on mobile devices. Ensure all buttons fit within the viewport.
+
+- [ ] **Centre lone button on odd-count rows**
+  When displayed as an odd number, the single button on the last row should be centred rather than aligned to one side.
+
+- [ ] **Fix progression tone reset between rounds**
+  Check that the escalating correct-answer pitch resets properly each round. Currently it may carry over incorrectly.
+
+- [ ] **Mute button for progression sounds**
+  Give the user an option to mute progression sounds with a mute button at the top of the progression bar.
+
+- [ ] **Progressively add more answer buttons as difficulty increases**
+  As a more difficult round, increase the number of answer buttons rather than reducing them.
 
 ---
 
