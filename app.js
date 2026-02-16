@@ -1508,14 +1508,14 @@
         // Update time limit based on current level
         game.timeLimit = getTimeLimit();
 
-        // Build list of unmastered {item, form} pairs
+        // Build list of unmastered {item, form} pairs (skip removed items)
         const items = getCategoryItems();
         const forms = getAvailableForms();
         const unmasteredPairs = [];
         items.forEach(item => {
             forms.forEach(form => {
                 const key = form === 'base' ? item : `${item}:${form}`;
-                if ((game.levelMastery[key] || 0) < MASTERY_THRESHOLD) {
+                if (key in game.levelMastery && game.levelMastery[key] < MASTERY_THRESHOLD) {
                     unmasteredPairs.push({ item, form });
                 }
             });
