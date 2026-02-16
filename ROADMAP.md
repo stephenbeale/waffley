@@ -79,6 +79,9 @@ Planned features and improvements for Waffley.
 - [ ] **Progressively add more answer buttons as difficulty increases**
   As a more difficult round, increase the number of answer buttons rather than reducing them.
 
+- [ ] **Redesign pause/cancel buttons**
+  Replace the small outlined pause and cancel buttons with bold, large symbols in a big box. The current outline is too small and hard to see, especially on mobile.
+
 ---
 
 ## Code Quality & Architecture
