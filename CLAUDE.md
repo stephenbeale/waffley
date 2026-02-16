@@ -105,3 +105,137 @@ Future features from ROADMAP.md:
 - Focus management uses `setTimeout(..., 100)` to ensure DOM is ready before focusing
 - Race condition guards are critical due to overlapping timer callbacks
 - Mastery tracking persists only within current level (resets on level-up)
+
+### 2026-02-16 - Major Feature Sprint (18 Features + 3 Bug Fixes)
+
+**Work Completed:**
+
+All 18 planned features from the feature roadmap were successfully implemented, committed, and merged to master in this session:
+
+1. **Phase Selection (Level Picker)** - `feature/phase-selection`
+   - Added clickable journey phase dots to jump to any unlocked phase
+   - Visual indicators show current phase and locked/unlocked states
+   - Smooth navigation between Learning, Practice, Speed, and Speech phases
+
+2. **Expand Vocabulary** - `feature/expand-vocabulary`
+   - Added 2 new items per category (animals, food, numbers, colors, clothes, feelings)
+   - Total vocabulary increased from 48 to 60 items
+   - Maintains balanced progression across all categories
+
+3. **Fix Uncountable Noun Plurals** - `feature/plurals-and-articles`
+   - Removed "rice" from plural forms ("rices" doesn't exist in French)
+   - Updated data model to handle uncountable nouns correctly
+
+4. **Feminine Adjective Forms** - `feature/adjective-gender-forms`
+   - Added gendered prompts for feelings category (How does **he** feel? / How does **she** feel?)
+   - Visual gender indicators (Mars/Venus symbols)
+   - Dynamically switches between masculine/feminine adjective forms
+
+5. **Speed Round Mercy** - `feature/speed-round-mercy`
+   - Added rescue options when timer hits 2 seconds: Retry / Add 5s / End Round
+   - Prevents frustration while maintaining speed challenge
+   - Clean overlay UI with icon-based buttons
+
+6. **Typing Mobile UX** - `feature/typing-mobile-ux`
+   - Reduced emoji/color display size for compact mobile layout
+   - Added accent button row (é è ê ë à â ç î ï ô ù û ü ÿ) below input
+   - Repositioned timer to top-right for better visibility
+   - Added keyboard hint: "Tap buttons for accents"
+
+7. **Correct Answer Sound Pitch Increase** - `feature/correct-sound-pitch`
+   - Progression tone pitch increases with each consecutive correct answer
+   - Pitch resets at the start of each level
+   - Creates satisfying escalating feedback within a level
+
+8. **Remove Mastered Items from Pool** - `feature/remove-mastered-items`
+   - Items are excluded from question pool after 3 consecutive correct answers
+   - Mastered items remain visible as answer options
+   - Smart handling: if all items mastered, resets mastery to continue gameplay
+
+9. **Speech Wrong Attempts History** - `feature/speech-wrong-attempts`
+   - Scrolling list of failed speech attempts with red cross marks
+   - Helps users see pronunciation patterns and learn from mistakes
+   - Auto-scrolls to show latest attempt
+
+10. **Smooth Vertical Progress Bar** - `fix/smooth-progress-bar`
+    - Added 0.8s cubic-bezier transition to progress bar height changes
+    - Eliminated jarring jumps during level progression
+    - Smooth, polished animation feel
+
+11. **Keep Mastered Buttons Visible** - `feature/visible-mastered-buttons`
+    - Mastered items no longer grey out or get disabled
+    - All buttons remain fully interactive and visible
+    - Items are simply excluded from being asked as questions
+
+12. **Silent Visual-Only Rounds** - `feature/silent-visual-round`
+    - Last 2 levels of Learning phase play no audio
+    - Forces users to rely on visual recognition alone
+    - Prepares for transition to output phases
+
+13. **Centre Lone Button on Odd Rows** - `fix/centre-lone-button`
+    - Applied flexbox centering to answer button grid
+    - Single remaining buttons on odd rows are now centered
+    - Cleaner, more balanced layout
+
+14. **Fix Button Overflow on Mobile** - `fix/button-overflow-mobile`
+    - Made answer button container scrollable with `overflow-y: auto`
+    - Removed minimum width constraints causing horizontal overflow
+    - Buttons now stack vertically on narrow screens
+
+15. **Fix Progression Tone Reset** - `fix/progression-tone-reset`
+    - Separated pitch progression from overall streak tracking
+    - Created dedicated `pitchStreak` counter that resets per level
+    - Progression sounds now correctly restart at base pitch each level
+
+16. **Mute Button for Progression Sounds** - `feature/mute-progression-sounds`
+    - Added SFX toggle button above progress bar
+    - Mutes/unmutes progression tone sounds
+    - Speech audio and voice feedback remain unaffected
+
+17. **Progressive Button Count** - `feature/progressive-button-count`
+    - Start with 4 answer buttons at Level 1
+    - Add 1 button every 2 levels (4→5→6...)
+    - Gradually increases difficulty as vocabulary expands
+
+18. **Redesign Pause/Cancel Buttons** - `feature/redesign-pause-cancel-buttons`
+    - Changed from thin header bar to rounded 44px boxes
+    - Bold symbols (❚❚ for pause, ✕ for cancel)
+    - Improved touch target size and visual hierarchy
+
+**Bug Fixes Completed:**
+- **Mastered items asked as questions** - Fixed deleted key evaluation in question selection logic
+- **Button layout single-column** - Removed min-width constraints causing overflow on narrow screens
+- **Mastery greying** - Removed opacity reduction on mastered buttons per user preference
+
+**Branches Cleaned Up:**
+Deleted 46 merged local branches including all feature/fix/refactor branches from this session and previous sessions.
+
+**Current State:**
+- All 18 features committed, pushed, and merged to master
+- Working tree clean, fully synchronized with origin/master
+- No unpushed commits, no uncommitted changes
+- No open PRs
+- All merged branches deleted locally
+
+**Remaining Roadmap (Code Quality Only):**
+All user-facing features are complete. Only technical debt remains:
+- Split app.js into ES modules (state.js, timer.js, speech.js, ui.js, game.js)
+- Extract utilities and name magic numbers
+- Consolidate language data into unified objects
+- Split data.js into per-language files
+- Refactor CSS with base/modifier classes
+
+**Next Steps:**
+1. Begin modularization sprint: extract ES modules from monolithic app.js
+2. Define clear module boundaries (state, timer, speech recognition, UI rendering, game logic)
+3. Extract magic numbers into named constants
+4. Split multi-language data into separate files
+
+**Technical Notes:**
+- Pitch progression uses `pitchStreak` counter separate from overall `correctStreak`
+- Mastered items tracked with `masteredItems` Set, excluded from question pool
+- Gender indicator stored per round: `currentGenderIndicator` state variable
+- Accent buttons use `insertAtCursor()` helper to inject characters at caret position
+- Progressive button count formula: `Math.min(4 + Math.floor((currentLevel - 1) / 2), activeItems.length)`
+- Speech wrong attempts stored as array, rendered as scrolling list with CSS flexbox column-reverse
+- Mobile-specific layout uses media queries at 480px breakpoint for compact UI
