@@ -20,6 +20,7 @@ All notable changes to Waffley are documented here. Format follows [Keep a Chang
 - Form-aware prompts, speech recognition, TTS, and button text
 
 ### Changed
+- Correct answer sound pitch rises with each consecutive correct answer (up to +1 octave), resets on wrong answer
 - Audio pronunciation suppressed in both Typing and Speech phases
 
 ## 2026-02-15

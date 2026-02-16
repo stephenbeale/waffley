@@ -55,7 +55,7 @@ Planned features and improvements for Waffley.
 - [ ] **Smooth vertical progress bar**
   The mastery progress bar jumps between values instead of animating smoothly. Add a CSS transition so it rises gradually when items are mastered.
 
-- [ ] **Correct answer sound pitch increase**
+- [x] **Correct answer sound pitch increase**
   Make the correct answer sound slightly higher pitch with each consecutive correct answer, resetting on a wrong answer. Creates a satisfying escalation effect.
 
 ---

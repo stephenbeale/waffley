@@ -535,8 +535,13 @@
         osc.connect(gain);
         gain.connect(ctx.destination);
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(523, ctx.currentTime);      // C5
-        osc.frequency.setValueAtTime(659, ctx.currentTime + 0.1); // E5
+        // Pitch rises by a semitone per consecutive correct answer (capped at +12)
+        const semitones = Math.min(game.score, 12);
+        const pitchMultiplier = Math.pow(2, semitones / 12);
+        const baseFreq = 523 * pitchMultiplier;  // C5 + streak offset
+        const peakFreq = 659 * pitchMultiplier;   // E5 + streak offset
+        osc.frequency.setValueAtTime(baseFreq, ctx.currentTime);
+        osc.frequency.setValueAtTime(peakFreq, ctx.currentTime + 0.1);
         gain.gain.setValueAtTime(0.3, ctx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
         osc.start(ctx.currentTime);
