@@ -22,7 +22,7 @@ Planned features and improvements for Waffley.
 - [x] **Make the 3 stages clearer**
   Make the 3 stages of Learning, Practising and Output (speech) clearer to the user so they understand the journey.
 
-- [ ] **Add a Typing phase before Speech**
+- [x] **Add a Typing phase before Speech**
   Introduce a new phase between Practice and Speech where users type the answer instead of selecting it. This bridges the gap between recognition (picking from options) and production (speaking aloud), reinforcing spelling and recall before the user is asked to speak.
 
 - [ ] **Level selection for new languages**

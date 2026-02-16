@@ -73,6 +73,15 @@
             <div class="journey-phase" data-phase="2">
                 <div class="journey-dot"></div>
                 <div class="journey-phase-info">
+                    <div class="journey-phase-name">Typing</div>
+                    <div class="journey-phase-desc">Type the answer</div>
+                    <div class="journey-phase-progress"></div>
+                </div>
+            </div>
+            <div class="journey-connector"></div>
+            <div class="journey-phase" data-phase="3">
+                <div class="journey-dot"></div>
+                <div class="journey-phase-info">
                     <div class="journey-phase-name">Speech</div>
                     <div class="journey-phase-desc">Speak the answer</div>
                     <div class="journey-phase-progress"></div>
@@ -153,6 +162,12 @@
     <div class="speech-warning" id="speech-warning">
         Voice input requires a browser with Web Speech API support (Chrome, Edge) and microphone permission.
         Falling back to Practice Mode buttons.
+    </div>
+    <div class="typing-ui" id="typing-ui">
+        <input type="text" id="typing-input" class="typing-input"
+               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+               aria-label="Type your answer">
+        <div class="typing-feedback" id="typing-feedback"></div>
     </div>
     <div id="timer-bar-container" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-label="Time remaining">
         <div id="timer-bar"></div>

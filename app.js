@@ -258,9 +258,9 @@
 
     // ========== MASTERY-BASED LEVEL FUNCTIONS ==========
 
-    // Get current phase (0=Learning, 1=Practice, 2=Speech) from levelsCompleted
+    // Get current phase (0=Learning, 1=Practice, 2=Typing, 3=Speech) from levelsCompleted
     function getPhaseFromProgress() {
-        return Math.floor(game.levelsCompleted / LEVELS_PER_PHASE) % 3;
+        return Math.floor(game.levelsCompleted / LEVELS_PER_PHASE) % 4;
     }
 
     // Get level within current phase (1-10)
@@ -434,8 +434,8 @@
 
     function speakColor(color, language) {
         if (!audioEnabled || !ttsSupported) return;
-        // Don't speak in Speech Mode (would give away the answer)
-        if (getPhaseFromProgress() === 2) return;
+        // Don't speak in Typing or Speech mode (would give away the answer)
+        if (getPhaseFromProgress() >= 2) return;
 
         const word = getFormTranslation(color, game.currentForm || 'base');
         if (!word) return;
@@ -556,6 +556,11 @@
     const voiceFeedback = document.getElementById('voice-feedback');
     const speechWarning = document.getElementById('speech-warning');
 
+    // Typing mode elements
+    const typingUI = document.getElementById('typing-ui');
+    const typingInput = document.getElementById('typing-input');
+    const typingFeedback = document.getElementById('typing-feedback');
+
     // ========== SPEECH RECOGNITION FUNCTIONS ==========
 
     function initSpeechRecognition() {
@@ -601,7 +606,7 @@
         recog.onend = () => {
             isListening = false;
             // Restart if still in speech mode and game is active
-            if (getPhaseFromProgress() === 2 && gameScreen.classList.contains('active') && !game.levelUpPending && !game.cycleCompletePending) {
+            if (getPhaseFromProgress() === 3 && gameScreen.classList.contains('active') && !game.levelUpPending && !game.cycleCompletePending) {
                 setTimeout(() => {
                     if (gameScreen.classList.contains('active') && !isListening) {
                         startListening();
@@ -680,12 +685,21 @@
     function showSpeechFallback() {
         speechWarning.classList.add('visible');
         speechUI.classList.remove('active');
+        typingUI.classList.remove('active');
         buttonsContainer.style.display = 'grid';
         promptLabel.textContent = getPromptText(game.currentForm || 'base');
     }
 
     function isSpeechMode() {
+        return getPhaseFromProgress() === 3;
+    }
+
+    function isTypingMode() {
         return getPhaseFromProgress() === 2;
+    }
+
+    function normalizeForComparison(str) {
+        return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\u00df/g, 'ss').toLowerCase().trim();
     }
 
     // ========== UI UPDATE FUNCTIONS ==========
@@ -769,6 +783,8 @@
             if (phase === 1) {
                 levelUpPhase.textContent = 'Now try without the words!';
             } else if (phase === 2) {
+                levelUpPhase.textContent = 'Now type the answer!';
+            } else if (phase === 3) {
                 const item = isColorCategory() ? 'the colour' : 'the word';
                 levelUpPhase.textContent = speechSupported
                     ? `Now it's your turn to speak ${item}!`
@@ -814,10 +830,10 @@
                 levelUpOverlay.classList.remove('active');
                 game.levelUpPending = false;
 
-                // Regenerate buttons if phase changed (Learning -> Practice -> Speech styling)
+                // Regenerate buttons if phase changed (Learning -> Practice -> Typing -> Speech)
                 if (phaseChanged) {
                     // Initialize speech recognition when entering speech phase
-                    if (phase === 2 && speechSupported && !recognition) {
+                    if (phase === 3 && speechSupported && !recognition) {
                         recognition = initSpeechRecognition();
                     }
                     generateButtons();
@@ -1076,6 +1092,11 @@
         if (isSpeechMode() && speechSupported && recognition) {
             startListening();
         }
+
+        // Refocus typing input if in typing mode
+        if (isTypingMode()) {
+            typingInput.focus();
+        }
     }
 
     function quitGame() {
@@ -1124,6 +1145,44 @@
         quitGame();
     });
 
+    // ========== TYPING MODE HANDLERS ==========
+
+    function matchItemFromTyping(typed) {
+        const items = getCategoryItems();
+        const currentForm = game.currentForm || 'base';
+        const normalizedTyped = normalizeForComparison(typed);
+        for (const item of items) {
+            const translation = getFormTranslation(item, currentForm);
+            if (normalizeForComparison(translation) === normalizedTyped) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    function handleTypingSubmit() {
+        if (!game.roundActive || !isTypingMode()) return;
+        const typed = typingInput.value;
+        if (!typed.trim()) return;
+
+        const matched = matchItemFromTyping(typed);
+        if (matched) {
+            typingFeedback.textContent = '';
+            handleAnswer(matched);
+        } else {
+            // Wrong answer — end the game
+            typingFeedback.textContent = '';
+            handleAnswer('__wrong__');
+        }
+    }
+
+    typingInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleTypingSubmit();
+        }
+    });
+
     // ========== GAME FUNCTIONS ==========
 
     function startGame() {
@@ -1160,6 +1219,13 @@
         return isEmojiMode ? 'What does this emoji mean?' : 'What colour is this?';
     }
 
+    function getTypingPrompt(form) {
+        if (form === 'article') return 'Type it with the article!';
+        if (form === 'plural') return 'Type the plural!';
+        const isEmojiMode = !isColorCategory();
+        return isEmojiMode ? 'Type the word!' : 'Type the colour!';
+    }
+
     function getSpeechPrompt(form) {
         if (form === 'article') return 'Say it with the article!';
         if (form === 'plural') return 'Say the plural!';
@@ -1175,20 +1241,33 @@
         const promptText = getPromptText(currentForm);
         const speechPrompt = getSpeechPrompt(currentForm);
 
+        const typingPrompt = getTypingPrompt(currentForm);
+
         // Speech mode: hide buttons and show speech UI
-        if (phase === 2) {
+        if (phase === 3) {
             if (speechSupported) {
                 buttonsContainer.style.display = 'none';
                 speechUI.classList.add('active');
+                typingUI.classList.remove('active');
                 speechWarning.classList.remove('visible');
                 promptLabel.textContent = speechPrompt;
             } else {
                 // Fall back to Practice mode if speech not supported
                 showSpeechFallback();
             }
+        } else if (phase === 2) {
+            // Typing mode: hide buttons and speech UI, show typing input
+            buttonsContainer.style.display = 'none';
+            speechUI.classList.remove('active');
+            typingUI.classList.add('active');
+            speechWarning.classList.remove('visible');
+            promptLabel.textContent = typingPrompt;
+            typingInput.value = '';
+            typingFeedback.textContent = '';
         } else {
             buttonsContainer.style.display = 'grid';
             speechUI.classList.remove('active');
+            typingUI.classList.remove('active');
             speechWarning.classList.remove('visible');
             promptLabel.textContent = promptText;
         }
@@ -1200,7 +1279,7 @@
             btn.textContent = getFormTranslation(item, currentForm);
 
             // Apply styling based on current phase and category
-            if (phase === 0 && !isEmojiMode) {
+            if (phase === 0 && isColorCategory()) {
                 // Learning mode: show colored backgrounds (colours only)
                 btn.classList.add('learning-mode');
                 btn.style.backgroundColor = getCategoryData().display[item];
@@ -1276,7 +1355,13 @@
 
         // Update prompt label per form
         const currentForm = game.currentForm || 'base';
-        promptLabel.textContent = isSpeechMode() ? getSpeechPrompt(currentForm) : getPromptText(currentForm);
+        if (isSpeechMode()) {
+            promptLabel.textContent = getSpeechPrompt(currentForm);
+        } else if (isTypingMode()) {
+            promptLabel.textContent = getTypingPrompt(currentForm);
+        } else {
+            promptLabel.textContent = getPromptText(currentForm);
+        }
 
         // Update button text for current form
         const btns = buttonsContainer.querySelectorAll('.answer-btn');
@@ -1324,6 +1409,13 @@
         // Start listening in speech mode
         if (isSpeechMode() && speechSupported && recognition) {
             startListening();
+        }
+
+        // Clear and focus input in typing mode
+        if (isTypingMode()) {
+            typingInput.value = '';
+            typingFeedback.textContent = '';
+            typingInput.focus();
         }
     }
 
@@ -1381,6 +1473,9 @@
         playWrongSound();
         clearTimeout(game.timeout);
         cancelAnimationFrame(game.timerRAF);
+
+        // Hide typing UI
+        typingUI.classList.remove('active');
 
         // Stop speech recognition
         if (recognition) {
