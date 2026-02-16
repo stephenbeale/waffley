@@ -67,7 +67,7 @@ Planned features and improvements for Waffley.
 - [ ] **Fix button overflow on mobile**
   Button options spill off the screen on mobile devices. Ensure all buttons fit within the viewport.
 
-- [ ] **Centre lone button on odd-count rows**
+- [x] **Centre lone button on odd-count rows**
   When displayed as an odd number, the single button on the last row should be centred rather than aligned to one side.
 
 - [ ] **Fix progression tone reset between rounds**
