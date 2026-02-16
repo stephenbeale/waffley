@@ -76,7 +76,7 @@ Planned features and improvements for Waffley.
 - [x] **Mute button for progression sounds**
   Give the user an option to mute progression sounds with a mute button at the top of the progression bar.
 
-- [ ] **Progressively add more answer buttons as difficulty increases**
+- [x] **Progressively add more answer buttons as difficulty increases**
   As a more difficult round, increase the number of answer buttons rather than reducing them.
 
 - [ ] **Redesign pause/cancel buttons**

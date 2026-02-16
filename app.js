@@ -246,9 +246,19 @@
         return copy;
     }
 
+    // Get number of visible buttons based on level within phase
+    function getButtonCount() {
+        const maxCount = game.activeColors.length;
+        const levelInPhase = getLevelInPhase();
+        // Start with 4 buttons (or max if fewer), add 1 every 2 levels
+        const base = Math.min(4, maxCount);
+        const extra = Math.floor((levelInPhase - 1) / 2);
+        return Math.min(base + extra, maxCount);
+    }
+
     // Randomly select new items from the full pool
     function randomizeActiveColors() {
-        const count = game.activeColors.length;
+        const count = getButtonCount();
         if (isColorCategory()) {
             game.activeItems = shuffle(ALL_COLORS).slice(0, count);
         } else {
@@ -1031,10 +1041,11 @@
                 // Update cycle and regenerate with new colours
                 game.currentCycle = newCycle;
                 game.activeColors = getActiveColors(game.currentCycle);
+                const cycleCount = getButtonCount();
                 if (isColorCategory()) {
-                    game.activeItems = game.activeColors.slice();
+                    game.activeItems = shuffle(game.activeColors).slice(0, cycleCount);
                 } else {
-                    game.activeItems = getCategoryData().items.slice(0, game.activeColors.length);
+                    game.activeItems = shuffle(getCategoryData().items).slice(0, cycleCount);
                 }
                 initLevelMastery();
                 saveProgress();
@@ -1386,10 +1397,11 @@
 
     function startGame() {
         game.activeColors = getActiveColors(game.currentCycle);
+        const count = getButtonCount();
         if (isColorCategory()) {
-            game.activeItems = game.activeColors.slice();
+            game.activeItems = shuffle(game.activeColors).slice(0, count);
         } else {
-            game.activeItems = getCategoryData().items.slice(0, game.activeColors.length);
+            game.activeItems = shuffle(getCategoryData().items).slice(0, count);
         }
         initLevelMastery();
         game.currentForm = 'base';
