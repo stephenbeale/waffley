@@ -70,7 +70,7 @@ Planned features and improvements for Waffley.
 - [x] **Centre lone button on odd-count rows**
   When displayed as an odd number, the single button on the last row should be centred rather than aligned to one side.
 
-- [ ] **Fix progression tone reset between rounds**
+- [x] **Fix progression tone reset between rounds**
   Check that the escalating correct-answer pitch resets properly each round. Currently it may carry over incorrectly.
 
 - [ ] **Mute button for progression sounds**

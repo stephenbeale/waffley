@@ -402,6 +402,7 @@
         // Mastery
         levelMastery: {},
         sessionStreak: {},  // consecutive correct per item+form (persists across levels)
+        pitchStreak: 0,     // correct answers in current level (resets on level-up)
 
         // Overlay flags
         levelUpPending: false,
@@ -524,8 +525,8 @@
         osc.connect(gain);
         gain.connect(ctx.destination);
         osc.type = 'sine';
-        // Pitch rises by a semitone per consecutive correct answer (capped at +12)
-        const semitones = Math.min(game.score, 12);
+        // Pitch rises by a semitone per correct answer in this level (capped at +12)
+        const semitones = Math.min(game.pitchStreak, 12);
         const pitchMultiplier = Math.pow(2, semitones / 12);
         const baseFreq = 523 * pitchMultiplier;  // C5 + streak offset
         const peakFreq = 659 * pitchMultiplier;   // E5 + streak offset
@@ -1389,6 +1390,7 @@
         game.timeBonus = 0;
         game.mercyUsed = false;
         game.sessionStreak = {};
+        game.pitchStreak = 0;
         currentScoreEl.textContent = '0';
 
         // Initialize speech recognition if entering speech mode
@@ -1646,6 +1648,7 @@
         if (chosen === game.currentColor) {
             game.responseTimes.push(performance.now() - game.timerStart);
             game.score++;
+            game.pitchStreak++;
             currentScoreEl.textContent = game.score;
             playCorrectSound();
 
@@ -1671,6 +1674,7 @@
                     // Normal level-up: randomize items and reset mastery
                     randomizeActiveColors();
                     initLevelMastery();
+                    game.pitchStreak = 0;
                     generateButtons();
                     updateLevelDisplay();
                     showLevelUp(getLevelInCycle(), previousPhase, timeChanged);
