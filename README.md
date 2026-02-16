@@ -6,12 +6,13 @@ An interactive language learning game that teaches vocabulary through progressiv
 
 1. **Choose a language** — Spanish, French, German, Italian, Welsh, or Portuguese
 2. **Pick a category** — Colours, Adjectives, Animals, Food, or Weather
-3. **Progress through three phases:**
+3. **Progress through four phases:**
    - **Learning** — words shown on the answer buttons
    - **Practice** — answer from memory
+   - **Typing** — type the answer (accents optional)
    - **Speech** — speak the answer aloud (requires microphone)
 
-Each level requires mastering every item (answering each correctly at least twice). The timer gets faster as you progress. Complete all three phases to finish a cycle, then start the next with new vocabulary.
+Each level requires mastering every item (answering each correctly at least twice). The timer gets faster as you progress. Complete all four phases to finish a cycle, then start the next with new vocabulary.
 
 ### Articles & Plurals (Noun Categories)
 
@@ -25,6 +26,7 @@ Each form is tracked independently for mastery.
 
 - 6 languages, 5 categories, 9 items per category
 - Mastery-based level progression
+- Accent-tolerant typing input
 - Text-to-speech pronunciation
 - Speech recognition input (Chrome/Edge)
 - Persistent per-language, per-category progress

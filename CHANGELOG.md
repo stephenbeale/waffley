@@ -5,10 +5,16 @@ All notable changes to Waffley are documented here. Format follows [Keep a Chang
 ## [Unreleased]
 
 ### Added
+- Typing phase between Practice and Speech (4-phase, 40-level cycle)
+- Accent-tolerant typing input (e.g. "Marron" accepted for "Marrón")
+- Form-aware typing prompts for articles and plurals
 - Article forms for noun categories (animals, food, weather) from Cycle 2 onwards
 - Plural forms with repeated emoji display from Cycle 3 onwards
 - Independent mastery tracking per form variant (base, article, plural)
 - Form-aware prompts, speech recognition, TTS, and button text
+
+### Changed
+- Audio pronunciation suppressed in both Typing and Speech phases
 
 ## 2026-02-15
 
