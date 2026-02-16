@@ -1,9 +1,9 @@
     // ========== LEVEL SYSTEM CONSTANTS ==========
     const MASTERY_THRESHOLD = 2;
     const LEVELS_PER_PHASE = 10;
-    const LEVELS_PER_CYCLE = LEVELS_PER_PHASE * 3; // 30
-    const PHASES = ['Learning', 'Practice', 'Speech'];
-    const PHASE_CLASSES = ['learning', 'practice', 'speech'];
+    const LEVELS_PER_CYCLE = LEVELS_PER_PHASE * 4; // 40
+    const PHASES = ['Learning', 'Practice', 'Typing', 'Speech'];
+    const PHASE_CLASSES = ['learning', 'practice', 'typing', 'speech'];
     const MAX_TIME = 10; // seconds
     const MIN_TIME = 2;  // seconds (floor for time limit)
 
