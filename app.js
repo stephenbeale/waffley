@@ -495,6 +495,8 @@
         if (!audioEnabled || !ttsSupported) return;
         // Don't speak in Typing or Speech mode (would give away the answer)
         if (getPhaseFromProgress() >= 2) return;
+        // Silent visual-only rounds: last 2 levels of Learning phase
+        if (getPhaseFromProgress() === 0 && getLevelInPhase() >= 9) return;
 
         const word = getFormTranslation(color, game.currentForm || 'base');
         if (!word) return;
@@ -908,7 +910,12 @@
             }
         } else {
             phaseBadgeOverlay.style.display = 'none';
-            levelUpPhase.textContent = '';
+            // Hint when entering silent visual-only levels
+            if (getPhaseFromProgress() === 0 && getLevelInPhase() === 9) {
+                levelUpPhase.textContent = 'No audio now — recognise by sight!';
+            } else {
+                levelUpPhase.textContent = '';
+            }
         }
 
         // Show info about what's active

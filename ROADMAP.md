@@ -61,7 +61,7 @@ Planned features and improvements for Waffley.
 - [x] **Keep mastered item buttons visible but exclude from questions**
   Instead of hiding buttons after 3 consecutive correct answers, keep them visible but ensure they can't be selected as the question. This keeps all options in view for a more natural feel.
 
-- [ ] **Silent visual-only round after pronunciation**
+- [x] **Silent visual-only round after pronunciation**
   After pronunciation has been on, add a round of purely visual answers with no sound, so the user must recognise the emoji without an audio prompt.
 
 - [ ] **Fix button overflow on mobile**
