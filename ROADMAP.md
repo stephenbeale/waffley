@@ -73,7 +73,7 @@ Planned features and improvements for Waffley.
 - [x] **Fix progression tone reset between rounds**
   Check that the escalating correct-answer pitch resets properly each round. Currently it may carry over incorrectly.
 
-- [ ] **Mute button for progression sounds**
+- [x] **Mute button for progression sounds**
   Give the user an option to mute progression sounds with a mute button at the top of the progression bar.
 
 - [ ] **Progressively add more answer buttons as difficulty increases**

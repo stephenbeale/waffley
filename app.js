@@ -518,7 +518,7 @@
     }
 
     function playCorrectSound() {
-        if (!audioEnabled) return;
+        if (!audioEnabled || sfxMuted) return;
         const ctx = getAudioContext();
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
@@ -539,7 +539,7 @@
     }
 
     function playWrongSound() {
-        if (!audioEnabled) return;
+        if (!audioEnabled || sfxMuted) return;
         const ctx = getAudioContext();
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
@@ -632,6 +632,16 @@
     };
 
     // Speed mercy overlay
+    const sfxMuteBtn = document.getElementById('sfx-mute-btn');
+    let sfxMuted = false;
+
+    sfxMuteBtn.addEventListener('click', () => {
+        sfxMuted = !sfxMuted;
+        sfxMuteBtn.textContent = sfxMuted ? '🔕' : '🔔';
+        sfxMuteBtn.classList.toggle('muted', sfxMuted);
+        sfxMuteBtn.title = sfxMuted ? 'Unmute sound effects' : 'Mute sound effects';
+    });
+
     const speedMercyOverlay = document.getElementById('speed-mercy-overlay');
     const speedMercyMessage = document.getElementById('speed-mercy-message');
     const speedMercyStreak = document.getElementById('speed-mercy-streak');
