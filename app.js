@@ -317,12 +317,47 @@
         if (game.levelMastery[key] !== undefined) {
             game.levelMastery[key]++;
         }
+
+        // Track session streak for pool removal
+        game.sessionStreak[key] = (game.sessionStreak[key] || 0) + 1;
+        if (game.sessionStreak[key] >= REMOVAL_STREAK) {
+            removeItemFromPool(item, form);
+        }
+    }
+
+    // Reset session streak for the current item+form on wrong answer
+    function resetSessionStreak() {
+        const form = game.currentForm || 'base';
+        const key = form === 'base' ? game.currentColor : `${game.currentColor}:${form}`;
+        game.sessionStreak[key] = 0;
+    }
+
+    // Remove a mastered item+form from the active pool
+    function removeItemFromPool(item, form) {
+        const key = form === 'base' ? item : `${item}:${form}`;
+        // Remove from level mastery so it's no longer asked
+        delete game.levelMastery[key];
+
+        // Hide the button for this item in Learning/Practice phases
+        const btn = buttonsContainer.querySelector(`.answer-btn[data-color="${item}"]`);
+        if (btn && !hasRemainingForms(item)) {
+            btn.classList.add('mastered-out');
+        }
+    }
+
+    // Check if an item still has unmastered forms in the pool
+    function hasRemainingForms(item) {
+        return Object.keys(game.levelMastery).some(key =>
+            key === item || key.startsWith(item + ':')
+        );
     }
 
     // Check if all items in the current level have been mastered
+    // Also true if all items were removed from the pool via session streaks
     function isLevelMastered() {
-        const values = Object.values(game.levelMastery);
-        return values.length > 0 && values.every(c => c >= MASTERY_THRESHOLD);
+        const keys = Object.keys(game.levelMastery);
+        if (keys.length === 0) return true;
+        return Object.values(game.levelMastery).every(c => c >= MASTERY_THRESHOLD);
     }
 
     // Get mastery progress for UI display
@@ -379,6 +414,7 @@
 
         // Mastery
         levelMastery: {},
+        sessionStreak: {},  // consecutive correct per item+form (persists across levels)
 
         // Overlay flags
         levelUpPending: false,
@@ -1344,6 +1380,7 @@
         game.responseTimes = [];
         game.timeBonus = 0;
         game.mercyUsed = false;
+        game.sessionStreak = {};
         currentScoreEl.textContent = '0';
 
         // Initialize speech recognition if entering speech mode
@@ -1631,6 +1668,7 @@
                 nextRound();
             }
         } else {
+            resetSessionStreak();
             // Show mercy overlay at min time if not already used this session
             if (isAtMinTime() && !game.mercyUsed) {
                 showSpeedMercy();

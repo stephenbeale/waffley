@@ -43,7 +43,7 @@ Planned features and improvements for Waffley.
 - [x] **Add navigation options to level-up and cycle-complete cards**
   On the overlay cards shown between rounds (level-up, cycle complete), give users options to quit to menu, change language, or change category — not just auto-continue. Users should be able to choose where they go at all times.
 
-- [ ] **Remove mastered items from the active pool**
+- [x] **Remove mastered items from the active pool**
   After 3 consecutive correct answers for an item within a session, remove it from the available options. This narrows the pool to only unlearned items, making it clear what remains to be mastered and focusing practice where it's needed.
 
 - [x] **Improve typing mode for mobile**

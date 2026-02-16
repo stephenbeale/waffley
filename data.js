@@ -1,5 +1,6 @@
     // ========== LEVEL SYSTEM CONSTANTS ==========
     const MASTERY_THRESHOLD = 2;
+    const REMOVAL_STREAK = 3; // consecutive correct answers to remove item from pool
     const LEVELS_PER_PHASE = 10;
     const LEVELS_PER_CYCLE = LEVELS_PER_PHASE * 4; // 40
     const PHASES = ['Learning', 'Practice', 'Typing', 'Speech'];
