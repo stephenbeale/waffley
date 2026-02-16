@@ -28,7 +28,7 @@ Planned features and improvements for Waffley.
 - [x] **Level selection for new languages**
   Give users the option to choose their starting level when beginning a new language or when continuing.
 
-- [ ] **Expand vocabulary items in each set**
+- [x] **Expand vocabulary items in each set**
   Add more items to each category so there is greater variety as the user progresses.
 
 - [x] **Introduce articles at higher levels**
@@ -42,6 +42,9 @@ Planned features and improvements for Waffley.
 
 - [x] **Add navigation options to level-up and cycle-complete cards**
   On the overlay cards shown between rounds (level-up, cycle complete), give users options to quit to menu, change language, or change category — not just auto-continue. Users should be able to choose where they go at all times.
+
+- [ ] **Remove mastered items from the active pool**
+  After 3 consecutive correct answers for an item within a session, remove it from the available options. This narrows the pool to only unlearned items, making it clear what remains to be mastered and focusing practice where it's needed.
 
 ---
 
@@ -82,6 +85,9 @@ Planned features and improvements for Waffley.
 
 - [ ] **Consolidate language data**
   Define each language as a single object (`{ code, name, flag, speechCode, translations, aliases }`) instead of 7 separate lookup objects.
+
+- [ ] **Split data.js into per-language files**
+  Move vocabulary and translations out of data.js into separate files per language (e.g. `lang-es.js`, `lang-fr.js`). Each file owns its translations, article/plural forms, and speech aliases. Keeps data.js for shared constants and category structure. Makes it easy to add new languages or let contributors work on one language independently.
 
 - [ ] **Refactor CSS with base/modifier classes**
   Create `.btn` base class with `.btn--primary`, `.btn--secondary` modifiers. Create `.overlay` base class. Cuts ~100 lines of duplication.

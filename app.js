@@ -294,6 +294,11 @@
         const forms = getAvailableForms();
         items.forEach(item => {
             forms.forEach(form => {
+                // Skip article/plural forms for items without form data (e.g. uncountable nouns)
+                if (form !== 'base') {
+                    const formData = getCategoryData().forms?.[selectedLanguage]?.[item];
+                    if (!formData) return;
+                }
                 const key = form === 'base' ? item : `${item}:${form}`;
                 game.levelMastery[key] = 0;
             });
