@@ -1,50 +1,50 @@
-    // ========== LEVEL SYSTEM CONSTANTS ==========
-    const MASTERY_THRESHOLD = 2;
-    const REMOVAL_STREAK = 3; // consecutive correct answers to remove item from pool
-    const LEVELS_PER_PHASE = 10;
-    const LEVELS_PER_CYCLE = LEVELS_PER_PHASE * 4; // 40
-    const PHASES = ['Learning', 'Practice', 'Typing', 'Speech'];
-    const PHASE_CLASSES = ['learning', 'practice', 'typing', 'speech'];
-    const MAX_TIME = 10; // seconds
-    const MIN_TIME = 2;  // seconds (floor for time limit)
+// ========== LEVEL SYSTEM CONSTANTS ==========
+export const MASTERY_THRESHOLD = 2;
+export const REMOVAL_STREAK = 3; // consecutive correct answers to remove item from pool
+export const LEVELS_PER_PHASE = 10;
+export const LEVELS_PER_CYCLE = LEVELS_PER_PHASE * 4; // 40
+export const PHASES = ['Learning', 'Practice', 'Typing', 'Speech'];
+export const PHASE_CLASSES = ['learning', 'practice', 'typing', 'speech'];
+export const MAX_TIME = 10; // seconds
+export const MIN_TIME = 2;  // seconds (floor for time limit)
 
-    // Colour pools by cycle - 2 new colours added each cycle
-    const CYCLE_COLORS = {
+// Colour pools by cycle - 2 new colours added each cycle
+export const CYCLE_COLORS = {
         1: ['red', 'green', 'blue', 'yellow', 'orange'],
         2: ['red', 'green', 'blue', 'yellow', 'orange', 'pink', 'purple'],
         3: ['red', 'green', 'blue', 'yellow', 'orange', 'pink', 'purple', 'brown', 'grey'],
         4: ['red', 'green', 'blue', 'yellow', 'orange', 'pink', 'purple', 'brown', 'grey', 'black', 'white']
     };
-    // Full pool of colours to randomly select from each level
-    const ALL_COLORS = ['red', 'green', 'blue', 'yellow', 'orange', 'pink', 'purple', 'brown', 'grey'];
-    const MAX_CYCLE_WITH_NEW_COLORS = 4;
-    const NEW_COLORS_PER_CYCLE = {
+// Full pool of colours to randomly select from each level
+export const ALL_COLORS = ['red', 'green', 'blue', 'yellow', 'orange', 'pink', 'purple', 'brown', 'grey'];
+export const MAX_CYCLE_WITH_NEW_COLORS = 4;
+export const NEW_COLORS_PER_CYCLE = {
         2: ['pink', 'purple'],
         3: ['brown', 'grey'],
         4: ['black', 'white']
     };
 
-    // Noun categories that support articles and plurals
-    const NOUN_CATEGORIES = ['animals', 'food', 'weather'];
-    // Adjective category supports feminine forms
-    const ADJECTIVE_CATEGORY = 'adjectives';
-    const ARTICLE_CYCLE = 2;
-    const PLURAL_CYCLE = 3;
-    const FEMININE_CYCLE = 2;
+// Noun categories that support articles and plurals
+export const NOUN_CATEGORIES = ['animals', 'food', 'weather'];
+// Adjective category supports feminine forms
+export const ADJECTIVE_CATEGORY = 'adjectives';
+export const ARTICLE_CYCLE = 2;
+export const PLURAL_CYCLE = 3;
+export const FEMININE_CYCLE = 2;
 
-    // Language display names
-    const LANGUAGE_NAMES = {
+// Language display names
+export const LANGUAGE_NAMES = {
         es: 'Spanish', fr: 'French', de: 'German',
         it: 'Italian', cy: 'Welsh', pt: 'Portuguese'
     };
 
-    const LANGUAGE_FLAGS = {
+export const LANGUAGE_FLAGS = {
         es: '🇪🇸', fr: '🇫🇷', de: '🇩🇪',
         it: '🇮🇹', cy: '🏴󠁧󠁢󠁷󠁬󠁳󠁿', pt: '🇵🇹'
     };
 
-    // ========== COLOUR DATA ==========
-    const TRANSLATIONS = {
+// ========== COLOUR DATA ==========
+export const TRANSLATIONS = {
         es: { // Spanish
             red: 'Rojo', green: 'Verde', blue: 'Azul', yellow: 'Amarillo',
             orange: 'Naranja', pink: 'Rosa', purple: 'Morado', brown: 'Marrón',
@@ -77,14 +77,14 @@
         }
     };
 
-    const COLOR_CSS = {
+export const COLOR_CSS = {
         red: '#dc3545', green: '#28a745', blue: '#007bff', yellow: '#ffc107',
         orange: '#fd7e14', pink: '#e83e8c', purple: '#6f42c1', brown: '#795548',
         grey: '#6c757d', black: '#212529', white: '#f8f9fa'
     };
 
-    // ========== CATEGORIES ==========
-    const CATEGORIES = {
+// ========== CATEGORIES ==========
+export const CATEGORIES = {
         colours: { label: 'Colours', icon: '🎨' },
         adjectives: { label: 'Adjectives', icon: '😊' },
         animals: { label: 'Animals', icon: '🐾' },
@@ -92,7 +92,7 @@
         weather: { label: 'Weather', icon: '☀️' }
     };
 
-    const CATEGORY_DATA = {
+export const CATEGORY_DATA = {
         colours: {
             displayType: 'color',
             items: ['red', 'green', 'blue', 'yellow', 'orange', 'pink', 'purple', 'brown', 'grey', 'black', 'white'],
@@ -539,14 +539,14 @@
         }
     };
 
-    // ========== SPEECH RECOGNITION ==========
-    const SPEECH_LANG_CODES = {
+// ========== SPEECH RECOGNITION ==========
+export const SPEECH_LANG_CODES = {
         es: 'es-ES', fr: 'fr-FR', de: 'de-DE',
         it: 'it-IT', cy: 'cy-GB', pt: 'pt-PT'
     };
 
-    // Aliases for voice recognition to handle accents and pronunciation variations
-    const COLOR_ALIASES = {
+// Aliases for voice recognition to handle accents and pronunciation variations
+export const COLOR_ALIASES = {
         es: {
             red: ['rojo'], green: ['verde'], blue: ['azul'], yellow: ['amarillo'],
             orange: ['naranja'], pink: ['rosa'], purple: ['morado'],

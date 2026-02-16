@@ -113,8 +113,8 @@ Planned features and improvements for Waffley.
 
 ### Priority 3 — Improve maintainability
 
-- [ ] **Split app.js into modules**
-  Use ES modules (`<script type="module">`) to split into logical files: `state.js`, `timer.js`, `speech.js`, `stats.js`, `ui.js`, `game.js`.
+- [x] **Split app.js into modules**
+  Use ES modules (`<script type="module">`) to split into logical files. data.js exports all constants, app.js imports them.
 
 - [ ] **Extract utilities and name magic numbers**
   Create `utils.js` with `shuffle()` (currently duplicated). Add named constants for `WARNING_THRESHOLD`, `LEVEL_UP_COUNTDOWN`, `CYCLE_COMPLETE_COUNTDOWN`, etc.
