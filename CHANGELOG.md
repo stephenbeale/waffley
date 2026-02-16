@@ -5,8 +5,12 @@ All notable changes to Waffley are documented here. Format follows [Keep a Chang
 ## [Unreleased]
 
 ### Added
+- Progressive button count — start with 4 buttons, add 1 every 2 levels up to cycle max
+- SFX mute button above the progress bar — toggle correct/wrong sound effects independently of TTS
+- Silent visual-only rounds — last 2 levels of Learning phase suppress audio for sight-only recognition
+- Redesigned pause/cancel buttons — larger 44px rounded boxes with bold symbols for mobile visibility
 - Speech wrong attempts history — scrolling list of failed speech recognition attempts with cross marks
-- Session mastery removal — items fade out after 3 consecutive correct answers, restored at next level
+- Session mastery removal — items excluded from questions after 3 consecutive correct, restored at next level
 - Speed round mercy — when failing at 2-second speed, choose to retry, add 2 seconds, or end game
 - Feminine adjective forms from Cycle 2 — gendered prompts with 👨/👩 indicators (ES, FR, IT, PT)
 - Expanded vocabulary: 2 new items per category (sick/strong, cow/pig, tomato/carrot, lightning/tornado)
@@ -21,8 +25,17 @@ All notable changes to Waffley are documented here. Format follows [Keep a Chang
 - Form-aware prompts, speech recognition, TTS, and button text
 
 ### Changed
-- Correct answer sound pitch rises with each consecutive correct answer (up to +1 octave), resets on wrong answer
+- Correct answer sound pitch rises per level (resets on level-up, capped at +1 octave)
 - Audio pronunciation suppressed in both Typing and Speech phases
+- Smooth vertical progress bar animation (0.8s cubic-bezier easing)
+- Buttons use flexbox layout — centred lone button on odd-count rows
+- Mobile-responsive buttons — compact padding and gap on small viewports
+- Mastered items stay visible (no greying) but excluded from questions
+
+### Fixed
+- Button overflow on mobile — screens now scroll, compact layout on small viewports
+- Progression tone pitch carried over between levels — now resets each level-up
+- Mastered items were still asked as questions due to deleted key evaluation bug
 
 ## 2026-02-15
 

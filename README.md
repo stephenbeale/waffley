@@ -26,15 +26,20 @@ Each form is tracked independently for mastery.
 
 - 6 languages, 5 categories, 11 items per category
 - Phase selection — jump to any learning stage
-- Mastery-based level progression
-- Accent-tolerant typing input
+- Mastery-based level progression with progressive button count
+- Session mastery — items answered 3 times correctly are excluded from questions
+- Silent visual-only rounds in later Learning levels
+- Accent-tolerant typing input with accent shortcut buttons
+- Escalating correct-answer pitch (resets each level)
+- SFX mute toggle on the progress bar
 - Text-to-speech pronunciation
-- Speech recognition input (Chrome/Edge)
+- Speech recognition input with wrong-attempt history (Chrome/Edge)
 - Persistent per-language, per-category progress
 - Statistics tracking (streaks, accuracy, games played)
 - Sound effects for correct/incorrect answers
-- Pause, quit, and menu navigation during gameplay
+- Pause, quit, and menu navigation with large, bold control buttons
 - Accessible: ARIA labels, keyboard navigation, focus management
+- Mobile-responsive button layout
 
 ## Running Locally
 
