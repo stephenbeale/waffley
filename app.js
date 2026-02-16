@@ -541,6 +541,9 @@
     const newColorBadges = document.getElementById('new-color-badges');
     const cycleCompleteCountdown = document.getElementById('cycle-complete-countdown');
 
+    // Start button
+    const startBtn = document.getElementById('start-btn');
+
     // Game control elements
     const pauseBtn = document.getElementById('pause-btn');
     const quitBtn = document.getElementById('quit-btn');
@@ -728,6 +731,27 @@
         startTotalAnswersEl.textContent = game.totalCorrectAnswers;
         startTimeLimitEl.textContent = getTimeLimitSeconds();
         startCycleEl.textContent = game.currentCycle;
+        updateStartButtonText();
+    }
+
+    // Update start button text based on current phase
+    function updateStartButtonText() {
+        const phase = getPhaseFromProgress();
+        const levelInPhase = getLevelInPhase();
+        const phaseName = PHASES[phase];
+        if (levelInPhase === 1 && phase === 0) {
+            startBtn.textContent = 'Start Learning';
+        } else {
+            startBtn.textContent = `Start from ${phaseName}`;
+        }
+    }
+
+    // Jump to a specific phase within the current cycle
+    function jumpToPhase(targetPhase) {
+        const cycleBase = (game.currentCycle - 1) * LEVELS_PER_CYCLE;
+        game.levelsCompleted = cycleBase + targetPhase * LEVELS_PER_PHASE;
+        saveProgress();
+        updateStartScreenProgress();
     }
 
     // Update game screen level display
@@ -923,6 +947,21 @@
     // ========== INITIALIZATION ==========
     updateStartScreenProgress();
 
+    // Journey phase click handlers — let users jump to any phase
+    journeyTracker.querySelectorAll('.journey-phase').forEach(el => {
+        el.addEventListener('click', () => {
+            const targetPhase = parseInt(el.dataset.phase);
+            jumpToPhase(targetPhase);
+        });
+        el.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                const targetPhase = parseInt(el.dataset.phase);
+                jumpToPhase(targetPhase);
+            }
+        });
+    });
+
     // Initialize audio toggle from saved setting
     audioToggleInput.checked = audioEnabled;
     audioToggleInput.addEventListener('change', function() {
@@ -988,7 +1027,7 @@
         });
     });
 
-    document.getElementById('start-btn').addEventListener('click', () => {
+    startBtn.addEventListener('click', () => {
         warmUpSpeech();
         startGame();
     });

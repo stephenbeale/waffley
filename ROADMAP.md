@@ -25,7 +25,7 @@ Planned features and improvements for Waffley.
 - [x] **Add a Typing phase before Speech**
   Introduce a new phase between Practice and Speech where users type the answer instead of selecting it. This bridges the gap between recognition (picking from options) and production (speaking aloud), reinforcing spelling and recall before the user is asked to speak.
 
-- [ ] **Level selection for new languages**
+- [x] **Level selection for new languages**
   Give users the option to choose their starting level when beginning a new language or when continuing.
 
 - [ ] **Expand vocabulary items in each set**

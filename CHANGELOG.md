@@ -5,6 +5,7 @@ All notable changes to Waffley are documented here. Format follows [Keep a Chang
 ## [Unreleased]
 
 ### Added
+- Phase selection on topic screen — click any journey phase to start from that point
 - Typing phase between Practice and Speech (4-phase, 40-level cycle)
 - Accent-tolerant typing input (e.g. "Marron" accepted for "Marrón")
 - Form-aware typing prompts for articles and plurals

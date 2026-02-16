@@ -25,6 +25,7 @@ Each form is tracked independently for mastery.
 ## Features
 
 - 6 languages, 5 categories, 9 items per category
+- Phase selection — jump to any learning stage
 - Mastery-based level progression
 - Accent-tolerant typing input
 - Text-to-speech pronunciation
