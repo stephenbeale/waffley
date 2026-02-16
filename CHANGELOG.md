@@ -8,6 +8,7 @@ All notable changes to Waffley are documented here. Format follows [Keep a Chang
 - Speed round mercy — when failing at 2-second speed, choose to retry, add 2 seconds, or end game
 - Feminine adjective forms from Cycle 2 — gendered prompts with 👨/👩 indicators (ES, FR, IT, PT)
 - Expanded vocabulary: 2 new items per category (sick/strong, cow/pig, tomato/carrot, lightning/tornado)
+- Typing mode mobile UX — smaller display, accent shortcut buttons, timer repositioned, keyboard hint
 - Phase selection on topic screen — click any journey phase to start from that point
 - Typing phase between Practice and Speech (4-phase, 40-level cycle)
 - Accent-tolerant typing input (e.g. "Marron" accepted for "Marrón")

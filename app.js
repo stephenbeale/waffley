@@ -586,6 +586,18 @@
     const typingUI = document.getElementById('typing-ui');
     const typingInput = document.getElementById('typing-input');
     const typingFeedback = document.getElementById('typing-feedback');
+    const accentButtons = document.getElementById('accent-buttons');
+    const typingHint = document.getElementById('typing-hint');
+
+    // Accent characters per language (only chars used in translations)
+    const ACCENT_CHARS = {
+        es: ['á', 'é', 'í', 'ó', 'ú', 'ñ'],
+        fr: ['é', 'è', 'ê', 'à', 'â', 'ç', 'œ'],
+        de: ['ä', 'ö', 'ü', 'ß'],
+        it: ['à', 'è', 'é', 'ì', 'ò', 'ù'],
+        cy: ['â', 'ê', 'î', 'ô', 'û', 'ŵ', 'ŷ'],
+        pt: ['á', 'â', 'ã', 'é', 'ê', 'í', 'ó', 'ô', 'ú', 'ç']
+    };
 
     // Speed mercy overlay
     const speedMercyOverlay = document.getElementById('speed-mercy-overlay');
@@ -835,7 +847,7 @@
             if (phase === 1) {
                 levelUpPhase.textContent = 'Now try without the words!';
             } else if (phase === 2) {
-                levelUpPhase.textContent = 'Now type the answer!';
+                levelUpPhase.textContent = 'Now type the answer! Tip: hold a key for accents';
             } else if (phase === 3) {
                 const item = isColorCategory() ? 'the colour' : 'the word';
                 levelUpPhase.textContent = speechSupported
@@ -1258,6 +1270,27 @@
 
     // ========== TYPING MODE HANDLERS ==========
 
+    function populateAccentButtons() {
+        accentButtons.innerHTML = '';
+        const chars = ACCENT_CHARS[selectedLanguage] || [];
+        chars.forEach(ch => {
+            const btn = document.createElement('button');
+            btn.className = 'accent-btn';
+            btn.type = 'button';
+            btn.textContent = ch;
+            btn.addEventListener('click', () => {
+                // Insert accent character at cursor position
+                const start = typingInput.selectionStart;
+                const end = typingInput.selectionEnd;
+                const val = typingInput.value;
+                typingInput.value = val.slice(0, start) + ch + val.slice(end);
+                typingInput.selectionStart = typingInput.selectionEnd = start + ch.length;
+                typingInput.focus();
+            });
+            accentButtons.appendChild(btn);
+        });
+    }
+
     function matchItemFromTyping(typed) {
         const items = getCategoryItems();
         const currentForm = game.currentForm || 'base';
@@ -1362,6 +1395,7 @@
 
         // Speech mode: hide buttons and show speech UI
         if (phase === 3) {
+            gameScreen.classList.remove('typing-active');
             if (speechSupported) {
                 buttonsContainer.style.display = 'none';
                 speechUI.classList.add('active');
@@ -1381,12 +1415,15 @@
             promptLabel.textContent = typingPrompt;
             typingInput.value = '';
             typingFeedback.textContent = '';
+            gameScreen.classList.add('typing-active');
+            populateAccentButtons();
         } else {
             buttonsContainer.style.display = 'grid';
             speechUI.classList.remove('active');
             typingUI.classList.remove('active');
             speechWarning.classList.remove('visible');
             promptLabel.textContent = promptText;
+            gameScreen.classList.remove('typing-active');
         }
 
         items.forEach(item => {
