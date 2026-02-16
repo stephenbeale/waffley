@@ -64,7 +64,7 @@ Planned features and improvements for Waffley.
 - [x] **Silent visual-only round after pronunciation**
   After pronunciation has been on, add a round of purely visual answers with no sound, so the user must recognise the emoji without an audio prompt.
 
-- [ ] **Fix button overflow on mobile**
+- [x] **Fix button overflow on mobile**
   Button options spill off the screen on mobile devices. Ensure all buttons fit within the viewport.
 
 - [x] **Centre lone button on odd-count rows**
