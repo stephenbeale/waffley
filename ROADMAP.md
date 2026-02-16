@@ -31,10 +31,10 @@ Planned features and improvements for Waffley.
 - [ ] **Expand vocabulary items in each set**
   Add more items to each category so there is greater variety as the user progresses.
 
-- [ ] **Introduce articles at higher levels**
+- [x] **Introduce articles at higher levels**
   At higher levels, require the article with the noun (e.g. "la torta", "el plátano", "die Katze"). Teaches gender alongside vocabulary.
 
-- [ ] **Add plurals with and without articles**
+- [x] **Add plurals with and without articles**
   Introduce plural forms at higher levels, with and without articles (e.g. "dos plátanos", "due torte", "una torta"). Display quantities using repeated emojis (e.g. two emojis for plural).
 
 - [x] **Add back and pause buttons to game UI**

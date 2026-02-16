@@ -72,6 +72,11 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     box-shadow: none;
 }
 
+.color-display.emoji-display.plural-display {
+    font-size: 4.5rem;
+    letter-spacing: 0.2rem;
+}
+
 .reinforcement-label {
     font-size: 1.3rem;
     font-weight: 600;

@@ -287,17 +287,25 @@
         return getTimeLimit() / 1000;
     }
 
-    // Build mastery map from current category items
+    // Build mastery map from current category items (with form variants)
     function initLevelMastery() {
         game.levelMastery = {};
         const items = getCategoryItems();
-        items.forEach(item => { game.levelMastery[item] = 0; });
+        const forms = getAvailableForms();
+        items.forEach(item => {
+            forms.forEach(form => {
+                const key = form === 'base' ? item : `${item}:${form}`;
+                game.levelMastery[key] = 0;
+            });
+        });
     }
 
     // Record a correct answer for mastery tracking
     function recordMasteryAnswer(item) {
-        if (game.levelMastery[item] !== undefined) {
-            game.levelMastery[item]++;
+        const form = game.currentForm || 'base';
+        const key = form === 'base' ? item : `${item}:${form}`;
+        if (game.levelMastery[key] !== undefined) {
+            game.levelMastery[key]++;
         }
     }
 
@@ -340,6 +348,7 @@
         activeColors: [],   // pool of colour keys for this cycle
         activeItems: [],    // shuffled subset for current level (colours or emoji items)
         currentColor: '',
+        currentForm: 'base',
         score: 0,
         totalQuestions: 0,
         responseTimes: [],
@@ -375,6 +384,27 @@
         return getCategoryData().displayType === 'color';
     }
 
+    function isNounCategory() {
+        return NOUN_CATEGORIES.includes(selectedCategory);
+    }
+
+    function getAvailableForms() {
+        if (!isNounCategory()) return ['base'];
+        if (game.currentCycle >= PLURAL_CYCLE) return ['base', 'article', 'plural'];
+        if (game.currentCycle >= ARTICLE_CYCLE) return ['base', 'article'];
+        return ['base'];
+    }
+
+    function getFormTranslation(item, form) {
+        const baseWord = getCategoryTranslation(item);
+        if (form === 'base' || !isNounCategory()) return baseWord;
+        const formData = getCategoryData().forms?.[selectedLanguage]?.[item];
+        if (!formData) return baseWord;
+        if (form === 'article') return formData.article + ' ' + baseWord;
+        if (form === 'plural') return formData.pluralArticle + ' ' + formData.plural;
+        return baseWord;
+    }
+
     function getCategoryItems() {
         return game.activeItems;
     }
@@ -407,7 +437,7 @@
         // Don't speak in Speech Mode (would give away the answer)
         if (getPhaseFromProgress() === 2) return;
 
-        const word = getCategoryTranslation(color);
+        const word = getFormTranslation(color, game.currentForm || 'base');
         if (!word) return;
 
         // Cancel any ongoing speech
@@ -541,12 +571,15 @@
 
             const result = event.results[event.results.length - 1];
             const transcript = result[0].transcript.trim().toLowerCase();
-            const lastWord = transcript.split(' ').pop();
+            const words = transcript.split(' ');
+            const lastWord = words.pop();
+            // For multi-word forms like "El Perro", show last two words
+            const displayText = words.length > 0 ? words.slice(-1).concat(lastWord).join(' ') : lastWord;
 
-            voiceFeedback.textContent = `Heard: "${lastWord}"`;
+            voiceFeedback.textContent = `Heard: "${displayText}"`;
 
             if (result.isFinal) {
-                const matchedColor = matchColorFromSpeech(lastWord);
+                const matchedColor = matchColorFromSpeech(lastWord, transcript);
                 if (matchedColor) {
                     handleAnswer(matchedColor);
                 }
@@ -580,7 +613,7 @@
         return recog;
     }
 
-    function matchColorFromSpeech(word) {
+    function matchColorFromSpeech(word, fullTranscript) {
         const items = getCategoryItems();
         const lowerWord = word.toLowerCase();
 
@@ -593,6 +626,18 @@
                     if (colorAliases && colorAliases.some(alias => alias.toLowerCase() === lowerWord)) {
                         return color;
                     }
+                }
+            }
+        }
+
+        // Match against form translation (e.g. "El Perro", "Los Perros")
+        const currentForm = game.currentForm || 'base';
+        if (currentForm !== 'base' && fullTranscript) {
+            const lowerTranscript = fullTranscript.toLowerCase();
+            for (const item of items) {
+                const formTranslation = getFormTranslation(item, currentForm);
+                if (formTranslation && lowerTranscript.endsWith(formTranslation.toLowerCase())) {
+                    return item;
                 }
             }
         }
@@ -636,7 +681,7 @@
         speechWarning.classList.add('visible');
         speechUI.classList.remove('active');
         buttonsContainer.style.display = 'grid';
-        promptLabel.textContent = 'What colour is this?';
+        promptLabel.textContent = getPromptText(game.currentForm || 'base');
     }
 
     function isSpeechMode() {
@@ -736,8 +781,14 @@
             levelUpPhase.textContent = '';
         }
 
-        // Always show info about colors shuffling
-        levelUpInfo.textContent = 'New colours selected!';
+        // Show info about what's active
+        const forms = getAvailableForms();
+        if (forms.length > 1) {
+            const formNames = forms.filter(f => f !== 'base').map(f => f.charAt(0).toUpperCase() + f.slice(1) + 's');
+            levelUpInfo.textContent = `New items selected! (${formNames.join(' & ')} active)`;
+        } else {
+            levelUpInfo.textContent = 'New items selected!';
+        }
 
         // Always show current time limit, highlight if changed
         if (timeChanged) {
@@ -805,6 +856,17 @@
         } else {
             cycleCompleteColors.textContent = 'All colours mastered!';
             newColorBadges.innerHTML = '';
+        }
+
+        // Announce new form types for noun categories
+        if (isNounCategory()) {
+            if (newCycle === ARTICLE_CYCLE) {
+                cycleCompleteColors.textContent = 'Articles unlocked!';
+                newColorBadges.innerHTML = '';
+            } else if (newCycle === PLURAL_CYCLE) {
+                cycleCompleteColors.textContent = 'Plurals unlocked!';
+                newColorBadges.innerHTML = '';
+            }
         }
 
         cycleCompleteOverlay.classList.add('active');
@@ -1072,6 +1134,7 @@
             game.activeItems = getCategoryData().items.slice(0, game.activeColors.length);
         }
         initLevelMastery();
+        game.currentForm = 'base';
         game.timeLimit = getTimeLimit();
         game.score = 0;
         game.totalQuestions = 0;
@@ -1090,13 +1153,27 @@
         nextRound();
     }
 
+    function getPromptText(form) {
+        const isEmojiMode = !isColorCategory();
+        if (form === 'article') return 'What is this with its article?';
+        if (form === 'plural') return 'What are these?';
+        return isEmojiMode ? 'What does this emoji mean?' : 'What colour is this?';
+    }
+
+    function getSpeechPrompt(form) {
+        if (form === 'article') return 'Say it with the article!';
+        if (form === 'plural') return 'Say the plural!';
+        const isEmojiMode = !isColorCategory();
+        return isEmojiMode ? 'Say the word!' : 'Say the colour!';
+    }
+
     function generateButtons() {
         buttonsContainer.innerHTML = '';
         const phase = getPhaseFromProgress();
         const items = getCategoryItems();
-        const isEmojiMode = !isColorCategory();
-        const promptText = isEmojiMode ? 'What does this emoji mean?' : 'What colour is this?';
-        const speechPrompt = isEmojiMode ? 'Say the word!' : 'Say the colour!';
+        const currentForm = game.currentForm || 'base';
+        const promptText = getPromptText(currentForm);
+        const speechPrompt = getSpeechPrompt(currentForm);
 
         // Speech mode: hide buttons and show speech UI
         if (phase === 2) {
@@ -1120,7 +1197,7 @@
             const btn = document.createElement('button');
             btn.className = 'answer-btn';
             btn.dataset.color = item;
-            btn.textContent = getCategoryTranslation(item);
+            btn.textContent = getFormTranslation(item, currentForm);
 
             // Apply styling based on current phase and category
             if (phase === 0 && !isEmojiMode) {
@@ -1156,32 +1233,60 @@
         // Update time limit based on current level
         game.timeLimit = getTimeLimit();
 
-        // Pick a random item, prioritizing un-mastered items
+        // Build list of unmastered {item, form} pairs
         const items = getCategoryItems();
-        const unmastered = items.filter(item => (game.levelMastery[item] || 0) < MASTERY_THRESHOLD);
-        const pool = unmastered.length > 0 ? unmastered : items;
-        let newColor;
-        do {
-            newColor = pool[Math.floor(Math.random() * pool.length)];
-        } while (newColor === game.currentColor && pool.length > 1);
+        const forms = getAvailableForms();
+        const unmasteredPairs = [];
+        items.forEach(item => {
+            forms.forEach(form => {
+                const key = form === 'base' ? item : `${item}:${form}`;
+                if ((game.levelMastery[key] || 0) < MASTERY_THRESHOLD) {
+                    unmasteredPairs.push({ item, form });
+                }
+            });
+        });
 
-        game.currentColor = newColor;
+        // Pick randomly from unmastered pairs, avoiding same item as last round
+        const pool = unmasteredPairs.length > 0 ? unmasteredPairs : items.map(item => ({ item, form: 'base' }));
+        let pick;
+        do {
+            pick = pool[Math.floor(Math.random() * pool.length)];
+        } while (pick.item === game.currentColor && pool.length > 1);
+
+        game.currentColor = pick.item;
+        game.currentForm = pick.form;
 
         // Display: emoji or colour swatch
         const emoji = getCategoryDisplay(game.currentColor);
         if (emoji) {
             colorDisplay.style.backgroundColor = 'transparent';
-            colorDisplay.textContent = emoji;
-            colorDisplay.classList.add('emoji-display');
+            if (game.currentForm === 'plural') {
+                colorDisplay.textContent = emoji + emoji;
+                colorDisplay.classList.add('emoji-display', 'plural-display');
+            } else {
+                colorDisplay.textContent = emoji;
+                colorDisplay.classList.add('emoji-display');
+                colorDisplay.classList.remove('plural-display');
+            }
         } else {
             colorDisplay.textContent = '';
-            colorDisplay.classList.remove('emoji-display');
+            colorDisplay.classList.remove('emoji-display', 'plural-display');
             colorDisplay.style.backgroundColor = getCategoryData().display[game.currentColor];
         }
 
+        // Update prompt label per form
+        const currentForm = game.currentForm || 'base';
+        promptLabel.textContent = isSpeechMode() ? getSpeechPrompt(currentForm) : getPromptText(currentForm);
+
+        // Update button text for current form
+        const btns = buttonsContainer.querySelectorAll('.answer-btn');
+        btns.forEach(btn => {
+            btn.textContent = getFormTranslation(btn.dataset.color, currentForm);
+        });
+
         // Show reinforcement label in level 1 of learning phase for non-colour categories
         if (!isColorCategory() && getPhaseFromProgress() === 0 && getLevelInPhase() === 1) {
-            reinforcementLabel.textContent = getCategoryTranslation(game.currentColor);
+            reinforcementLabel.textContent = getFormTranslation(game.currentColor, currentForm);
         } else {
             reinforcementLabel.textContent = '';
         }
@@ -1315,10 +1420,12 @@
         }
 
         if (game.score === 0) {
-            const answerWord = getCategoryTranslation(game.currentColor);
+            const currentForm = game.currentForm || 'base';
+            const answerWord = getFormTranslation(game.currentColor, currentForm);
             const answerEmoji = getCategoryDisplay(game.currentColor);
-            endMessage.textContent = answerEmoji
-                ? `The answer was ${answerWord} ${answerEmoji} (${game.currentColor})`
+            const emojiDisplay = answerEmoji ? (currentForm === 'plural' ? answerEmoji + answerEmoji : answerEmoji) : null;
+            endMessage.textContent = emojiDisplay
+                ? `The answer was ${answerWord} ${emojiDisplay} (${game.currentColor})`
                 : `The colour was ${answerWord} (${game.currentColor})`;
         } else if (game.score < 5) {
             endMessage.textContent = 'Good start! Keep practising!';
