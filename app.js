@@ -393,7 +393,15 @@
         return NOUN_CATEGORIES.includes(selectedCategory);
     }
 
+    function isAdjectiveCategory() {
+        return selectedCategory === ADJECTIVE_CATEGORY;
+    }
+
     function getAvailableForms() {
+        if (isAdjectiveCategory()) {
+            if (game.currentCycle >= FEMININE_CYCLE) return ['base', 'feminine'];
+            return ['base'];
+        }
         if (!isNounCategory()) return ['base'];
         if (game.currentCycle >= PLURAL_CYCLE) return ['base', 'article', 'plural'];
         if (game.currentCycle >= ARTICLE_CYCLE) return ['base', 'article'];
@@ -402,9 +410,10 @@
 
     function getFormTranslation(item, form) {
         const baseWord = getCategoryTranslation(item);
-        if (form === 'base' || !isNounCategory()) return baseWord;
+        if (form === 'base') return baseWord;
         const formData = getCategoryData().forms?.[selectedLanguage]?.[item];
         if (!formData) return baseWord;
+        if (form === 'feminine') return formData.feminine || baseWord;
         if (form === 'article') return formData.article + ' ' + baseWord;
         if (form === 'plural') return formData.pluralArticle + ' ' + formData.plural;
         return baseWord;
@@ -829,7 +838,8 @@
         // Show info about what's active
         const forms = getAvailableForms();
         if (forms.length > 1) {
-            const formNames = forms.filter(f => f !== 'base').map(f => f.charAt(0).toUpperCase() + f.slice(1) + 's');
+            const formLabels = { article: 'Articles', plural: 'Plurals', feminine: 'Feminine forms' };
+            const formNames = forms.filter(f => f !== 'base').map(f => formLabels[f] || f);
             levelUpInfo.textContent = `New items selected! (${formNames.join(' & ')} active)`;
         } else {
             levelUpInfo.textContent = 'New items selected!';
@@ -912,6 +922,12 @@
                 cycleCompleteColors.textContent = 'Plurals unlocked!';
                 newColorBadges.innerHTML = '';
             }
+        }
+
+        // Announce feminine forms for adjective category
+        if (isAdjectiveCategory() && newCycle === FEMININE_CYCLE) {
+            cycleCompleteColors.textContent = 'Feminine forms unlocked!';
+            newColorBadges.innerHTML = '';
         }
 
         cycleCompleteOverlay.classList.add('active');
@@ -1258,12 +1274,15 @@
 
     function getPromptText(form) {
         const isEmojiMode = !isColorCategory();
+        if (form === 'feminine') return 'How does she feel?';
         if (form === 'article') return 'What is this with its article?';
         if (form === 'plural') return 'What are these?';
+        if (isAdjectiveCategory() && getAvailableForms().includes('feminine')) return 'How does he feel?';
         return isEmojiMode ? 'What does this emoji mean?' : 'What colour is this?';
     }
 
     function getTypingPrompt(form) {
+        if (form === 'feminine') return 'Type the feminine!';
         if (form === 'article') return 'Type it with the article!';
         if (form === 'plural') return 'Type the plural!';
         const isEmojiMode = !isColorCategory();
@@ -1271,6 +1290,7 @@
     }
 
     function getSpeechPrompt(form) {
+        if (form === 'feminine') return 'Say the feminine!';
         if (form === 'article') return 'Say it with the article!';
         if (form === 'plural') return 'Say the plural!';
         const isEmojiMode = !isColorCategory();
@@ -1386,6 +1406,14 @@
             if (game.currentForm === 'plural') {
                 colorDisplay.textContent = emoji + emoji;
                 colorDisplay.classList.add('emoji-display', 'plural-display');
+            } else if (game.currentForm === 'feminine') {
+                colorDisplay.textContent = '👩 ' + emoji;
+                colorDisplay.classList.add('emoji-display');
+                colorDisplay.classList.remove('plural-display');
+            } else if (isAdjectiveCategory() && getAvailableForms().includes('feminine')) {
+                colorDisplay.textContent = '👨 ' + emoji;
+                colorDisplay.classList.add('emoji-display');
+                colorDisplay.classList.remove('plural-display');
             } else {
                 colorDisplay.textContent = emoji;
                 colorDisplay.classList.add('emoji-display');

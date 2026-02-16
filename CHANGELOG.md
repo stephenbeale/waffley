@@ -5,6 +5,7 @@ All notable changes to Waffley are documented here. Format follows [Keep a Chang
 ## [Unreleased]
 
 ### Added
+- Feminine adjective forms from Cycle 2 — gendered prompts with 👨/👩 indicators (ES, FR, IT, PT)
 - Expanded vocabulary: 2 new items per category (sick/strong, cow/pig, tomato/carrot, lightning/tornado)
 - Phase selection on topic screen — click any journey phase to start from that point
 - Typing phase between Practice and Speech (4-phase, 40-level cycle)

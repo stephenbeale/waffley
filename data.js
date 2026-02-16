@@ -25,8 +25,11 @@
 
     // Noun categories that support articles and plurals
     const NOUN_CATEGORIES = ['animals', 'food', 'weather'];
+    // Adjective category supports feminine forms
+    const ADJECTIVE_CATEGORY = 'adjectives';
     const ARTICLE_CYCLE = 2;
     const PLURAL_CYCLE = 3;
+    const FEMININE_CYCLE = 2;
 
     // Language display names
     const LANGUAGE_NAMES = {
@@ -133,6 +136,46 @@
                     happy: 'Feliz', sad: 'Triste', angry: 'Zangado', tired: 'Cansado',
                     surprised: 'Surpreso', scared: 'Assustado', excited: 'Entusiasmado', bored: 'Aborrecido', cold: 'Frio',
                     sick: 'Doente', strong: 'Forte'
+                }
+            },
+            forms: {
+                es: {
+                    angry: { feminine: 'Enfadada' },
+                    tired: { feminine: 'Cansada' },
+                    surprised: { feminine: 'Sorprendida' },
+                    scared: { feminine: 'Asustada' },
+                    excited: { feminine: 'Emocionada' },
+                    bored: { feminine: 'Aburrida' },
+                    cold: { feminine: 'Fría' },
+                    sick: { feminine: 'Enferma' }
+                },
+                fr: {
+                    happy: { feminine: 'Heureuse' },
+                    tired: { feminine: 'Fatiguée' },
+                    surprised: { feminine: 'Surprise' },
+                    scared: { feminine: 'Effrayée' },
+                    excited: { feminine: 'Excitée' },
+                    bored: { feminine: 'Ennuyée' },
+                    cold: { feminine: 'Froide' },
+                    strong: { feminine: 'Forte' }
+                },
+                it: {
+                    angry: { feminine: 'Arrabbiata' },
+                    tired: { feminine: 'Stanca' },
+                    surprised: { feminine: 'Sorpresa' },
+                    scared: { feminine: 'Spaventata' },
+                    bored: { feminine: 'Annoiata' },
+                    cold: { feminine: 'Fredda' },
+                    sick: { feminine: 'Malata' }
+                },
+                pt: {
+                    angry: { feminine: 'Zangada' },
+                    tired: { feminine: 'Cansada' },
+                    surprised: { feminine: 'Surpresa' },
+                    scared: { feminine: 'Assustada' },
+                    excited: { feminine: 'Entusiasmada' },
+                    bored: { feminine: 'Aborrecida' },
+                    sick: { feminine: 'Doente' }
                 }
             }
         },
