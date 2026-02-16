@@ -46,6 +46,12 @@ Planned features and improvements for Waffley.
 - [ ] **Remove mastered items from the active pool**
   After 3 consecutive correct answers for an item within a session, remove it from the available options. This narrows the pool to only unlearned items, making it clear what remains to be mastered and focusing practice where it's needed.
 
+- [ ] **Improve typing mode for mobile**
+  Make emoji/colour display smaller so the keyboard overlay doesn't obscure the text input. Move the timer bar between the display and the input. Add accent shortcut buttons above the text input for easy character entry. Show a hint on typing phase start and level-up cards that accents can be found by holding the relevant key on keyboard.
+
+- [ ] **Show wrong attempts in speech mode**
+  When the user gets a speech recognition answer wrong, show a scrolling record of past attempts with a cross next to each, so they can see what was heard and adjust their pronunciation.
+
 ---
 
 ## Code Quality & Architecture
