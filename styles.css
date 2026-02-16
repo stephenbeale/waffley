@@ -1232,6 +1232,107 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     color: #fff;
 }
 
+/* Speed round mercy overlay */
+#speed-mercy-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(26, 26, 46, 0.95);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+#speed-mercy-overlay.active {
+    display: flex;
+}
+
+.speed-mercy-title {
+    font-size: 3rem;
+    font-weight: 900;
+    color: #fd7e14;
+    margin-bottom: 1rem;
+    animation: levelUpPulse 0.5s ease-out;
+}
+
+.speed-mercy-message {
+    font-size: 1.2rem;
+    color: #aaa;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.speed-mercy-streak {
+    font-size: 1.1rem;
+    color: #16c79a;
+    margin-bottom: 2rem;
+}
+
+.speed-mercy-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+#speed-mercy-retry {
+    padding: 1rem 3rem;
+    font-size: 1.3rem;
+    font-family: inherit;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    background: #e94560;
+    color: #fff;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.2s;
+}
+
+#speed-mercy-retry:hover {
+    background: #c73651;
+    transform: scale(1.05);
+}
+
+#speed-mercy-add-time {
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+    font-family: inherit;
+    font-weight: 600;
+    border: 2px solid #fd7e14;
+    border-radius: 8px;
+    background: transparent;
+    color: #fd7e14;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+#speed-mercy-add-time:hover {
+    background: #fd7e14;
+    color: #fff;
+}
+
+.speed-mercy-end-btn {
+    padding: 0.5rem 1.2rem;
+    font-size: 0.9rem;
+    font-family: inherit;
+    font-weight: 600;
+    border: 2px solid #444;
+    border-radius: 6px;
+    background: transparent;
+    color: #aaa;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.speed-mercy-end-btn:hover {
+    border-color: #666;
+    color: #fff;
+}
+
 /* Personal best indicator on end screen */
 .personal-best {
     display: none;

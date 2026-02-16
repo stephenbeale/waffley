@@ -278,8 +278,13 @@
     // Level 1 = 10s, Level 2 = 8s, Level 3 = 6s, Level 4 = 4s, Level 5+ = 2s
     function getTimeLimit() {
         const levelInPhase = getLevelInPhase();
-        const timeInSeconds = Math.max(MIN_TIME, MAX_TIME - (levelInPhase - 1) * 2);
+        const timeInSeconds = Math.max(MIN_TIME, MAX_TIME - (levelInPhase - 1) * 2) + game.timeBonus;
         return timeInSeconds * 1000;
+    }
+
+    function isAtMinTime() {
+        const levelInPhase = getLevelInPhase();
+        return Math.max(MIN_TIME, MAX_TIME - (levelInPhase - 1) * 2) <= MIN_TIME;
     }
 
     // Get time limit in seconds for display
@@ -378,6 +383,10 @@
         // Overlay flags
         levelUpPending: false,
         cycleCompletePending: false,
+
+        // Speed mercy: extra seconds added by player
+        timeBonus: 0,
+        mercyUsed: false,
     };
 
     // Helper: get current category data
@@ -577,6 +586,11 @@
     const typingUI = document.getElementById('typing-ui');
     const typingInput = document.getElementById('typing-input');
     const typingFeedback = document.getElementById('typing-feedback');
+
+    // Speed mercy overlay
+    const speedMercyOverlay = document.getElementById('speed-mercy-overlay');
+    const speedMercyMessage = document.getElementById('speed-mercy-message');
+    const speedMercyStreak = document.getElementById('speed-mercy-streak');
 
     // ========== SPEECH RECOGNITION FUNCTIONS ==========
 
@@ -1138,7 +1152,11 @@
             if (!game.roundActive) return;
             game.roundActive = false;
             game.totalQuestions++;
-            endGame();
+            if (isAtMinTime() && !game.mercyUsed) {
+                showSpeedMercy();
+            } else {
+                endGame();
+            }
         }, game.pausedTimeRemaining);
 
         cancelAnimationFrame(game.timerRAF);
@@ -1205,6 +1223,39 @@
         quitGame();
     });
 
+    // ========== SPEED MERCY HANDLERS ==========
+
+    document.getElementById('speed-mercy-retry').addEventListener('click', function() {
+        speedMercyOverlay.classList.remove('active');
+        game.mercyUsed = true;
+        game.roundActive = true;
+        // Re-show typing UI if in typing mode
+        if (isTypingMode()) {
+            typingUI.classList.add('active');
+        }
+        generateButtons();
+        nextRound();
+    });
+
+    document.getElementById('speed-mercy-add-time').addEventListener('click', function() {
+        speedMercyOverlay.classList.remove('active');
+        game.mercyUsed = true;
+        game.timeBonus += 2;
+        game.roundActive = true;
+        // Re-show typing UI if in typing mode
+        if (isTypingMode()) {
+            typingUI.classList.add('active');
+        }
+        updateLevelDisplay();
+        generateButtons();
+        nextRound();
+    });
+
+    document.getElementById('speed-mercy-end').addEventListener('click', function() {
+        speedMercyOverlay.classList.remove('active');
+        endGame();
+    });
+
     // ========== TYPING MODE HANDLERS ==========
 
     function matchItemFromTyping(typed) {
@@ -1258,6 +1309,8 @@
         game.score = 0;
         game.totalQuestions = 0;
         game.responseTimes = [];
+        game.timeBonus = 0;
+        game.mercyUsed = false;
         currentScoreEl.textContent = '0';
 
         // Initialize speech recognition if entering speech mode
@@ -1475,7 +1528,11 @@
             if (!game.roundActive) return;
             game.roundActive = false;
             game.totalQuestions++;
-            endGame();
+            if (isAtMinTime() && !game.mercyUsed) {
+                showSpeedMercy();
+            } else {
+                endGame();
+            }
         }, game.timeLimit);
 
         // Start listening in speech mode
@@ -1537,8 +1594,32 @@
                 nextRound();
             }
         } else {
-            endGame();
+            // Show mercy overlay at min time if not already used this session
+            if (isAtMinTime() && !game.mercyUsed) {
+                showSpeedMercy();
+            } else {
+                endGame();
+            }
         }
+    }
+
+    function showSpeedMercy() {
+        playWrongSound();
+        clearTimeout(game.timeout);
+        cancelAnimationFrame(game.timerRAF);
+
+        // Stop speech/typing
+        if (recognition) stopListening();
+        typingUI.classList.remove('active');
+
+        const timeSeconds = getTimeLimitSeconds();
+        speedMercyMessage.textContent = timeSeconds <= MIN_TIME
+            ? "That 2-second timer is no joke!"
+            : `Tricky at ${timeSeconds} seconds!`;
+        speedMercyStreak.textContent = `Current streak: ${game.score}`;
+
+        speedMercyOverlay.classList.add('active');
+        document.getElementById('speed-mercy-retry').focus();
     }
 
     function endGame() {
