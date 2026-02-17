@@ -98,12 +98,12 @@
     </div>
 
     <div class="start-buttons">
-        <button id="start-btn">Start Learning</button>
+        <button id="start-btn" class="btn btn--primary">Start Learning</button>
     </div>
-    <button class="back-btn" id="back-btn">Back</button>
+    <button class="btn btn--secondary back-btn" id="back-btn">Back</button>
 </div>
 
-<div id="stats-overlay" role="dialog" aria-label="Statistics">
+<div id="stats-overlay" class="overlay" role="dialog" aria-label="Statistics">
     <div class="stats-title">Your Statistics</div>
     <div class="stats-grid">
         <div class="stats-card">
@@ -179,15 +179,15 @@
     <div class="buttons" id="buttons-container"></div>
 </div>
 
-<div id="pause-overlay" role="dialog" aria-label="Game paused">
+<div id="pause-overlay" class="overlay" role="dialog" aria-label="Game paused">
     <div class="pause-title">Paused</div>
     <div class="pause-buttons">
-        <button id="resume-btn">Resume</button>
-        <button id="quit-from-pause-btn" class="pause-quit-btn">Go to Menu</button>
+        <button id="resume-btn" class="btn btn--primary">Resume</button>
+        <button id="quit-from-pause-btn" class="btn btn--secondary">Go to Menu</button>
     </div>
 </div>
 
-<div id="level-up-overlay" role="dialog" aria-label="Level up">
+<div id="level-up-overlay" class="overlay" role="dialog" aria-label="Level up">
     <div class="level-up-title" id="level-up-title">Level Up!</div>
     <div class="level-up-streak" id="level-up-streak"></div>
     <div class="level-up-message" id="level-up-message">You reached Level 2</div>
@@ -197,11 +197,11 @@
     <div class="level-up-time" id="level-up-time"></div>
     <div class="level-up-countdown" id="level-up-countdown">3</div>
     <div class="overlay-nav">
-        <button class="overlay-nav-btn" id="level-up-menu-btn">Go to Menu</button>
+        <button class="btn btn--secondary" id="level-up-menu-btn">Go to Menu</button>
     </div>
 </div>
 
-<div id="cycle-complete-overlay" role="dialog" aria-label="Cycle complete">
+<div id="cycle-complete-overlay" class="overlay" role="dialog" aria-label="Cycle complete">
     <div class="cycle-complete-title">Cycle Complete!</div>
     <div class="cycle-complete-message" id="cycle-complete-message">You finished Cycle 1!</div>
     <div class="cycle-complete-colors" id="cycle-complete-colors">New colours unlocked!</div>
@@ -209,18 +209,18 @@
     <div class="cycle-complete-info">Time resets to 10 seconds</div>
     <div class="cycle-complete-countdown" id="cycle-complete-countdown">5</div>
     <div class="overlay-nav">
-        <button class="overlay-nav-btn" id="cycle-complete-menu-btn">Go to Menu</button>
+        <button class="btn btn--secondary" id="cycle-complete-menu-btn">Go to Menu</button>
     </div>
 </div>
 
-<div id="speed-mercy-overlay" role="dialog" aria-label="Speed round">
+<div id="speed-mercy-overlay" class="overlay" role="dialog" aria-label="Speed round">
     <div class="speed-mercy-title">Speed Round!</div>
     <div class="speed-mercy-message" id="speed-mercy-message">That 2-second timer is no joke!</div>
     <div class="speed-mercy-streak" id="speed-mercy-streak">Current streak: 0</div>
     <div class="speed-mercy-buttons">
-        <button id="speed-mercy-retry">Try Again</button>
+        <button id="speed-mercy-retry" class="btn btn--primary">Try Again</button>
         <button id="speed-mercy-add-time">Add 2 Seconds</button>
-        <button id="speed-mercy-end" class="speed-mercy-end-btn">End Game</button>
+        <button id="speed-mercy-end" class="btn btn--secondary">End Game</button>
     </div>
 </div>
 
@@ -242,7 +242,7 @@
         </div>
     </div>
     <br><br>
-    <button id="restart-btn">Play Again</button>
+    <button id="restart-btn" class="btn btn--primary">Play Again</button>
 </div>
 
 <script type="module" src="app.js"></script>

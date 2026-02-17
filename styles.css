@@ -12,6 +12,73 @@ body {
     user-select: none;
 }
 
+/* ========== BASE CLASSES ========== */
+
+/* Overlay base — fullscreen modal backdrop */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(26, 26, 46, 0.95);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+}
+
+.overlay.active {
+    display: flex;
+}
+
+/* Button base */
+.btn {
+    font-family: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: transform 0.1s, background 0.2s;
+}
+
+/* Primary CTA — large red action button */
+.btn--primary {
+    padding: 1rem 3rem;
+    font-size: 1.3rem;
+    border: none;
+    background: #e94560;
+    color: #fff;
+}
+
+.btn--primary:hover {
+    background: #c73651;
+    transform: scale(1.05);
+}
+
+/* Secondary — ghost outline button */
+.btn--secondary {
+    padding: 0.5rem 1.2rem;
+    font-size: 0.9rem;
+    border: 2px solid #444;
+    border-radius: 6px;
+    background: transparent;
+    color: #aaa;
+    transition: all 0.2s;
+}
+
+.btn--secondary:hover {
+    border-color: #666;
+    color: #fff;
+}
+
+.btn--secondary:focus-visible {
+    outline: 2px solid #16c79a;
+    outline-offset: 2px;
+}
+
+/* ========== SCREEN CONTAINERS ========== */
+
 #language-screen, #topic-screen, #game-screen, #end-screen {
     display: none;
     flex-direction: column;
@@ -40,21 +107,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 
 .instructions strong { color: #fff; }
 
-#start-btn, #restart-btn {
-    padding: 1rem 3rem;
-    font-size: 1.3rem;
-    border: none;
-    border-radius: 8px;
-    background: #e94560;
-    color: #fff;
-    cursor: pointer;
-    transition: transform 0.1s, background 0.2s;
-}
-
-#start-btn:hover, #restart-btn:hover {
-    background: #c73651;
-    transform: scale(1.05);
-}
+/* #start-btn and #restart-btn use .btn.btn--primary */
 
 .color-display {
     width: 200px;
@@ -227,21 +280,9 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     color: #fff;
 }
 
+/* .back-btn uses .btn.btn--secondary */
 .back-btn {
-    padding: 0.5rem 1.2rem;
-    font-size: 0.9rem;
-    border: 2px solid #444;
-    border-radius: 6px;
-    background: transparent;
-    color: #aaa;
-    cursor: pointer;
-    transition: all 0.2s;
     margin-top: 1rem;
-}
-
-.back-btn:hover {
-    border-color: #666;
-    color: #fff;
 }
 
 .setting-label {
@@ -781,24 +822,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     background: rgba(60, 60, 100, 0.95);
 }
 
-/* Pause overlay */
-#pause-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(26, 26, 46, 0.95);
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-}
-
-#pause-overlay.active {
-    display: flex;
-}
+/* Pause overlay — uses .overlay base */
 
 .pause-title {
     font-size: 3rem;
@@ -814,60 +838,11 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     align-items: center;
 }
 
-#resume-btn {
-    padding: 1rem 3rem;
-    font-size: 1.3rem;
-    font-family: inherit;
-    font-weight: 600;
-    border: none;
-    border-radius: 8px;
-    background: #e94560;
-    color: #fff;
-    cursor: pointer;
-    transition: transform 0.1s, background 0.2s;
-}
+/* #resume-btn uses .btn.btn--primary */
 
-#resume-btn:hover {
-    background: #c73651;
-    transform: scale(1.05);
-}
+/* .pause-quit-btn uses .btn.btn--secondary */
 
-.pause-quit-btn {
-    padding: 0.5rem 1.2rem;
-    font-size: 0.9rem;
-    font-family: inherit;
-    font-weight: 600;
-    border: 2px solid #444;
-    border-radius: 6px;
-    background: transparent;
-    color: #aaa;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.pause-quit-btn:hover {
-    border-color: #666;
-    color: #fff;
-}
-
-/* Level-up overlay */
-#level-up-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(26, 26, 46, 0.95);
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-}
-
-#level-up-overlay.active {
-    display: flex;
-}
+/* Level-up overlay — uses .overlay base */
 
 .level-up-title {
     font-size: 3rem;
@@ -924,28 +899,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     margin-top: 1rem;
 }
 
-.overlay-nav-btn {
-    padding: 0.5rem 1.2rem;
-    font-size: 0.9rem;
-    font-family: inherit;
-    font-weight: 600;
-    border: 2px solid #444;
-    border-radius: 6px;
-    background: transparent;
-    color: #aaa;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.overlay-nav-btn:hover {
-    border-color: #666;
-    color: #fff;
-}
-
-.overlay-nav-btn:focus-visible {
-    outline: 2px solid #16c79a;
-    outline-offset: 2px;
-}
+/* .overlay-nav-btn uses .btn.btn--secondary */
 
 /* Start screen progress display */
 .progress-display {
@@ -1106,24 +1060,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     color: #555;
 }
 
-/* Cycle complete overlay */
-#cycle-complete-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(26, 26, 46, 0.95);
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-}
-
-#cycle-complete-overlay.active {
-    display: flex;
-}
+/* Cycle complete overlay — uses .overlay base */
 
 .cycle-complete-title {
     font-size: 3rem;
@@ -1201,24 +1138,11 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     color: #fff;
 }
 
+/* Stats overlay — uses .overlay base, overrides bg opacity */
 #stats-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
     background: rgba(26, 26, 46, 0.98);
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
     padding: 2rem;
     overflow-y: auto;
-}
-
-#stats-overlay.active {
-    display: flex;
 }
 
 .stats-title {
@@ -1348,24 +1272,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     color: #fff;
 }
 
-/* Speed round mercy overlay */
-#speed-mercy-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(26, 26, 46, 0.95);
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-}
-
-#speed-mercy-overlay.active {
-    display: flex;
-}
+/* Speed mercy overlay — uses .overlay base */
 
 .speed-mercy-title {
     font-size: 3rem;
@@ -1395,23 +1302,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     align-items: center;
 }
 
-#speed-mercy-retry {
-    padding: 1rem 3rem;
-    font-size: 1.3rem;
-    font-family: inherit;
-    font-weight: 600;
-    border: none;
-    border-radius: 8px;
-    background: #e94560;
-    color: #fff;
-    cursor: pointer;
-    transition: transform 0.1s, background 0.2s;
-}
-
-#speed-mercy-retry:hover {
-    background: #c73651;
-    transform: scale(1.05);
-}
+/* #speed-mercy-retry uses .btn.btn--primary */
 
 #speed-mercy-add-time {
     padding: 0.8rem 2rem;
@@ -1431,23 +1322,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     color: #fff;
 }
 
-.speed-mercy-end-btn {
-    padding: 0.5rem 1.2rem;
-    font-size: 0.9rem;
-    font-family: inherit;
-    font-weight: 600;
-    border: 2px solid #444;
-    border-radius: 6px;
-    background: transparent;
-    color: #aaa;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.speed-mercy-end-btn:hover {
-    border-color: #666;
-    color: #fff;
-}
+/* .speed-mercy-end-btn uses .btn.btn--secondary */
 
 /* Personal best indicator on end screen */
 .personal-best {
