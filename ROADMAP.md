@@ -119,8 +119,8 @@ Planned features and improvements for Waffley.
 - [x] **Extract utilities and name magic numbers**
   Add named constants for `TIMER_WARNING_RATIO`, `LEVEL_UP_COUNTDOWN`, `CYCLE_COMPLETE_COUNTDOWN`, `STARTING_BUTTON_COUNT`, `MAX_PITCH_SEMITONES`, `TTS_SPEECH_RATE`, `SILENT_LEVEL_THRESHOLD`, etc.
 
-- [ ] **Consolidate language data**
-  Define each language as a single object (`{ code, name, flag, speechCode, translations, aliases }`) instead of 7 separate lookup objects.
+- [x] **Consolidate language data**
+  Define each language as a single object (`{ code, name, flag, speechCode }`) with derived lookups for backward compatibility.
 
 - [ ] **Split data.js into per-language files**
   Move vocabulary and translations out of data.js into separate files per language (e.g. `lang-es.js`, `lang-fr.js`). Each file owns its translations, article/plural forms, and speech aliases. Keeps data.js for shared constants and category structure. Makes it easy to add new languages or let contributors work on one language independently.

@@ -43,16 +43,19 @@ export const ARTICLE_CYCLE = 2;
 export const PLURAL_CYCLE = 3;
 export const FEMININE_CYCLE = 2;
 
-// Language display names
-export const LANGUAGE_NAMES = {
-        es: 'Spanish', fr: 'French', de: 'German',
-        it: 'Italian', cy: 'Welsh', pt: 'Portuguese'
-    };
+// Unified language definitions
+export const LANGUAGES = {
+    es: { name: 'Spanish', flag: '🇪🇸', speechCode: 'es-ES' },
+    fr: { name: 'French',  flag: '🇫🇷', speechCode: 'fr-FR' },
+    de: { name: 'German',  flag: '🇩🇪', speechCode: 'de-DE' },
+    it: { name: 'Italian', flag: '🇮🇹', speechCode: 'it-IT' },
+    cy: { name: 'Welsh',   flag: '🏴󠁧󠁢󠁷󠁬󠁳󠁿', speechCode: 'cy-GB' },
+    pt: { name: 'Portuguese', flag: '🇵🇹', speechCode: 'pt-PT' }
+};
 
-export const LANGUAGE_FLAGS = {
-        es: '🇪🇸', fr: '🇫🇷', de: '🇩🇪',
-        it: '🇮🇹', cy: '🏴󠁧󠁢󠁷󠁬󠁳󠁿', pt: '🇵🇹'
-    };
+// Derived lookups for backward compatibility
+export const LANGUAGE_NAMES = Object.fromEntries(Object.entries(LANGUAGES).map(([k, v]) => [k, v.name]));
+export const LANGUAGE_FLAGS = Object.fromEntries(Object.entries(LANGUAGES).map(([k, v]) => [k, v.flag]));
 
 // ========== COLOUR DATA ==========
 export const TRANSLATIONS = {
@@ -551,10 +554,7 @@ export const CATEGORY_DATA = {
     };
 
 // ========== SPEECH RECOGNITION ==========
-export const SPEECH_LANG_CODES = {
-        es: 'es-ES', fr: 'fr-FR', de: 'de-DE',
-        it: 'it-IT', cy: 'cy-GB', pt: 'pt-PT'
-    };
+export const SPEECH_LANG_CODES = Object.fromEntries(Object.entries(LANGUAGES).map(([k, v]) => [k, v.speechCode]));
 
 // Aliases for voice recognition to handle accents and pronunciation variations
 export const COLOR_ALIASES = {
