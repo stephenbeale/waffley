@@ -161,20 +161,20 @@ export const VERB_LIST = ['be', 'have', 'go', 'do', 'want', 'can', 'know', 'eat'
 export const PRONOUN_KEYS = ['I', 'you', 'he', 'she', 'we', 'you_pl', 'they'];
 
 export const VERB_ENGLISH = {
-    be:    { emoji: '🌟', I: 'I am',    you: 'You are',   he: 'He is',      she: 'She is',      we: 'We are',   you_pl: 'You are',   they: 'They are' },
-    have:  { emoji: '🤲', I: 'I have',  you: 'You have',  he: 'He has',     she: 'She has',     we: 'We have',  you_pl: 'You have',  they: 'They have' },
-    go:    { emoji: '🚶', I: 'I go',    you: 'You go',    he: 'He goes',    she: 'She goes',    we: 'We go',    you_pl: 'You go',    they: 'They go' },
-    do:    { emoji: '⚡', I: 'I do',    you: 'You do',    he: 'He does',    she: 'She does',    we: 'We do',    you_pl: 'You do',    they: 'They do' },
-    want:  { emoji: '💭', I: 'I want',  you: 'You want',  he: 'He wants',   she: 'She wants',   we: 'We want',  you_pl: 'You want',  they: 'They want' },
-    can:   { emoji: '💪', I: 'I can',   you: 'You can',   he: 'He can',     she: 'She can',     we: 'We can',   you_pl: 'You can',   they: 'They can' },
-    know:  { emoji: '🧠', I: 'I know',  you: 'You know',  he: 'He knows',   she: 'She knows',   we: 'We know',  you_pl: 'You know',  they: 'They know' },
-    eat:   { emoji: '🍴', I: 'I eat',   you: 'You eat',   he: 'He eats',    she: 'She eats',    we: 'We eat',   you_pl: 'You eat',   they: 'They eat' },
-    speak: { emoji: '💬', I: 'I speak', you: 'You speak', he: 'He speaks',  she: 'She speaks',  we: 'We speak', you_pl: 'You speak', they: 'They speak' },
-    live:  { emoji: '🏠', I: 'I live',  you: 'You live',  he: 'He lives',   she: 'She lives',   we: 'We live',  you_pl: 'You live',  they: 'They live' },
+    be:    { emoji: '🌟', I: 'I am',    you: 'You are',   he: 'He is',      she: 'She is',      we: 'We are',   you_pl: 'You all are',   they: 'They are' },
+    have:  { emoji: '🤲', I: 'I have',  you: 'You have',  he: 'He has',     she: 'She has',     we: 'We have',  you_pl: 'You all have',  they: 'They have' },
+    go:    { emoji: '🚶', I: 'I go',    you: 'You go',    he: 'He goes',    she: 'She goes',    we: 'We go',    you_pl: 'You all go',    they: 'They go' },
+    do:    { emoji: '⚡', I: 'I do',    you: 'You do',    he: 'He does',    she: 'She does',    we: 'We do',    you_pl: 'You all do',    they: 'They do' },
+    want:  { emoji: '💭', I: 'I want',  you: 'You want',  he: 'He wants',   she: 'She wants',   we: 'We want',  you_pl: 'You all want',  they: 'They want' },
+    can:   { emoji: '💪', I: 'I can',   you: 'You can',   he: 'He can',     she: 'She can',     we: 'We can',   you_pl: 'You all can',   they: 'They can' },
+    know:  { emoji: '🧠', I: 'I know',  you: 'You know',  he: 'He knows',   she: 'She knows',   we: 'We know',  you_pl: 'You all know',  they: 'They know' },
+    eat:   { emoji: '🍴', I: 'I eat',   you: 'You eat',   he: 'He eats',    she: 'She eats',    we: 'We eat',   you_pl: 'You all eat',   they: 'They eat' },
+    speak: { emoji: '💬', I: 'I speak', you: 'You speak', he: 'He speaks',  she: 'She speaks',  we: 'We speak', you_pl: 'You all speak', they: 'They speak' },
+    live:  { emoji: '🏠', I: 'I live',  you: 'You live',  he: 'He lives',   she: 'She lives',   we: 'We live',  you_pl: 'You all live',  they: 'They live' },
 };
 
 export const PRONOUN_LABELS = {
-    I: 'I', you: 'You', he: 'He', she: 'She', we: 'We', you_pl: 'You (pl)', they: 'They'
+    I: 'I', you: 'You', he: 'He', she: 'She', we: 'We', you_pl: 'You all', they: 'They'
 };
 
 // Assemble verb conjugations from language files
