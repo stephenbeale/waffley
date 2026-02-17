@@ -40,13 +40,23 @@
 <div id="topic-screen">
     <div class="topic-header" id="topic-header">🇪🇸 Spanish</div>
 
-    <div class="setting-label">Category</div>
-    <div class="category-selector">
+    <div class="mode-selector" id="mode-selector">
+        <button class="mode-btn selected" data-mode="words">📝 Words</button>
+        <button class="mode-btn" data-mode="verbs">🔄 Verbs</button>
+    </div>
+
+    <div class="setting-label" id="words-setting-label">Category</div>
+    <div class="category-selector" id="words-selector">
         <button class="category-btn selected" data-category="colours">🎨 Colours</button>
         <button class="category-btn" data-category="adjectives">😊 Adjectives</button>
         <button class="category-btn" data-category="animals">🐾 Animals</button>
         <button class="category-btn" data-category="food">🍎 Food</button>
         <button class="category-btn" data-category="weather">☀️ Weather</button>
+    </div>
+
+    <div class="setting-label" id="verb-setting-label" style="display:none">Tense</div>
+    <div class="category-selector" id="verb-selector" style="display:none">
+        <button class="category-btn selected" data-category="verbs_present">🕐 Present Tense</button>
     </div>
 
     <div class="progress-display" id="progress-display">

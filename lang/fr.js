@@ -81,6 +81,23 @@ export default {
             tornado: { article: 'La', plural: 'Tornades', pluralArticle: 'Les' }
         }
     },
+    verbs: {
+        pronouns: {
+            I: 'Je', you: 'Tu', he: 'Il/Elle', we: 'Nous', you_pl: 'Vous', they: 'Ils/Elles'
+        },
+        present: {
+            be:    { infinitive: 'Être',     I: 'Suis',     you: 'Es',       he: 'Est',      we: 'Sommes',    you_pl: 'Êtes',      they: 'Sont' },
+            have:  { infinitive: 'Avoir',    I: 'Ai',       you: 'As',       he: 'A',        we: 'Avons',     you_pl: 'Avez',      they: 'Ont' },
+            go:    { infinitive: 'Aller',    I: 'Vais',     you: 'Vas',      he: 'Va',       we: 'Allons',    you_pl: 'Allez',     they: 'Vont' },
+            do:    { infinitive: 'Faire',    I: 'Fais',     you: 'Fais',     he: 'Fait',     we: 'Faisons',   you_pl: 'Faites',    they: 'Font' },
+            want:  { infinitive: 'Vouloir',  I: 'Veux',     you: 'Veux',     he: 'Veut',     we: 'Voulons',   you_pl: 'Voulez',    they: 'Veulent' },
+            can:   { infinitive: 'Pouvoir',  I: 'Peux',     you: 'Peux',     he: 'Peut',     we: 'Pouvons',   you_pl: 'Pouvez',    they: 'Peuvent' },
+            know:  { infinitive: 'Savoir',   I: 'Sais',     you: 'Sais',     he: 'Sait',     we: 'Savons',    you_pl: 'Savez',     they: 'Savent' },
+            eat:   { infinitive: 'Manger',   I: 'Mange',    you: 'Manges',   he: 'Mange',    we: 'Mangeons',  you_pl: 'Mangez',    they: 'Mangent' },
+            speak: { infinitive: 'Parler',   I: 'Parle',    you: 'Parles',   he: 'Parle',    we: 'Parlons',   you_pl: 'Parlez',    they: 'Parlent' },
+            live:  { infinitive: 'Vivre',    I: 'Vis',      you: 'Vis',      he: 'Vit',      we: 'Vivons',    you_pl: 'Vivez',     they: 'Vivent' }
+        }
+    },
     aliases: {
         red: ['rouge'], green: ['vert', 'verte'], blue: ['bleu', 'bleue'], yellow: ['jaune'],
         orange: ['orange'], pink: ['rose'], purple: ['violet', 'violette'],

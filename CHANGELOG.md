@@ -5,6 +5,11 @@ All notable changes to Waffley are documented here. Format follows [Keep a Chang
 ## [Unreleased]
 
 ### Added
+- Verb conjugation learning path — parallel "Verbs" mode alongside existing "Words" mode
+- Present tense matching exercises for 10 common irregular verbs (ES, FR, DE, IT, PT)
+- Mode toggle (Words/Verbs) and verb tense selector in UI
+- Verb-specific game loop with pronoun prompts, speech/typing support, and progress tracking
+- Welsh excluded from verb support (words-only language)
 - Progressive button count — start with 4 buttons, add 1 every 2 levels up to cycle max
 - SFX mute button above the progress bar — toggle correct/wrong sound effects independently of TTS
 - Silent visual-only rounds — last 2 levels of Learning phase suppress audio for sight-only recognition

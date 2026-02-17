@@ -80,6 +80,23 @@ export default {
             tornado: { article: 'O', plural: 'Tornados', pluralArticle: 'Os' }
         }
     },
+    verbs: {
+        pronouns: {
+            I: 'Eu', you: 'Tu', he: 'Ele/Ela', we: 'Nós', you_pl: 'Vós', they: 'Eles/Elas'
+        },
+        present: {
+            be:    { infinitive: 'Ser',     I: 'Sou',    you: 'És',      he: 'É',       we: 'Somos',    you_pl: 'Sois',     they: 'São' },
+            have:  { infinitive: 'Ter',     I: 'Tenho',  you: 'Tens',    he: 'Tem',     we: 'Temos',    you_pl: 'Tendes',   they: 'Têm' },
+            go:    { infinitive: 'Ir',      I: 'Vou',    you: 'Vais',    he: 'Vai',     we: 'Vamos',    you_pl: 'Ides',     they: 'Vão' },
+            do:    { infinitive: 'Fazer',   I: 'Faço',   you: 'Fazes',   he: 'Faz',     we: 'Fazemos',  you_pl: 'Fazeis',   they: 'Fazem' },
+            want:  { infinitive: 'Querer',  I: 'Quero',  you: 'Queres',  he: 'Quer',    we: 'Queremos', you_pl: 'Quereis',  they: 'Querem' },
+            can:   { infinitive: 'Poder',   I: 'Posso',  you: 'Podes',   he: 'Pode',    we: 'Podemos',  you_pl: 'Podeis',   they: 'Podem' },
+            know:  { infinitive: 'Saber',   I: 'Sei',    you: 'Sabes',   he: 'Sabe',    we: 'Sabemos',  you_pl: 'Sabeis',   they: 'Sabem' },
+            eat:   { infinitive: 'Comer',   I: 'Como',   you: 'Comes',   he: 'Come',    we: 'Comemos',  you_pl: 'Comeis',   they: 'Comem' },
+            speak: { infinitive: 'Falar',   I: 'Falo',   you: 'Falas',   he: 'Fala',    we: 'Falamos',  you_pl: 'Falais',   they: 'Falam' },
+            live:  { infinitive: 'Viver',   I: 'Vivo',   you: 'Vives',   he: 'Vive',    we: 'Vivemos',  you_pl: 'Viveis',   they: 'Vivem' }
+        }
+    },
     aliases: {
         red: ['vermelho'], green: ['verde'], blue: ['azul'], yellow: ['amarelo'],
         orange: ['laranja'], pink: ['rosa'], purple: ['roxo'],

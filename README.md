@@ -5,8 +5,9 @@ An interactive language learning game that teaches vocabulary through progressiv
 ## How to Play
 
 1. **Choose a language** — Spanish, French, German, Italian, Welsh, or Portuguese
-2. **Pick a category** — Colours, Adjectives, Animals, Food, or Weather
-3. **Progress through four phases:**
+2. **Choose a mode** — Words (vocabulary) or Verbs (conjugation; not available for Welsh)
+3. **Pick a category** — Colours, Adjectives, Animals, Food, or Weather (Words) or a verb tense (Verbs)
+4. **Progress through four phases:**
    - **Learning** — words shown on the answer buttons
    - **Practice** — answer from memory
    - **Typing** — type the answer (accents optional)
@@ -24,7 +25,8 @@ Each form is tracked independently for mastery.
 
 ## Features
 
-- 6 languages, 5 categories, 11 items per category
+- 6 languages, 5 categories, 11 items per category (Words mode)
+- Verb conjugation mode with 10 present tense verbs across 5 languages (ES, FR, DE, IT, PT)
 - Phase selection — jump to any learning stage
 - Mastery-based level progression with progressive button count
 - Session mastery — items answered 3 times correctly are excluded from questions
