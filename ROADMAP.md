@@ -122,8 +122,8 @@ Planned features and improvements for Waffley.
 - [x] **Consolidate language data**
   Define each language as a single object (`{ code, name, flag, speechCode }`) with derived lookups for backward compatibility.
 
-- [ ] **Split data.js into per-language files**
-  Move vocabulary and translations out of data.js into separate files per language (e.g. `lang-es.js`, `lang-fr.js`). Each file owns its translations, article/plural forms, and speech aliases. Keeps data.js for shared constants and category structure. Makes it easy to add new languages or let contributors work on one language independently.
+- [x] **Split data.js into per-language files**
+  Move vocabulary and translations out of data.js into separate files per language (e.g. `lang/es.js`, `lang/fr.js`). Each file owns its translations, article/plural forms, and speech aliases. Keeps data.js for shared constants and category structure. Makes it easy to add new languages or let contributors work on one language independently.
 
 - [ ] **Refactor CSS with base/modifier classes**
   Create `.btn` base class with `.btn--primary`, `.btn--secondary` modifiers. Create `.overlay` base class. Cuts ~100 lines of duplication.

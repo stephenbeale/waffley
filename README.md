@@ -54,8 +54,15 @@ For speech recognition, use Chrome or Edge and allow microphone access.
 ```
 index.html   — Application markup (single module entry point)
 styles.css   — Styling
-data.js      — Category data, translations, forms, speech config (ES module exports)
+data.js      — Constants, category structure, assembles language data (ES module)
 app.js       — Game logic, state management, UI updates (ES module, imports data.js)
+lang/        — Per-language translation files
+  es.js      — Spanish translations, forms, aliases
+  fr.js      — French
+  de.js      — German
+  it.js      — Italian
+  cy.js      — Welsh
+  pt.js      — Portuguese
 ROADMAP.md   — Feature roadmap and technical debt tracking
 CLAUDE.md    — Project documentation for AI-assisted development
 ```
