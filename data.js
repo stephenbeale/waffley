@@ -10,8 +10,8 @@ const LANG_DATA = { es, fr, de, it, cy, pt };
 // ========== LEVEL SYSTEM CONSTANTS ==========
 export const MASTERY_THRESHOLD = 2;
 export const REMOVAL_STREAK = 3;      // consecutive correct answers to remove item from pool
-export const LEVELS_PER_PHASE = 10;
-export const LEVELS_PER_CYCLE = LEVELS_PER_PHASE * 4; // 40
+export const LEVELS_PER_PHASE = 5;
+export const LEVELS_PER_CYCLE = LEVELS_PER_PHASE * 4; // 20
 export const PHASES = ['Learning', 'Practice', 'Typing', 'Speech'];
 export const PHASE_CLASSES = ['learning', 'practice', 'typing', 'speech'];
 export const MAX_TIME = 10;           // seconds
@@ -26,7 +26,7 @@ export const BUTTONS_ADD_INTERVAL = 2;         // add 1 button every N levels
 export const MAX_PITCH_SEMITONES = 12;         // max pitch increase for correct answer streak
 export const TTS_SPEECH_RATE = 0.85;           // text-to-speech playback rate
 export const SPEECH_RESTART_DELAY = 100;       // ms delay before restarting speech recognition
-export const SILENT_LEVEL_THRESHOLD = 9;       // learning phase level where audio stops
+export const SILENT_LEVEL_THRESHOLD = 4;       // learning phase level where audio stops
 
 // Colour pools by cycle - 2 new colours added each cycle
 export const CYCLE_COLORS = {

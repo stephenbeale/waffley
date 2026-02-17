@@ -573,23 +573,34 @@ import {
         }
         if (!word) return;
 
-        // Cancel any ongoing speech
-        speechSynthesis.cancel();
-
         const langCode = SPEECH_LANG_CODES[language] || 'es-ES';
-        const utterance = new SpeechSynthesisUtterance(word);
-        utterance.lang = langCode;
-        utterance.rate = TTS_SPEECH_RATE;
 
-        speechSynthesis.speak(utterance);
+        const doSpeak = () => {
+            speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(word);
+            utterance.lang = langCode;
+            utterance.rate = TTS_SPEECH_RATE;
+            speechSynthesis.speak(utterance);
+        };
+
+        // If TTS hasn't warmed up yet, wait briefly for the engine to be ready
+        if (!speechWarmedUp) {
+            setTimeout(doSpeak, 150);
+        } else {
+            doSpeak();
+        }
     }
 
+    let speechWarmedUp = false;
+
     function warmUpSpeech() {
-        if (!audioEnabled || !ttsSupported) return;
+        if (!ttsSupported) return;
+        // Use a real short word — some TTS engines skip empty utterances
         speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance('');
+        const utterance = new SpeechSynthesisUtterance('.');
         utterance.lang = SPEECH_LANG_CODES[selectedLanguage] || 'es-ES';
         utterance.volume = 0;
+        utterance.onend = () => { speechWarmedUp = true; };
         speechSynthesis.speak(utterance);
     }
 
@@ -1229,6 +1240,8 @@ import {
             topicHeader.textContent = `${LANGUAGE_FLAGS[selectedLanguage]} ${LANGUAGE_NAMES[selectedLanguage]}`;
             updateModeToggleVisibility();
             updateStartScreenProgress();
+            // Warm up TTS engine early so first question audio isn't delayed
+            warmUpSpeech();
             show(topicScreen);
         });
     });
@@ -1752,10 +1765,10 @@ import {
 
         // Pick randomly from unmastered pairs, avoiding same item as last round
         const pool = unmasteredPairs.length > 0 ? unmasteredPairs : items.map(item => ({ item, form: 'base' }));
-        let pick;
-        do {
-            pick = pool[Math.floor(Math.random() * pool.length)];
-        } while (pick.item === game.currentColor && pool.length > 1);
+        // Filter out previous item if possible
+        const filteredPool = pool.filter(p => p.item !== game.currentColor);
+        const pickPool = filteredPool.length > 0 ? filteredPool : pool;
+        const pick = pickPool[Math.floor(Math.random() * pickPool.length)];
 
         game.currentColor = pick.item;
         game.currentForm = pick.form;
