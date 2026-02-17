@@ -73,19 +73,19 @@ export default {
     },
     verbs: {
         pronouns: {
-            I: 'Ich', you: 'Du', he: 'Er/Sie', we: 'Wir', you_pl: 'Ihr', they: 'Sie'
+            I: 'Ich', you: 'Du', he: 'Er', she: 'Sie', we: 'Wir', you_pl: 'Ihr', they: 'Sie'
         },
         present: {
-            be:    { infinitive: 'Sein',      I: 'Bin',      you: 'Bist',      he: 'Ist',       we: 'Sind',      you_pl: 'Seid',      they: 'Sind' },
-            have:  { infinitive: 'Haben',     I: 'Habe',     you: 'Hast',      he: 'Hat',       we: 'Haben',     you_pl: 'Habt',      they: 'Haben' },
-            go:    { infinitive: 'Gehen',     I: 'Gehe',     you: 'Gehst',     he: 'Geht',      we: 'Gehen',     you_pl: 'Geht',      they: 'Gehen' },
-            do:    { infinitive: 'Machen',    I: 'Mache',    you: 'Machst',    he: 'Macht',     we: 'Machen',    you_pl: 'Macht',     they: 'Machen' },
-            want:  { infinitive: 'Wollen',    I: 'Will',     you: 'Willst',    he: 'Will',      we: 'Wollen',    you_pl: 'Wollt',     they: 'Wollen' },
-            can:   { infinitive: 'Können',    I: 'Kann',     you: 'Kannst',    he: 'Kann',      we: 'Können',    you_pl: 'Könnt',     they: 'Können' },
-            know:  { infinitive: 'Wissen',    I: 'Weiß',     you: 'Weißt',     he: 'Weiß',      we: 'Wissen',    you_pl: 'Wisst',     they: 'Wissen' },
-            eat:   { infinitive: 'Essen',     I: 'Esse',     you: 'Isst',      he: 'Isst',      we: 'Essen',     you_pl: 'Esst',      they: 'Essen' },
-            speak: { infinitive: 'Sprechen',  I: 'Spreche',  you: 'Sprichst',  he: 'Spricht',   we: 'Sprechen',  you_pl: 'Sprecht',   they: 'Sprechen' },
-            live:  { infinitive: 'Leben',     I: 'Lebe',     you: 'Lebst',     he: 'Lebt',      we: 'Leben',     you_pl: 'Lebt',      they: 'Leben' }
+            be:    { infinitive: 'Sein',      I: 'Bin',      you: 'Bist',      he: 'Ist',       she: 'Ist',       we: 'Sind',      you_pl: 'Seid',      they: 'Sind' },
+            have:  { infinitive: 'Haben',     I: 'Habe',     you: 'Hast',      he: 'Hat',       she: 'Hat',       we: 'Haben',     you_pl: 'Habt',      they: 'Haben' },
+            go:    { infinitive: 'Gehen',     I: 'Gehe',     you: 'Gehst',     he: 'Geht',      she: 'Geht',      we: 'Gehen',     you_pl: 'Geht',      they: 'Gehen' },
+            do:    { infinitive: 'Machen',    I: 'Mache',    you: 'Machst',    he: 'Macht',     she: 'Macht',     we: 'Machen',    you_pl: 'Macht',     they: 'Machen' },
+            want:  { infinitive: 'Wollen',    I: 'Will',     you: 'Willst',    he: 'Will',      she: 'Will',      we: 'Wollen',    you_pl: 'Wollt',     they: 'Wollen' },
+            can:   { infinitive: 'Können',    I: 'Kann',     you: 'Kannst',    he: 'Kann',      she: 'Kann',      we: 'Können',    you_pl: 'Könnt',     they: 'Können' },
+            know:  { infinitive: 'Wissen',    I: 'Weiß',     you: 'Weißt',     he: 'Weiß',      she: 'Weiß',      we: 'Wissen',    you_pl: 'Wisst',     they: 'Wissen' },
+            eat:   { infinitive: 'Essen',     I: 'Esse',     you: 'Isst',      he: 'Isst',      she: 'Isst',      we: 'Essen',     you_pl: 'Esst',      they: 'Essen' },
+            speak: { infinitive: 'Sprechen',  I: 'Spreche',  you: 'Sprichst',  he: 'Spricht',   she: 'Spricht',   we: 'Sprechen',  you_pl: 'Sprecht',   they: 'Sprechen' },
+            live:  { infinitive: 'Leben',     I: 'Lebe',     you: 'Lebst',     he: 'Lebt',      she: 'Lebt',      we: 'Leben',     you_pl: 'Lebt',      they: 'Leben' }
         }
     },
     aliases: {

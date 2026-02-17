@@ -83,19 +83,19 @@ export default {
     },
     verbs: {
         pronouns: {
-            I: 'Yo', you: 'Tú', he: 'Él/Ella', we: 'Nosotros', you_pl: 'Vosotros', they: 'Ellos/Ellas'
+            I: 'Yo', you: 'Tú', he: 'Él', she: 'Ella', we: 'Nosotros', you_pl: 'Vosotros', they: 'Ellos/Ellas'
         },
         present: {
-            be:    { infinitive: 'Ser',     I: 'Soy',     you: 'Eres',    he: 'Es',      we: 'Somos',    you_pl: 'Sois',     they: 'Son' },
-            have:  { infinitive: 'Tener',   I: 'Tengo',   you: 'Tienes',  he: 'Tiene',   we: 'Tenemos',  you_pl: 'Tenéis',   they: 'Tienen' },
-            go:    { infinitive: 'Ir',      I: 'Voy',     you: 'Vas',     he: 'Va',      we: 'Vamos',    you_pl: 'Vais',     they: 'Van' },
-            do:    { infinitive: 'Hacer',   I: 'Hago',    you: 'Haces',   he: 'Hace',    we: 'Hacemos',  you_pl: 'Hacéis',   they: 'Hacen' },
-            want:  { infinitive: 'Querer',  I: 'Quiero',  you: 'Quieres', he: 'Quiere',  we: 'Queremos', you_pl: 'Queréis',  they: 'Quieren' },
-            can:   { infinitive: 'Poder',   I: 'Puedo',   you: 'Puedes',  he: 'Puede',   we: 'Podemos',  you_pl: 'Podéis',   they: 'Pueden' },
-            know:  { infinitive: 'Saber',   I: 'Sé',      you: 'Sabes',   he: 'Sabe',    we: 'Sabemos',  you_pl: 'Sabéis',   they: 'Saben' },
-            eat:   { infinitive: 'Comer',   I: 'Como',    you: 'Comes',   he: 'Come',    we: 'Comemos',  you_pl: 'Coméis',   they: 'Comen' },
-            speak: { infinitive: 'Hablar',  I: 'Hablo',   you: 'Hablas',  he: 'Habla',   we: 'Hablamos', you_pl: 'Habláis',  they: 'Hablan' },
-            live:  { infinitive: 'Vivir',   I: 'Vivo',    you: 'Vives',   he: 'Vive',    we: 'Vivimos',  you_pl: 'Vivís',    they: 'Viven' }
+            be:    { infinitive: 'Ser',     I: 'Soy',     you: 'Eres',    he: 'Es',      she: 'Es',      we: 'Somos',    you_pl: 'Sois',     they: 'Son' },
+            have:  { infinitive: 'Tener',   I: 'Tengo',   you: 'Tienes',  he: 'Tiene',   she: 'Tiene',   we: 'Tenemos',  you_pl: 'Tenéis',   they: 'Tienen' },
+            go:    { infinitive: 'Ir',      I: 'Voy',     you: 'Vas',     he: 'Va',      she: 'Va',      we: 'Vamos',    you_pl: 'Vais',     they: 'Van' },
+            do:    { infinitive: 'Hacer',   I: 'Hago',    you: 'Haces',   he: 'Hace',    she: 'Hace',    we: 'Hacemos',  you_pl: 'Hacéis',   they: 'Hacen' },
+            want:  { infinitive: 'Querer',  I: 'Quiero',  you: 'Quieres', he: 'Quiere',  she: 'Quiere',  we: 'Queremos', you_pl: 'Queréis',  they: 'Quieren' },
+            can:   { infinitive: 'Poder',   I: 'Puedo',   you: 'Puedes',  he: 'Puede',   she: 'Puede',   we: 'Podemos',  you_pl: 'Podéis',   they: 'Pueden' },
+            know:  { infinitive: 'Saber',   I: 'Sé',      you: 'Sabes',   he: 'Sabe',    she: 'Sabe',    we: 'Sabemos',  you_pl: 'Sabéis',   they: 'Saben' },
+            eat:   { infinitive: 'Comer',   I: 'Como',    you: 'Comes',   he: 'Come',    she: 'Come',    we: 'Comemos',  you_pl: 'Coméis',   they: 'Comen' },
+            speak: { infinitive: 'Hablar',  I: 'Hablo',   you: 'Hablas',  he: 'Habla',   she: 'Habla',   we: 'Hablamos', you_pl: 'Habláis',  they: 'Hablan' },
+            live:  { infinitive: 'Vivir',   I: 'Vivo',    you: 'Vives',   he: 'Vive',    she: 'Vive',    we: 'Vivimos',  you_pl: 'Vivís',    they: 'Viven' }
         }
     },
     aliases: {

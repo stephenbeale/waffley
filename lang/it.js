@@ -82,19 +82,19 @@ export default {
     },
     verbs: {
         pronouns: {
-            I: 'Io', you: 'Tu', he: 'Lui/Lei', we: 'Noi', you_pl: 'Voi', they: 'Loro'
+            I: 'Io', you: 'Tu', he: 'Lui', she: 'Lei', we: 'Noi', you_pl: 'Voi', they: 'Loro'
         },
         present: {
-            be:    { infinitive: 'Essere',    I: 'Sono',    you: 'Sei',      he: 'È',        we: 'Siamo',     you_pl: 'Siete',    they: 'Sono' },
-            have:  { infinitive: 'Avere',     I: 'Ho',      you: 'Hai',      he: 'Ha',       we: 'Abbiamo',   you_pl: 'Avete',    they: 'Hanno' },
-            go:    { infinitive: 'Andare',    I: 'Vado',    you: 'Vai',      he: 'Va',       we: 'Andiamo',   you_pl: 'Andate',   they: 'Vanno' },
-            do:    { infinitive: 'Fare',      I: 'Faccio',  you: 'Fai',      he: 'Fa',       we: 'Facciamo',  you_pl: 'Fate',     they: 'Fanno' },
-            want:  { infinitive: 'Volere',    I: 'Voglio',  you: 'Vuoi',     he: 'Vuole',    we: 'Vogliamo',  you_pl: 'Volete',   they: 'Vogliono' },
-            can:   { infinitive: 'Potere',    I: 'Posso',   you: 'Puoi',     he: 'Può',      we: 'Possiamo',  you_pl: 'Potete',   they: 'Possono' },
-            know:  { infinitive: 'Sapere',    I: 'So',      you: 'Sai',      he: 'Sa',       we: 'Sappiamo',  you_pl: 'Sapete',   they: 'Sanno' },
-            eat:   { infinitive: 'Mangiare',  I: 'Mangio',  you: 'Mangi',    he: 'Mangia',   we: 'Mangiamo',  you_pl: 'Mangiate', they: 'Mangiano' },
-            speak: { infinitive: 'Parlare',   I: 'Parlo',   you: 'Parli',    he: 'Parla',    we: 'Parliamo',  you_pl: 'Parlate',  they: 'Parlano' },
-            live:  { infinitive: 'Vivere',    I: 'Vivo',    you: 'Vivi',     he: 'Vive',     we: 'Viviamo',   you_pl: 'Vivete',   they: 'Vivono' }
+            be:    { infinitive: 'Essere',    I: 'Sono',    you: 'Sei',      he: 'È',        she: 'È',        we: 'Siamo',     you_pl: 'Siete',    they: 'Sono' },
+            have:  { infinitive: 'Avere',     I: 'Ho',      you: 'Hai',      he: 'Ha',       she: 'Ha',       we: 'Abbiamo',   you_pl: 'Avete',    they: 'Hanno' },
+            go:    { infinitive: 'Andare',    I: 'Vado',    you: 'Vai',      he: 'Va',       she: 'Va',       we: 'Andiamo',   you_pl: 'Andate',   they: 'Vanno' },
+            do:    { infinitive: 'Fare',      I: 'Faccio',  you: 'Fai',      he: 'Fa',       she: 'Fa',       we: 'Facciamo',  you_pl: 'Fate',     they: 'Fanno' },
+            want:  { infinitive: 'Volere',    I: 'Voglio',  you: 'Vuoi',     he: 'Vuole',    she: 'Vuole',    we: 'Vogliamo',  you_pl: 'Volete',   they: 'Vogliono' },
+            can:   { infinitive: 'Potere',    I: 'Posso',   you: 'Puoi',     he: 'Può',      she: 'Può',      we: 'Possiamo',  you_pl: 'Potete',   they: 'Possono' },
+            know:  { infinitive: 'Sapere',    I: 'So',      you: 'Sai',      he: 'Sa',       she: 'Sa',       we: 'Sappiamo',  you_pl: 'Sapete',   they: 'Sanno' },
+            eat:   { infinitive: 'Mangiare',  I: 'Mangio',  you: 'Mangi',    he: 'Mangia',   she: 'Mangia',   we: 'Mangiamo',  you_pl: 'Mangiate', they: 'Mangiano' },
+            speak: { infinitive: 'Parlare',   I: 'Parlo',   you: 'Parli',    he: 'Parla',    she: 'Parla',    we: 'Parliamo',  you_pl: 'Parlate',  they: 'Parlano' },
+            live:  { infinitive: 'Vivere',    I: 'Vivo',    you: 'Vivi',     he: 'Vive',     she: 'Vive',     we: 'Viviamo',   you_pl: 'Vivete',   they: 'Vivono' }
         }
     },
     aliases: {
