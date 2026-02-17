@@ -1,6 +1,9 @@
 import {
     MASTERY_THRESHOLD, REMOVAL_STREAK, LEVELS_PER_PHASE, LEVELS_PER_CYCLE,
     PHASES, PHASE_CLASSES, MAX_TIME, MIN_TIME,
+    TIMER_WARNING_RATIO, LEVEL_UP_COUNTDOWN, CYCLE_COMPLETE_COUNTDOWN,
+    STARTING_BUTTON_COUNT, BUTTONS_ADD_INTERVAL, MAX_PITCH_SEMITONES,
+    TTS_SPEECH_RATE, SPEECH_RESTART_DELAY, SILENT_LEVEL_THRESHOLD,
     CYCLE_COLORS, ALL_COLORS, MAX_CYCLE_WITH_NEW_COLORS, NEW_COLORS_PER_CYCLE,
     NOUN_CATEGORIES, ADJECTIVE_CATEGORY, ARTICLE_CYCLE, PLURAL_CYCLE, FEMININE_CYCLE,
     LANGUAGE_NAMES, LANGUAGE_FLAGS, TRANSLATIONS, COLOR_CSS,
@@ -261,8 +264,8 @@ import {
         const maxCount = game.activeColors.length;
         const levelInPhase = getLevelInPhase();
         // Start with 4 buttons (or max if fewer), add 1 every 2 levels
-        const base = Math.min(4, maxCount);
-        const extra = Math.floor((levelInPhase - 1) / 2);
+        const base = Math.min(STARTING_BUTTON_COUNT, maxCount);
+        const extra = Math.floor((levelInPhase - 1) / BUTTONS_ADD_INTERVAL);
         return Math.min(base + extra, maxCount);
     }
 
@@ -503,8 +506,8 @@ import {
         if (!audioEnabled || !ttsSupported) return;
         // Don't speak in Typing or Speech mode (would give away the answer)
         if (getPhaseFromProgress() >= 2) return;
-        // Silent visual-only rounds: last 2 levels of Learning phase
-        if (getPhaseFromProgress() === 0 && getLevelInPhase() >= 9) return;
+        // Silent visual-only rounds: last levels of Learning phase
+        if (getPhaseFromProgress() === 0 && getLevelInPhase() >= SILENT_LEVEL_THRESHOLD) return;
 
         const word = getFormTranslation(color, game.currentForm || 'base');
         if (!word) return;
@@ -515,7 +518,7 @@ import {
         const langCode = SPEECH_LANG_CODES[language] || 'es-ES';
         const utterance = new SpeechSynthesisUtterance(word);
         utterance.lang = langCode;
-        utterance.rate = 0.85;
+        utterance.rate = TTS_SPEECH_RATE;
 
         speechSynthesis.speak(utterance);
     }
@@ -546,7 +549,7 @@ import {
         gain.connect(ctx.destination);
         osc.type = 'sine';
         // Pitch rises by a semitone per correct answer in this level (capped at +12)
-        const semitones = Math.min(game.pitchStreak, 12);
+        const semitones = Math.min(game.pitchStreak, MAX_PITCH_SEMITONES);
         const pitchMultiplier = Math.pow(2, semitones / 12);
         const baseFreq = 523 * pitchMultiplier;  // C5 + streak offset
         const peakFreq = 659 * pitchMultiplier;   // E5 + streak offset
@@ -723,7 +726,7 @@ import {
                     if (gameScreen.classList.contains('active') && !isListening) {
                         startListening();
                     }
-                }, 100);
+                }, SPEECH_RESTART_DELAY);
             }
         };
 
@@ -929,7 +932,7 @@ import {
         } else {
             phaseBadgeOverlay.style.display = 'none';
             // Hint when entering silent visual-only levels
-            if (getPhaseFromProgress() === 0 && getLevelInPhase() === 9) {
+            if (getPhaseFromProgress() === 0 && getLevelInPhase() === SILENT_LEVEL_THRESHOLD) {
                 levelUpPhase.textContent = 'No audio now — recognise by sight!';
             } else {
                 levelUpPhase.textContent = '';
@@ -956,7 +959,7 @@ import {
         levelUpOverlay.classList.add('active');
 
         // Countdown
-        let count = 3;
+        let count = LEVEL_UP_COUNTDOWN;
         levelUpCountdown.textContent = count;
 
         levelUpCountdownInterval = setInterval(() => {
@@ -1033,8 +1036,8 @@ import {
 
         cycleCompleteOverlay.classList.add('active');
 
-        // Longer countdown for cycle complete (5 seconds)
-        let count = 5;
+        // Longer countdown for cycle complete
+        let count = CYCLE_COMPLETE_COUNTDOWN;
         cycleCompleteCountdown.textContent = count;
 
         cycleCompleteCountdownInterval = setInterval(() => {
@@ -1250,7 +1253,7 @@ import {
         cancelAnimationFrame(game.timerRAF);
         game.timerRAF = requestAnimationFrame(function tick() {
             const elapsed = performance.now() - game.timerStart;
-            if (elapsed > game.timeLimit * 0.6) timerBar.classList.add('warning');
+            if (elapsed > game.timeLimit * TIMER_WARNING_RATIO) timerBar.classList.add('warning');
             if (elapsed < game.timeLimit) game.timerRAF = requestAnimationFrame(tick);
         });
 
@@ -1639,7 +1642,7 @@ import {
 
         game.timerRAF = requestAnimationFrame(function tick() {
             const elapsed = performance.now() - game.timerStart;
-            if (elapsed > game.timeLimit * 0.6) timerBar.classList.add('warning');
+            if (elapsed > game.timeLimit * TIMER_WARNING_RATIO) timerBar.classList.add('warning');
             if (elapsed < game.timeLimit) game.timerRAF = requestAnimationFrame(tick);
         });
 

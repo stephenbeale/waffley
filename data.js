@@ -1,12 +1,23 @@
 // ========== LEVEL SYSTEM CONSTANTS ==========
 export const MASTERY_THRESHOLD = 2;
-export const REMOVAL_STREAK = 3; // consecutive correct answers to remove item from pool
+export const REMOVAL_STREAK = 3;      // consecutive correct answers to remove item from pool
 export const LEVELS_PER_PHASE = 10;
 export const LEVELS_PER_CYCLE = LEVELS_PER_PHASE * 4; // 40
 export const PHASES = ['Learning', 'Practice', 'Typing', 'Speech'];
 export const PHASE_CLASSES = ['learning', 'practice', 'typing', 'speech'];
-export const MAX_TIME = 10; // seconds
-export const MIN_TIME = 2;  // seconds (floor for time limit)
+export const MAX_TIME = 10;           // seconds
+export const MIN_TIME = 2;            // seconds (floor for time limit)
+
+// ========== UI / GAMEPLAY CONSTANTS ==========
+export const TIMER_WARNING_RATIO = 0.6;       // show warning when 60% of time elapsed
+export const LEVEL_UP_COUNTDOWN = 3;           // seconds before auto-continuing after level-up
+export const CYCLE_COMPLETE_COUNTDOWN = 5;     // seconds before auto-continuing after cycle complete
+export const STARTING_BUTTON_COUNT = 4;        // answer buttons at level 1 of each phase
+export const BUTTONS_ADD_INTERVAL = 2;         // add 1 button every N levels
+export const MAX_PITCH_SEMITONES = 12;         // max pitch increase for correct answer streak
+export const TTS_SPEECH_RATE = 0.85;           // text-to-speech playback rate
+export const SPEECH_RESTART_DELAY = 100;       // ms delay before restarting speech recognition
+export const SILENT_LEVEL_THRESHOLD = 9;       // learning phase level where audio stops
 
 // Colour pools by cycle - 2 new colours added each cycle
 export const CYCLE_COLORS = {

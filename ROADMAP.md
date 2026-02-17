@@ -116,8 +116,8 @@ Planned features and improvements for Waffley.
 - [x] **Split app.js into modules**
   Use ES modules (`<script type="module">`) to split into logical files. data.js exports all constants, app.js imports them.
 
-- [ ] **Extract utilities and name magic numbers**
-  Create `utils.js` with `shuffle()` (currently duplicated). Add named constants for `WARNING_THRESHOLD`, `LEVEL_UP_COUNTDOWN`, `CYCLE_COMPLETE_COUNTDOWN`, etc.
+- [x] **Extract utilities and name magic numbers**
+  Add named constants for `TIMER_WARNING_RATIO`, `LEVEL_UP_COUNTDOWN`, `CYCLE_COMPLETE_COUNTDOWN`, `STARTING_BUTTON_COUNT`, `MAX_PITCH_SEMITONES`, `TTS_SPEECH_RATE`, `SILENT_LEVEL_THRESHOLD`, etc.
 
 - [ ] **Consolidate language data**
   Define each language as a single object (`{ code, name, flag, speechCode, translations, aliases }`) instead of 7 separate lookup objects.
