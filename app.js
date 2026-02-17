@@ -799,7 +799,7 @@ import {
         speechWarning.classList.add('visible');
         speechUI.classList.remove('active');
         typingUI.classList.remove('active');
-        buttonsContainer.style.display = 'grid';
+        buttonsContainer.style.display = 'flex';
         promptLabel.textContent = getPromptText(game.currentForm || 'base');
     }
 
@@ -1497,7 +1497,7 @@ import {
             gameScreen.classList.add('typing-active');
             populateAccentButtons();
         } else {
-            buttonsContainer.style.display = 'grid';
+            buttonsContainer.style.display = 'flex';
             speechUI.classList.remove('active');
             typingUI.classList.remove('active');
             speechWarning.classList.remove('visible');
