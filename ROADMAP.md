@@ -193,7 +193,7 @@ Planned features and improvements for Waffley.
 
 ## Verb Learning Path — Future Improvements
 
-- [ ] **One verb per full cycle — master it before moving on**
+- [x] **One verb per full cycle — master it before moving on**
   Currently the active verb rotates every 5 levels (once per phase). Instead, a single verb should be practiced through all 4 phases (Learning → Practice → Typing → Speech, 20 levels total) before the next verb is introduced. This gives the learner time to truly internalise each conjugation set before layering a new one.
 
   **Verb ordering by language:**
