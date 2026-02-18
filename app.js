@@ -238,8 +238,9 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     function resetStats() {
         stats = getDefaultStats();
         saveStats();
-        // Also clear all progress for all languages/categories
+        // Also clear all progress and pronoun intro flags for all languages
         localStorage.removeItem('waffley_progress');
+        localStorage.removeItem(PRONOUN_INTRO_KEY);
         game.totalCorrectAnswers = 0;
         game.currentCycle = 1;
         game.levelsCompleted = 0;
@@ -251,14 +252,20 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     function resetProgress() {
         const allProgress = loadAllProgress();
         if (allProgress.languages) {
-            // Remove all keys for the selected language
-            const categories = ['colours', 'adjectives', 'animals', 'food', 'weather'];
+            // Remove all keys for the selected language (words and verbs)
+            const categories = ['colours', 'adjectives', 'animals', 'food', 'weather', 'verbs_present', 'verbs_pronouns'];
             categories.forEach(cat => {
                 const key = getProgressKey(selectedLanguage, cat);
                 delete allProgress.languages[key];
             });
             localStorage.setItem('waffley_progress', JSON.stringify(allProgress));
         }
+        // Also clear pronoun intro flag so the walkthrough shows again
+        try {
+            const saved = JSON.parse(localStorage.getItem(PRONOUN_INTRO_KEY) || '{}');
+            delete saved[selectedLanguage];
+            localStorage.setItem(PRONOUN_INTRO_KEY, JSON.stringify(saved));
+        } catch {}
         game.totalCorrectAnswers = 0;
         game.currentCycle = 1;
         game.levelsCompleted = 0;
@@ -727,8 +734,12 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
     // ========== VERB MODE HELPERS ==========
 
+    function isPronounMode() {
+        return selectedCategory === 'verbs_pronouns';
+    }
+
     function isVerbMode() {
-        return selectedMode === 'verbs';
+        return selectedMode === 'verbs' && !isPronounMode();
     }
 
     function isVerbSupported() {
@@ -1243,6 +1254,10 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
     // Update start screen progress display
     function updateStartScreenProgress() {
+        // Pronoun mode has no cycle-based progress to display
+        const progressDisplay = document.getElementById('progress-display');
+        if (progressDisplay) progressDisplay.style.display = isPronounMode() ? 'none' : '';
+
         const currentPhase = getPhaseFromProgress();
         const levelInPhase = getLevelInPhase();
 
@@ -1271,6 +1286,10 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
     // Update start button text based on current phase
     function updateStartButtonText() {
+        if (isPronounMode()) {
+            startBtn.textContent = 'Learn Pronouns';
+            return;
+        }
         const phase = getPhaseFromProgress();
         const levelInPhase = getLevelInPhase();
         const phaseName = PHASES[phase];
@@ -1691,7 +1710,10 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
     startBtn.addEventListener('click', () => {
         warmUpSpeech();
-        if (isVerbMode() && !hasPronounIntroCompleted(selectedLanguage)) {
+        if (isPronounMode()) {
+            // Pronoun review: always show intro, return to topic screen when done
+            showPronounIntro(() => show(topicScreen));
+        } else if (isVerbMode() && !hasPronounIntroCompleted(selectedLanguage)) {
             showPronounIntro(() => startGame());
         } else {
             startGame();
