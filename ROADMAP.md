@@ -224,3 +224,15 @@ Planned features and improvements for Waffley.
   - They → 👨👩 (mixed, ellos) / 👩👩 (ellas, where applicable)
   For Spanish/Italian specifically, surface nosotras/vosotras/ellas variants as additional pronouns with their own emoji groupings (two 👩 for all-female groups, one 👨 + one 👩 for mixed).
 
+- [ ] **Make pronoun intro interactive, not a static table**
+  The current pronoun intro shows a static table of mappings (I = Ich, You = Du, etc.) before the verb game starts. Replace this with an interactive teaching round:
+  - **Round 1 (guided):** Show the English pronoun ("I") with only one answer button in the target language ("Ich"). Cycle through all 7 pronouns twice so each mapping is seen at least twice.
+  - **Round 2 (practice):** Show the English pronoun with multiple answer buttons (all 7 target-language pronouns scrambled), requiring the user to pick the correct one. This follows the same Learning → Practice progression used for vocabulary.
+  This ensures users actually learn pronoun mappings rather than skimming a table.
+
+- [ ] **Verb conjugation round: show pronoun, pick verb form**
+  In the verb conjugation game, introduce a complementary round type: display the subject pronoun in the target language (e.g. "Ich") and show answer buttons for each conjugated verb form (e.g. "bin", "bist", "ist", "sind"). The user selects the correct conjugation. On correct answer, play TTS audio of the full conjugated form so users hear the pronunciation immediately after a correct pick.
+
+- [ ] **Bug: Brave desktop TTS uses English voice for German**
+  On desktop Brave browser, text-to-speech always speaks in English regardless of the selected language. Confirmed in German games — the TTS audio is English-accented and does not use the German speech synthesis voice. Investigate whether Brave's Web Speech API implementation requires a different `lang` attribute, explicit voice selection from `speechSynthesis.getVoices()`, or a workaround for voice loading timing. Ensure the correct language voice is used across Chrome, Edge, Firefox, and Brave on desktop.
+
