@@ -1820,6 +1820,7 @@ import {
         // (show foreign word as question; user picks emoji/colour)
         const phaseNow = getPhaseFromProgress();
         game.isReverseRound = !isVerbMode() && phaseNow === 1 && Math.random() < 0.3;
+        buttonsContainer.classList.toggle('reverse-mode', game.isReverseRound);
 
         // Display: verb text, emoji, or colour swatch
         if (isVerbMode()) {
