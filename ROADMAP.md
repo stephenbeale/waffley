@@ -190,6 +190,16 @@ Planned features and improvements for Waffley.
 
 ## Verb Learning Path — Future Improvements
 
+- [ ] **One verb per full cycle — master it before moving on**
+  Currently the active verb rotates every 5 levels (once per phase). Instead, a single verb should be practiced through all 4 phases (Learning → Practice → Typing → Speech, 20 levels total) before the next verb is introduced. This gives the learner time to truly internalise each conjugation set before layering a new one.
+
+  **Verb ordering by language:**
+  - **Spanish**: ser → estar → tener → ir → hablar → hacer → querer → poder → saber → comer → vivir (ser and estar both mean "to be" — teach ser first as permanent state, then estar as temporary)
+  - **Italian**: essere → avere → andare → fare → volere → potere → sapere → mangiare → parlare → vivere (essere = permanent, followed by avere etc.)
+  - Other languages: be → have → go → do → want → can → know → eat → speak → live (existing order)
+
+  Implementation: replace the rotating `getCurrentVerb()` level-index formula with a persistent `currentVerbIndex` stored alongside `levelsCompleted` in progress. Advance the index only on full cycle completion (after all 4 phases for that verb).
+
 - [ ] **Teach subject pronouns before conjugations**
   Before showing verb conjugations, run a short pronoun introduction phase: teach "Yo = I", "Tú = You", etc. as a prerequisite mini-game. Only needs to pass once per language. Pronoun cards should use gendered emojis to disambiguate:
   - I → 🧍 (neutral)
