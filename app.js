@@ -724,6 +724,17 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             englishEl.textContent  = PRONOUN_LABELS[key] || key;
             answerBtn.textContent  = pronouns[key] || '';
             answerBtn.focus();
+
+            // Speak the target-language pronoun
+            const word = pronouns[key];
+            if (word && audioEnabled && ttsSupported) {
+                const langCode = SPEECH_LANG_CODES[selectedLanguage] || 'es-ES';
+                speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(word);
+                utterance.lang = langCode;
+                utterance.rate = TTS_SPEECH_RATE;
+                speechSynthesis.speak(utterance);
+            }
         }
 
         function advance() {
