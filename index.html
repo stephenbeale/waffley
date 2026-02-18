@@ -50,6 +50,7 @@
                 </button>
             </div>
         </div>
+        <div id="auth-error" class="auth-error" style="display:none"></div>
         <div id="auth-signed-in" style="display:none">
             <span class="auth-user-label" id="auth-user-label"></span>
             <button id="signout-btn" class="auth-signout-btn">Sign out</button>
@@ -127,6 +128,8 @@
         </div>
     </div>
 
+    <div class="streak-badge" id="streak-badge">Start your streak today!</div>
+
     <div class="start-buttons">
         <button id="start-btn" class="btn btn--primary">Start Learning</button>
     </div>
@@ -151,6 +154,14 @@
         <div class="stats-card">
             <div class="stats-card-value" id="stats-games-played">0</div>
             <div class="stats-card-label">Games Played</div>
+        </div>
+        <div class="stats-card">
+            <div class="stats-card-value" id="stats-daily-streak">0</div>
+            <div class="stats-card-label">Day Streak</div>
+        </div>
+        <div class="stats-card">
+            <div class="stats-card-value" id="stats-best-daily">0</div>
+            <div class="stats-card-label">Best Streak</div>
         </div>
     </div>
     <div class="language-stats">
