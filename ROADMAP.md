@@ -178,3 +178,25 @@ Planned features and improvements for Waffley.
 
 - [ ] **Migrate from localStorage to database**
   Replace localStorage reads/writes with API calls. Support offline fallback for web app.
+
+---
+
+## Auth & User Accounts
+
+- [ ] **Add Google / Apple OAuth via Supabase Auth**
+  Use Supabase Auth with Google and Apple as providers. Anonymous sessions should be created automatically on first visit (no sign-up wall). On login, migrate the anonymous user's progress to the authenticated account. Apple Sign-In is required for iOS app submissions; Google for Android and web. Use Supabase's built-in JWT handling — do not roll custom auth. Row Level Security (RLS) on all user tables so each user can only read/write their own data.
+
+---
+
+## Verb Learning Path — Future Improvements
+
+- [ ] **Teach subject pronouns before conjugations**
+  Before showing verb conjugations, run a short pronoun introduction phase: teach "Yo = I", "Tú = You", etc. as a prerequisite mini-game. Only needs to pass once per language. Pronoun cards should use gendered emojis to disambiguate:
+  - I → 🧍 (neutral)
+  - You (sing.) → 👉
+  - He → 👨
+  - She → 👩
+  - We → 👨‍👩 (mixed, default nosotros) / 👩👩 (nosotras, where applicable)
+  - You (all) → 👥
+  - They → 👨👩 (mixed, ellos) / 👩👩 (ellas, where applicable)
+  For Spanish/Italian specifically, surface nosotras/vosotras/ellas variants as additional pronouns with their own emoji groupings (two 👩 for all-female groups, one 👨 + one 👩 for mixed).
