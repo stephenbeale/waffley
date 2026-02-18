@@ -486,6 +486,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 
 #game-screen {
     position: relative;
+    scrollbar-gutter: stable;
 }
 
 .stats-row {
@@ -1294,72 +1295,30 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     color: rgba(255,255,255,0.8);
 }
 
-/* Pronoun learning overlay */
-#pronoun-intro-overlay {
-    padding: 2rem 1.5rem;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.4rem;
+/* Pronoun intro mode — suppress game chrome, show only the card */
+#game-screen.pronoun-intro-mode .game-controls,
+#game-screen.pronoun-intro-mode #vertical-progress-container,
+#game-screen.pronoun-intro-mode .score-display,
+#game-screen.pronoun-intro-mode .reinforcement-label,
+#game-screen.pronoun-intro-mode #timer-bar-container,
+#game-screen.pronoun-intro-mode #speech-ui,
+#game-screen.pronoun-intro-mode #typing-ui,
+#game-screen.pronoun-intro-mode #speech-warning,
+#game-screen.pronoun-intro-mode .time-display {
+    display: none !important;
 }
 
-.pronoun-learn-title {
+#game-screen.pronoun-intro-mode #buttons-container {
+    max-height: none;
+    overflow-y: visible;
+}
+
+#game-screen.pronoun-intro-mode #buttons-container .answer-btn {
+    flex: 0 1 auto;
+    min-width: 200px;
+    max-width: 360px;
     font-size: 1.6rem;
-    font-weight: 900;
-    color: #e94560;
-}
-
-.pronoun-learn-subtitle {
-    font-size: 0.9rem;
-    color: #aaa;
-    margin-bottom: 0.6rem;
-}
-
-.pronoun-learn-progress {
-    font-size: 0.78rem;
-    color: rgba(255,255,255,0.35);
-    letter-spacing: 0.04em;
-    margin-bottom: 1.5rem;
-}
-
-.pronoun-learn-emoji {
-    font-size: 4rem;
-    line-height: 1;
-    min-height: 4rem;
-}
-
-.pronoun-learn-english {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: rgba(255,255,255,0.65);
-    margin-bottom: 2rem;
-}
-
-.pronoun-answer-btn {
-    padding: 1rem 2.5rem;
-    font-size: 1.6rem;
-    font-weight: 900;
-    font-family: inherit;
-    background: #2a2a4e;
-    color: #fff;
-    border: 2px solid #4a4a7e;
-    border-radius: 12px;
-    cursor: pointer;
-    min-width: 180px;
-    transition: background 0.15s, border-color 0.15s, transform 0.1s;
-}
-
-.pronoun-answer-btn:hover {
-    background: #3a3a6e;
-    border-color: #e94560;
-    transform: scale(1.04);
-}
-
-.pronoun-answer-btn:active { transform: scale(0.97); }
-
-.pronoun-answer-btn:focus { outline: none; }
-.pronoun-answer-btn:focus-visible {
-    outline: 2px solid #16c79a;
-    outline-offset: 2px;
+    padding: 1rem 2rem;
 }
 
 /* Stats overlay — uses .overlay base, overrides bg opacity */
