@@ -808,8 +808,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         timerBar.style.width      = '100%';
         timerBar.classList.remove('warning');
 
-        // Reinforcement label — encouraging message shown throughout
-        reinforcementLabel.textContent = 'Easy to start so we learn!';
+        reinforcementLabel.textContent = '';
 
         // Speech/typing UIs stay hidden (their default state)
         speechUI.classList.remove('active');
@@ -871,6 +870,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
                     // Fill progress bar to show completion
                     verticalProgressBar.style.height  = '100%';
                     verticalProgressLabel.textContent = `${total}/${total}`;
+                    reinforcementLabel.textContent = ''; // ensure clean slate for next screen
                     markPronounIntroCompleted(selectedLanguage);
                     // Engine has spoken many utterances — it's definitely warm now
                     speechWarmedUp = true;
