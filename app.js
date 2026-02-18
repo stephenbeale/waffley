@@ -12,7 +12,7 @@ import {
     VERB_LIST, VERB_ORDER, PRONOUN_KEYS, VERB_ENGLISH, PRONOUN_LABELS, PRONOUN_EMOJIS,
     VERB_CONJUGATIONS, VERB_PRONOUNS, VERB_LANGUAGES
 } from './data.js';
-import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, recordSession } from './src/api.js';
+import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, recordSession, signInWithGoogle, signInWithApple, signOut, getUser, onAuthChange } from './src/api.js';
 
     // ========== LEVEL SYSTEM FUNCTIONS ==========
 
@@ -305,6 +305,62 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
                 updateStartScreenProgress();
             }
         }).catch(e => console.debug('[waffley] DB progress merge failed:', e.message));
+    }
+
+    // ========== AUTH ==========
+
+    let currentUser = null;
+
+    async function syncAllProgressToDb() {
+        const local = loadAllProgress();
+        if (!local.languages) return;
+        for (const [key, data] of Object.entries(local.languages)) {
+            const underscore = key.indexOf('_');
+            const lang = underscore === -1 ? key : key.slice(0, underscore);
+            const cat  = underscore === -1 ? 'colours' : key.slice(underscore + 1);
+            if (DB_CATEGORIES.includes(cat)) syncProgressToDb(lang, cat, data);
+        }
+        syncStatsToDb();
+    }
+
+    function updateAuthUI() {
+        const section = document.getElementById('auth-section');
+        if (!section) return;
+        const isOAuth = currentUser && !currentUser.is_anonymous;
+        document.getElementById('auth-signed-out').style.display = isOAuth ? 'none' : '';
+        document.getElementById('auth-signed-in').style.display  = isOAuth ? '' : 'none';
+        if (isOAuth) {
+            document.getElementById('auth-user-label').textContent =
+                currentUser.email || currentUser.user_metadata?.full_name || 'Signed in';
+        }
+    }
+
+    if (isConfigured()) {
+        getUser().then(user => {
+            currentUser = user;
+            updateAuthUI();
+        }).catch(() => {});
+
+        onAuthChange((event, user) => {
+            currentUser = user;
+            updateAuthUI();
+            if (event === 'SIGNED_IN' && user && !user.is_anonymous) {
+                syncAllProgressToDb();
+            }
+        });
+
+        document.getElementById('google-signin-btn')?.addEventListener('click', () => {
+            signInWithGoogle().catch(e => console.debug('[waffley] Google sign-in failed:', e.message));
+        });
+        document.getElementById('apple-signin-btn')?.addEventListener('click', () => {
+            signInWithApple().catch(e => console.debug('[waffley] Apple sign-in failed:', e.message));
+        });
+        document.getElementById('signout-btn')?.addEventListener('click', () => {
+            signOut().then(() => {
+                currentUser = null;
+                updateAuthUI();
+            }).catch(e => console.debug('[waffley] Sign-out failed:', e.message));
+        });
     }
 
     // Get colours available for a given cycle
