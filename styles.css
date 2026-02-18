@@ -1193,18 +1193,18 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 #stats-btn {
     padding: 0.6rem 1.2rem;
     font-size: 0.9rem;
-    border: 2px solid #0f3460;
+    border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: 8px;
     background: transparent;
-    color: #0f3460;
+    color: #fff;
     cursor: pointer;
     transition: all 0.2s;
     margin-top: 0.5rem;
 }
 
 #stats-btn:hover {
-    background: #0f3460;
-    color: #fff;
+    border-color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.08);
 }
 
 /* Auth section */
