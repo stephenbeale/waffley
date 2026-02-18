@@ -10,7 +10,8 @@ import {
     CATEGORIES, CATEGORY_DATA,
     SPEECH_LANG_CODES, COLOR_ALIASES,
     VERB_LIST, VERB_ORDER, PRONOUN_KEYS, VERB_ENGLISH, PRONOUN_LABELS, PRONOUN_EMOJIS,
-    VERB_CONJUGATIONS, VERB_PRONOUNS, VERB_LANGUAGES
+    VERB_CONJUGATIONS, VERB_PRONOUNS, VERB_LANGUAGES,
+    COLOUR_FORMS, SENTENCE_LANGUAGES, SENTENCE_WORD_ORDER, SENTENCE_PAIRS
 } from './data.js';
 
     // ========== LEVEL SYSTEM FUNCTIONS ==========
@@ -165,7 +166,7 @@ import {
         const allProgress = loadAllProgress();
         if (allProgress.languages) {
             // Remove all keys for the selected language
-            const categories = ['colours', 'adjectives', 'animals', 'food', 'weather'];
+            const categories = ['colours', 'adjectives', 'animals', 'food', 'weather', 'verbs_present', 'sentences_colours'];
             categories.forEach(cat => {
                 const key = getProgressKey(selectedLanguage, cat);
                 delete allProgress.languages[key];
@@ -275,6 +276,10 @@ import {
 
     // Randomly select new items from the full pool
     function randomizeActiveColors() {
+        if (isSentenceMode()) {
+            game.activeItems = ['sentence'];
+            return;
+        }
         if (isVerbMode()) {
             game.currentVerb = getCurrentVerb();
             game.activeItems = [...PRONOUN_KEYS];
@@ -459,6 +464,11 @@ import {
         // Verb mode
         currentVerb: null,
 
+        // Sentence mode
+        currentSentencePair: null,  // { colour, item, category }
+        sentenceAnswer: [],         // ['el', 'perro', 'rojo'] correct word array
+        sentencePlaced: [],         // parallel array of DOM tile refs (null = empty slot)
+
         // Session timing: first level of each session always gets MAX_TIME
         levelsAtSessionStart: -1,
     };
@@ -470,6 +480,7 @@ import {
 
     function isColorCategory() {
         if (isVerbMode()) return false;
+        if (isSentenceMode()) return false;
         return getCategoryData().displayType === 'color';
     }
 
@@ -530,6 +541,10 @@ import {
         return selectedMode === 'verbs';
     }
 
+    function isSentenceMode() {
+        return selectedMode === 'sentences';
+    }
+
     function isVerbSupported() {
         return VERB_LANGUAGES.includes(selectedLanguage);
     }
@@ -557,6 +572,103 @@ import {
         }
         // Practice+ phases: just the conjugation
         return conjugation;
+    }
+
+    // ========== SENTENCE MODE HELPERS ==========
+
+    function deriveGender(lang, article, formEntry) {
+        if (formEntry?.gender) return formEntry.gender;  // explicit override (for L' cases)
+        const masc = { es: ['el','los'], fr: ['le','les'], it: ['il','i','gli'], pt: ['o','os'] };
+        const fem  = { es: ['la','las'], fr: ['la','les'], it: ['la','le'],      pt: ['a','as'] };
+        if (masc[lang]?.includes(article)) return 'masculine';
+        if (fem[lang]?.includes(article))  return 'feminine';
+        return 'masculine';
+    }
+
+    function buildCorrectSentence(pair, lang) {
+        const catData = CATEGORY_DATA[pair.category];
+        const formData = catData.forms?.[lang]?.[pair.item];
+        const articleRaw = (formData?.article || '').toLowerCase();
+        const noun = catData.translations[lang][pair.item].toLowerCase();
+        const gender = deriveGender(lang, articleRaw, formData);
+        const colourForms = COLOUR_FORMS[lang]?.[pair.colour];
+        const colour = gender === 'feminine' ? (colourForms?.f || '') : (colourForms?.m || '');
+        const wordOrder = SENTENCE_WORD_ORDER[lang];
+        const map = { article: articleRaw, noun, colour };
+        return wordOrder.map(k => map[k]);
+    }
+
+    // Join sentence parts, handling elision (l'éléphant not l' éléphant)
+    function joinSentenceParts(parts) {
+        if (parts.length > 0 && parts[0].endsWith("'")) {
+            return parts[0] + parts.slice(1).join(' ');
+        }
+        return parts.join(' ');
+    }
+
+    function generateSentenceTiles() {
+        const words = [...game.sentenceAnswer];
+        const shuffled = shuffle(words);
+        const tilesContainer = document.getElementById('sentence-tiles');
+        const slotsContainer = document.getElementById('sentence-slots');
+        tilesContainer.innerHTML = '';
+        slotsContainer.innerHTML = '';
+        game.sentencePlaced = game.sentenceAnswer.map(() => null);
+        // Create empty slots
+        game.sentenceAnswer.forEach((_, i) => {
+            const slot = document.createElement('div');
+            slot.className = 'sentence-slot';
+            slot.dataset.index = i;
+            slotsContainer.appendChild(slot);
+        });
+        // Create tiles
+        shuffled.forEach(word => {
+            const tile = document.createElement('button');
+            tile.className = 'word-tile';
+            tile.textContent = word;
+            tile.addEventListener('click', () => handleTileTap(tile, word));
+            tilesContainer.appendChild(tile);
+        });
+    }
+
+    function handleTileTap(tileEl, word) {
+        if (tileEl.classList.contains('used')) return;
+        if (!game.roundActive) return;
+        const nextSlotIdx = game.sentencePlaced.findIndex(v => v === null);
+        if (nextSlotIdx === -1) return;
+        // Place tile
+        game.sentencePlaced[nextSlotIdx] = tileEl;
+        tileEl.classList.add('used');
+        const slots = document.querySelectorAll('.sentence-slot');
+        slots[nextSlotIdx].textContent = word;
+        slots[nextSlotIdx].classList.add('filled');
+        // Check if all filled
+        if (game.sentencePlaced.every(v => v !== null)) {
+            checkSentenceAnswer();
+        }
+    }
+
+    function checkSentenceAnswer() {
+        const placed = game.sentencePlaced.map(tile => tile.textContent);
+        const correct = placed.every((w, i) => w === game.sentenceAnswer[i]);
+        if (correct) {
+            handleAnswer('sentence');  // game.currentColor === 'sentence' → triggers correct path
+        } else {
+            // Shake slots then reset tiles, without ending the game
+            const slotsContainer = document.getElementById('sentence-slots');
+            slotsContainer.classList.add('shake');
+            setTimeout(() => {
+                slotsContainer.classList.remove('shake');
+                game.sentencePlaced.forEach(tile => tile?.classList.remove('used'));
+                game.sentencePlaced = game.sentenceAnswer.map(() => null);
+                document.querySelectorAll('.sentence-slot').forEach(s => {
+                    s.textContent = '';
+                    s.classList.remove('filled');
+                });
+            }, 350);
+            playWrongSound();
+            resetSessionStreak();
+        }
     }
 
     // ========== PRONOUN INTRO ==========
@@ -634,7 +746,9 @@ import {
         if (getPhaseFromProgress() === 0 && getLevelInPhase() >= SILENT_LEVEL_THRESHOLD) return;
 
         let word;
-        if (isVerbMode()) {
+        if (isSentenceMode()) {
+            word = joinSentenceParts(game.sentenceAnswer);
+        } else if (isVerbMode()) {
             const conjugations = VERB_CONJUGATIONS[selectedLanguage]?.[game.currentVerb];
             const pronoun = VERB_PRONOUNS[selectedLanguage]?.[color] || '';
             const conjugation = conjugations?.[color] || '';
@@ -794,6 +908,8 @@ import {
     const wordsSelector = document.getElementById('words-selector');
     const verbSettingLabel = document.getElementById('verb-setting-label');
     const verbSelector = document.getElementById('verb-selector');
+    const sentenceSettingLabel = document.getElementById('sentence-setting-label');
+    const sentenceSelector = document.getElementById('sentence-selector');
 
     // Game control elements
     const pauseBtn = document.getElementById('pause-btn');
@@ -907,6 +1023,16 @@ import {
     }
 
     function matchColorFromSpeech(word, fullTranscript) {
+        // Sentence mode: match full transcript against the expected sentence
+        if (isSentenceMode()) {
+            if (!game.sentenceAnswer || game.sentenceAnswer.length === 0) return null;
+            const expected = joinSentenceParts(game.sentenceAnswer);
+            if (normalizeForComparison(fullTranscript) === normalizeForComparison(expected)) {
+                return 'sentence';
+            }
+            return null;
+        }
+
         const items = getCategoryItems();
         const lowerWord = word.toLowerCase();
 
@@ -1203,8 +1329,15 @@ import {
 
         cycleCompleteMessage.textContent = `You finished Cycle ${completedCycle}!`;
 
+        // Sentence mode: announce next pair
+        if (isSentenceMode()) {
+            const nextPair = SENTENCE_PAIRS[(newCycle - 1) % SENTENCE_PAIRS.length];
+            cycleCompleteColors.textContent = `Next up: the ${nextPair.colour} ${nextPair.item}!`;
+            newColorBadges.innerHTML = '';
+        }
+
         // Verb mode: simple cycle complete message
-        if (isVerbMode()) {
+        else if (isVerbMode()) {
             cycleCompleteColors.textContent = 'All verbs mastered! Starting again with faster time.';
             newColorBadges.innerHTML = '';
         }
@@ -1265,7 +1398,15 @@ import {
                 game.currentCycle = newCycle;
                 saveProgress();
 
-                if (isVerbMode()) {
+                if (isSentenceMode()) {
+                    // Advance to next sentence pair
+                    game.currentSentencePair = SENTENCE_PAIRS[(game.currentCycle - 1) % SENTENCE_PAIRS.length];
+                    game.activeItems = ['sentence'];
+                    initLevelMastery();
+                    generateButtons();
+                    updateLevelDisplay();
+                    nextRound();
+                } else if (isVerbMode()) {
                     // Verb mastered — return to topic screen so next verb starts as a fresh session
                     refreshProgressFromStorage();
                     show(topicScreen);
@@ -1354,30 +1495,25 @@ import {
         });
     });
 
-    // Mode toggle (Words / Verbs)
+    // Mode toggle (Words / Verbs / Sentences)
     function updateModeUI() {
         document.querySelectorAll('.mode-btn').forEach(b => {
             b.classList.toggle('selected', b.dataset.mode === selectedMode);
         });
-        if (selectedMode === 'words') {
-            wordsSettingLabel.style.display = '';
-            wordsSelector.style.display = '';
-            verbSettingLabel.style.display = 'none';
-            verbSelector.style.display = 'none';
-        } else {
-            wordsSettingLabel.style.display = 'none';
-            wordsSelector.style.display = 'none';
-            verbSettingLabel.style.display = '';
-            verbSelector.style.display = '';
-        }
+        wordsSettingLabel.style.display = selectedMode === 'words' ? '' : 'none';
+        wordsSelector.style.display = selectedMode === 'words' ? '' : 'none';
+        verbSettingLabel.style.display = selectedMode === 'verbs' ? '' : 'none';
+        verbSelector.style.display = selectedMode === 'verbs' ? '' : 'none';
+        sentenceSettingLabel.style.display = selectedMode === 'sentences' ? '' : 'none';
+        sentenceSelector.style.display = selectedMode === 'sentences' ? '' : 'none';
     }
 
     function updateModeToggleVisibility() {
-        // Hide mode toggle for Welsh (no verb support)
+        const sentenceBtn = document.querySelector('.mode-btn[data-mode="sentences"]');
+        // Hide entire mode toggle for Welsh (no verb or sentence support)
         if (!isVerbSupported()) {
             modeSelector.style.display = 'none';
-            // Force words mode if currently in verbs
-            if (selectedMode === 'verbs') {
+            if (selectedMode === 'verbs' || selectedMode === 'sentences') {
                 selectedMode = 'words';
                 selectedCategory = 'colours';
                 const newProgress = getLanguageProgress(selectedLanguage, selectedCategory);
@@ -1388,6 +1524,18 @@ import {
             }
         } else {
             modeSelector.style.display = '';
+            // Hide sentences button for languages without sentence support (e.g. German)
+            const sentenceSupported = SENTENCE_LANGUAGES.includes(selectedLanguage);
+            if (sentenceBtn) sentenceBtn.style.display = sentenceSupported ? '' : 'none';
+            if (!sentenceSupported && selectedMode === 'sentences') {
+                selectedMode = 'words';
+                selectedCategory = 'colours';
+                const newProgress = getLanguageProgress(selectedLanguage, selectedCategory);
+                game.totalCorrectAnswers = newProgress.totalAnswers;
+                game.currentCycle = newProgress.currentCycle;
+                game.levelsCompleted = newProgress.levelsCompleted || 0;
+                updateModeUI();
+            }
         }
     }
 
@@ -1401,6 +1549,8 @@ import {
             // Switch category context
             if (newMode === 'verbs') {
                 selectedCategory = 'verbs_present';
+            } else if (newMode === 'sentences') {
+                selectedCategory = 'sentences_colours';
             } else {
                 // Restore to whatever word category is selected
                 const selectedWordBtn = wordsSelector.querySelector('.category-btn.selected');
@@ -1447,6 +1597,24 @@ import {
                 updateStartScreenProgress();
             }
             verbSelector.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+        });
+    });
+
+    // Sentence theme selection (sentences mode)
+    sentenceSelector.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const newCategory = btn.dataset.category;
+            if (newCategory !== selectedCategory) {
+                saveProgress();
+                selectedCategory = newCategory;
+                const newProgress = getLanguageProgress(selectedLanguage, newCategory);
+                game.totalCorrectAnswers = newProgress.totalAnswers;
+                game.currentCycle = newProgress.currentCycle;
+                game.levelsCompleted = newProgress.levelsCompleted || 0;
+                updateStartScreenProgress();
+            }
+            sentenceSelector.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
         });
     });
@@ -1673,6 +1841,14 @@ import {
     }
 
     function matchItemFromTyping(typed) {
+        if (isSentenceMode()) {
+            if (!game.sentenceAnswer || game.sentenceAnswer.length === 0) return null;
+            const expected = joinSentenceParts(game.sentenceAnswer);
+            if (normalizeForComparison(typed) === normalizeForComparison(expected)) {
+                return 'sentence';
+            }
+            return null;
+        }
         const items = getCategoryItems();
         const currentForm = game.currentForm || 'base';
         const normalizedTyped = normalizeForComparison(typed);
@@ -1711,7 +1887,11 @@ import {
     // ========== GAME FUNCTIONS ==========
 
     function startGame() {
-        if (isVerbMode()) {
+        if (isSentenceMode()) {
+            game.currentSentencePair = SENTENCE_PAIRS[(game.currentCycle - 1) % SENTENCE_PAIRS.length];
+            game.activeItems = ['sentence'];
+            game.activeColors = [];
+        } else if (isVerbMode()) {
             game.currentVerb = getCurrentVerb();
             game.activeItems = [...PRONOUN_KEYS];
             game.activeColors = [];
@@ -1752,6 +1932,7 @@ import {
     }
 
     function getPromptText(form) {
+        if (isSentenceMode()) return 'Build the sentence!';
         if (isVerbMode()) {
             const phase = getPhaseFromProgress();
             return phase === 0 ? 'Match the translation' : 'What is the conjugation?';
@@ -1768,6 +1949,7 @@ import {
     }
 
     function getTypingPrompt(form) {
+        if (isSentenceMode()) return 'Type the sentence!';
         if (isVerbMode()) return 'Type the conjugation!';
         if (form === 'feminine') return 'Type the feminine!';
         if (form === 'article') return 'Type it with the article!';
@@ -1777,6 +1959,7 @@ import {
     }
 
     function getSpeechPrompt(form) {
+        if (isSentenceMode()) return 'Say the sentence!';
         if (isVerbMode()) return 'Say the conjugation!';
         if (form === 'feminine') return 'Say the feminine!';
         if (form === 'article') return 'Say it with the article!';
@@ -1788,6 +1971,50 @@ import {
     function generateButtons() {
         buttonsContainer.innerHTML = '';
         const phase = getPhaseFromProgress();
+        const sentenceBuilder = document.getElementById('sentence-builder');
+
+        // Sentence mode: manage sentence builder visibility
+        if (isSentenceMode()) {
+            if (phase === 3) {
+                // Speech phase
+                sentenceBuilder.style.display = 'none';
+                buttonsContainer.style.display = 'none';
+                typingUI.classList.remove('active');
+                speechWarning.classList.remove('visible');
+                gameScreen.classList.remove('typing-active');
+                if (speechSupported) {
+                    speechUI.classList.add('active');
+                    promptLabel.textContent = 'Say the sentence!';
+                } else {
+                    showSpeechFallback();
+                }
+            } else if (phase === 2) {
+                // Typing phase
+                sentenceBuilder.style.display = 'none';
+                buttonsContainer.style.display = 'none';
+                speechUI.classList.remove('active');
+                typingUI.classList.add('active');
+                speechWarning.classList.remove('visible');
+                promptLabel.textContent = 'Type the sentence!';
+                typingInput.value = '';
+                typingFeedback.textContent = '';
+                gameScreen.classList.add('typing-active');
+                populateAccentButtons();
+            } else {
+                // Learning / Practice: show tile builder
+                sentenceBuilder.style.display = '';
+                buttonsContainer.style.display = 'none';
+                speechUI.classList.remove('active');
+                typingUI.classList.remove('active');
+                speechWarning.classList.remove('visible');
+                gameScreen.classList.remove('typing-active');
+                promptLabel.textContent = 'Build the sentence!';
+            }
+            return;
+        }
+
+        if (sentenceBuilder) sentenceBuilder.style.display = 'none';
+
         const items = getCategoryItems();
         const currentForm = game.currentForm || 'base';
         const promptText = getPromptText(currentForm);
@@ -1894,11 +2121,38 @@ import {
         // Reverse mode: ~30% of rounds in Practice phase flip display
         // (show foreign word as question; user picks emoji/colour)
         const phaseNow = getPhaseFromProgress();
-        game.isReverseRound = !isVerbMode() && phaseNow === 1 && Math.random() < 0.3;
+        game.isReverseRound = !isVerbMode() && !isSentenceMode() && phaseNow === 1 && Math.random() < 0.3;
         buttonsContainer.classList.toggle('reverse-mode', game.isReverseRound);
 
         // Display: verb text, emoji, or colour swatch
-        if (isVerbMode()) {
+        if (isSentenceMode()) {
+            // Sentence mode: emoji + colour swatch side by side
+            const pair = game.currentSentencePair;
+            const catData = CATEGORY_DATA[pair.category];
+            const emoji = catData.display[pair.item];
+            const colourCss = COLOR_CSS[pair.colour];
+            colorDisplay.style.backgroundColor = 'transparent';
+            colorDisplay.classList.remove('emoji-display', 'plural-display');
+            colorDisplay.innerHTML = `<div class="sentence-display-pair">` +
+                `<span>${emoji}</span>` +
+                `<div class="sentence-colour-swatch" style="background-color:${colourCss}"></div>` +
+                `</div>`;
+
+            // Build correct answer for this round
+            game.sentenceAnswer = buildCorrectSentence(pair, selectedLanguage);
+
+            // Reinforcement label: English hint in Learning phase
+            if (getPhaseFromProgress() === 0) {
+                reinforcementLabel.textContent = `the ${pair.colour} ${pair.item}`;
+            } else {
+                reinforcementLabel.textContent = '';
+            }
+
+            // Generate word tiles for Learning / Practice phases
+            if (getPhaseFromProgress() <= 1) {
+                generateSentenceTiles();
+            }
+        } else if (isVerbMode()) {
             const verb = game.currentVerb;
             const pronoun = game.currentColor; // pronoun key
             const phase = getPhaseFromProgress();
@@ -1951,14 +2205,16 @@ import {
             }
         }
 
-        // Update prompt label per form
+        // Update prompt label per form (sentence mode sets its own prompt label above)
         const currentForm = game.currentForm || 'base';
-        if (isSpeechMode()) {
-            promptLabel.textContent = getSpeechPrompt(currentForm);
-        } else if (isTypingMode()) {
-            promptLabel.textContent = getTypingPrompt(currentForm);
-        } else {
-            promptLabel.textContent = getPromptText(currentForm);
+        if (!isSentenceMode()) {
+            if (isSpeechMode()) {
+                promptLabel.textContent = getSpeechPrompt(currentForm);
+            } else if (isTypingMode()) {
+                promptLabel.textContent = getTypingPrompt(currentForm);
+            } else {
+                promptLabel.textContent = getPromptText(currentForm);
+            }
         }
 
         // Update button content for current round (text or visual in reverse mode)
@@ -1991,10 +2247,13 @@ import {
         });
 
         // Show reinforcement label in level 1 of learning phase for non-colour categories
-        if (!isColorCategory() && !isVerbMode() && getPhaseFromProgress() === 0 && getLevelInPhase() === 1) {
-            reinforcementLabel.textContent = getFormTranslation(game.currentColor, currentForm);
-        } else {
-            reinforcementLabel.textContent = '';
+        // (sentence mode sets its own reinforcement label in the display section above)
+        if (!isSentenceMode()) {
+            if (!isColorCategory() && !isVerbMode() && getPhaseFromProgress() === 0 && getLevelInPhase() === 1) {
+                reinforcementLabel.textContent = getFormTranslation(game.currentColor, currentForm);
+            } else {
+                reinforcementLabel.textContent = '';
+            }
         }
 
         // Speak the word if audio is enabled
@@ -2003,7 +2262,9 @@ import {
         // Clear speech wrong attempts for the new round
         speechAttempts.innerHTML = '';
 
-        shuffleButtons();
+        if (!isSentenceMode()) {
+            shuffleButtons();
+        }
 
         // Timer setup
         timerBar.style.transition = 'none';
@@ -2170,7 +2431,10 @@ import {
         }
 
         if (game.score === 0) {
-            if (isVerbMode()) {
+            if (isSentenceMode()) {
+                const sentenceStr = joinSentenceParts(game.sentenceAnswer || []);
+                endMessage.textContent = sentenceStr ? `The sentence was "${sentenceStr}"` : 'Keep practising!';
+            } else if (isVerbMode()) {
                 const answerWord = getVerbTranslation(game.currentColor);
                 const pronoun = PRONOUN_LABELS[game.currentColor] || game.currentColor;
                 endMessage.textContent = `The answer was "${answerWord}" (${pronoun})`;

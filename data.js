@@ -216,3 +216,33 @@ export const SPEECH_LANG_CODES = Object.fromEntries(Object.entries(LANGUAGES).ma
 export const COLOR_ALIASES = Object.fromEntries(
     Object.entries(LANG_DATA).map(([code, lang]) => [code, lang.aliases])
 );
+
+// ========== SENTENCE MODE ==========
+export const SENTENCE_LANGUAGES = ['es', 'fr', 'it', 'pt'];
+
+export const SENTENCE_WORD_ORDER = {
+    es: ['article', 'noun', 'colour'],
+    fr: ['article', 'noun', 'colour'],
+    it: ['article', 'noun', 'colour'],
+    pt: ['article', 'noun', 'colour'],
+};
+
+export const SENTENCE_PAIRS = [
+    { colour: 'red',    item: 'dog',      category: 'animals' },
+    { colour: 'blue',   item: 'cat',      category: 'animals' },
+    { colour: 'yellow', item: 'banana',   category: 'food'    },
+    { colour: 'green',  item: 'apple',    category: 'food'    },
+    { colour: 'orange', item: 'carrot',   category: 'food'    },
+    { colour: 'red',    item: 'tomato',   category: 'food'    },
+    { colour: 'grey',   item: 'elephant', category: 'animals' },
+    { colour: 'brown',  item: 'bear',     category: 'animals' },
+    { colour: 'pink',   item: 'pig',      category: 'animals' },
+    { colour: 'white',  item: 'rabbit',   category: 'animals' },
+];
+
+// Colour adjective forms (masculine/feminine) assembled from language files
+export const COLOUR_FORMS = Object.fromEntries(
+    Object.entries(LANG_DATA)
+        .filter(([, lang]) => lang.colourForms)
+        .map(([code, lang]) => [code, lang.colourForms])
+);

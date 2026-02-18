@@ -31,12 +31,12 @@ export default {
         forms: {
             dog: { article: 'Le', plural: 'Chiens', pluralArticle: 'Les' },
             cat: { article: 'Le', plural: 'Chats', pluralArticle: 'Les' },
-            elephant: { article: "L'", plural: 'Éléphants', pluralArticle: 'Les' },
-            bird: { article: "L'", plural: 'Oiseaux', pluralArticle: 'Les' },
+            elephant: { article: "L'", plural: 'Éléphants', pluralArticle: 'Les', gender: 'masculine' },
+            bird: { article: "L'", plural: 'Oiseaux', pluralArticle: 'Les', gender: 'masculine' },
             fish: { article: 'Le', plural: 'Poissons', pluralArticle: 'Les' },
             horse: { article: 'Le', plural: 'Chevaux', pluralArticle: 'Les' },
             rabbit: { article: 'Le', plural: 'Lapins', pluralArticle: 'Les' },
-            bear: { article: "L'", plural: 'Ours', pluralArticle: 'Les' },
+            bear: { article: "L'", plural: 'Ours', pluralArticle: 'Les', gender: 'masculine' },
             monkey: { article: 'Le', plural: 'Singes', pluralArticle: 'Les' },
             cow: { article: 'La', plural: 'Vaches', pluralArticle: 'Les' },
             pig: { article: 'Le', plural: 'Cochons', pluralArticle: 'Les' }
@@ -102,5 +102,18 @@ export default {
         red: ['rouge'], green: ['vert', 'verte'], blue: ['bleu', 'bleue'], yellow: ['jaune'],
         orange: ['orange'], pink: ['rose'], purple: ['violet', 'violette'],
         brown: ['marron', 'brun', 'brune'], grey: ['gris', 'grise'], black: ['noir', 'noire'], white: ['blanc', 'blanche']
+    },
+    colourForms: {
+        red:    { m: 'rouge',    f: 'rouge'    },
+        blue:   { m: 'bleu',     f: 'bleue'    },
+        yellow: { m: 'jaune',    f: 'jaune'    },
+        green:  { m: 'vert',     f: 'verte'    },
+        orange: { m: 'orange',   f: 'orange'   },
+        pink:   { m: 'rose',     f: 'rose'     },
+        purple: { m: 'violet',   f: 'violette' },
+        brown:  { m: 'marron',   f: 'marron'   },
+        grey:   { m: 'gris',     f: 'grise'    },
+        black:  { m: 'noir',     f: 'noire'    },
+        white:  { m: 'blanc',    f: 'blanche'  }
     }
 };

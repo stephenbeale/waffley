@@ -102,5 +102,18 @@ export default {
         red: ['rojo'], green: ['verde'], blue: ['azul'], yellow: ['amarillo'],
         orange: ['naranja'], pink: ['rosa'], purple: ['morado'],
         brown: ['marron', 'marrón'], grey: ['gris'], black: ['negro'], white: ['blanco']
+    },
+    colourForms: {
+        red:    { m: 'rojo',     f: 'roja'     },
+        blue:   { m: 'azul',     f: 'azul'     },
+        yellow: { m: 'amarillo', f: 'amarilla'  },
+        green:  { m: 'verde',    f: 'verde'    },
+        orange: { m: 'naranja',  f: 'naranja'  },
+        pink:   { m: 'rosa',     f: 'rosa'     },
+        purple: { m: 'morado',   f: 'morada'   },
+        brown:  { m: 'marrón',   f: 'marrón'   },
+        grey:   { m: 'gris',     f: 'gris'     },
+        black:  { m: 'negro',    f: 'negra'    },
+        white:  { m: 'blanco',   f: 'blanca'   }
     }
 };

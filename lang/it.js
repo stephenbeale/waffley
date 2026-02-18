@@ -30,12 +30,12 @@ export default {
         forms: {
             dog: { article: 'Il', plural: 'Cani', pluralArticle: 'I' },
             cat: { article: 'Il', plural: 'Gatti', pluralArticle: 'I' },
-            elephant: { article: "L'", plural: 'Elefanti', pluralArticle: 'Gli' },
-            bird: { article: "L'", plural: 'Uccelli', pluralArticle: 'Gli' },
+            elephant: { article: "L'", plural: 'Elefanti', pluralArticle: 'Gli', gender: 'masculine' },
+            bird: { article: "L'", plural: 'Uccelli', pluralArticle: 'Gli', gender: 'masculine' },
             fish: { article: 'Il', plural: 'Pesci', pluralArticle: 'I' },
             horse: { article: 'Il', plural: 'Cavalli', pluralArticle: 'I' },
             rabbit: { article: 'Il', plural: 'Conigli', pluralArticle: 'I' },
-            bear: { article: "L'", plural: 'Orsi', pluralArticle: 'Gli' },
+            bear: { article: "L'", plural: 'Orsi', pluralArticle: 'Gli', gender: 'masculine' },
             monkey: { article: 'La', plural: 'Scimmie', pluralArticle: 'Le' },
             cow: { article: 'La', plural: 'Mucche', pluralArticle: 'Le' },
             pig: { article: 'Il', plural: 'Maiali', pluralArticle: 'I' }
@@ -101,5 +101,18 @@ export default {
         red: ['rosso'], green: ['verde'], blue: ['blu'], yellow: ['giallo'],
         orange: ['arancione'], pink: ['rosa'], purple: ['viola'],
         brown: ['marrone'], grey: ['grigio'], black: ['nero'], white: ['bianco']
+    },
+    colourForms: {
+        red:    { m: 'rosso',     f: 'rossa'     },
+        blue:   { m: 'blu',       f: 'blu'        },
+        yellow: { m: 'giallo',    f: 'gialla'     },
+        green:  { m: 'verde',     f: 'verde'      },
+        orange: { m: 'arancione', f: 'arancione'  },
+        pink:   { m: 'rosa',      f: 'rosa'       },
+        purple: { m: 'viola',     f: 'viola'      },
+        brown:  { m: 'marrone',   f: 'marrone'    },
+        grey:   { m: 'grigio',    f: 'grigia'     },
+        black:  { m: 'nero',      f: 'nera'       },
+        white:  { m: 'bianco',    f: 'bianca'     }
     }
 };
