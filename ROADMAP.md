@@ -160,7 +160,7 @@ Planned features and improvements for Waffley.
 - [x] **Improve end-game flow — return to language home page**
   The current "Play Again" end screen is confusing. After a game ends, the user should be returned to the topic screen for their selected language (not the language picker). Make the flow: end game -> show score -> "Continue" returns to topic screen with progress updated.
 
-- [ ] **Add gameplay variations to reduce repetitiveness**
+- [x] **Add gameplay variations to reduce repetitiveness**
   The level-to-level experience feels samey. Consider small variations as the user progresses within a phase, such as: timed bonus rounds, reverse mode (show the foreign word, pick the English), "pick the odd one out", or brief review rounds that mix items from earlier levels. Even subtle changes like shuffling the display format or adding streak challenges would help.
 
 ---
@@ -170,14 +170,17 @@ Planned features and improvements for Waffley.
 - [x] **Design database schema**
   Designed a comprehensive, normalised PostgreSQL schema covering all vocabulary data (languages, categories, items, translations, word forms, verb conjugations), user progress, statistics, and session tracking. Schema supports offline-first mobile architecture with sync capabilities. See `docs/db-schema.md`.
 
-- [ ] **Implement database and seed data**
-  Stand up a PostgreSQL instance (Supabase or similar), run the schema DDL, and write seed scripts to populate content tables from the existing JS data files.
+- [x] **Implement database and seed data**
+  Stand up a PostgreSQL instance (Supabase or similar), run the schema DDL, and write seed scripts to populate content tables from the existing JS data files. Schema at `supabase/schema.sql`, seed at `supabase/seed.js`, setup guide at `supabase/README.md`.
 
-- [ ] **Build API layer**
-  Create REST API endpoints for content retrieval, user progress sync, and session recording.
+- [x] **Build API layer**
+  Created `src/api.js` — a thin browser ES module wrapper around the Supabase JS client. Exports `ensureSession`, `signInWithGoogle`, `signInWithApple`, `signOut`, `getVocabulary`, `getVerbs`, `getPronounTranslations`, `getProgress`, `upsertCategoryProgress`, `recordSession`, `upsertUserStats`. In-memory caching for content. Ready to be imported in `app.js` when frontend migration starts.
 
 - [ ] **Migrate from localStorage to database**
   Replace localStorage reads/writes with API calls. Support offline fallback for web app.
+
+- [ ] **Fix reverse-mode emoji buttons too small on mobile**
+  In reverse mode (Practice phase), answer buttons display emoji/colour swatches instead of text. On mobile the buttons are too small for comfortable tapping. Either increase the emoji font size and button height dynamically when in reverse mode, or convert reverse rounds to a dedicated round type where the layout is designed specifically for emoji/colour choices (e.g. a 2×3 or 3×2 grid with large tap targets).
 
 ---
 
@@ -200,3 +203,9 @@ Planned features and improvements for Waffley.
   - You (all) → 👥
   - They → 👨👩 (mixed, ellos) / 👩👩 (ellas, where applicable)
   For Spanish/Italian specifically, surface nosotras/vosotras/ellas variants as additional pronouns with their own emoji groupings (two 👩 for all-female groups, one 👨 + one 👩 for mixed).
+
+- [ ] **One verb per full cycle (master all phases before moving on)**
+  Currently the verb rotates every level. Instead, keep one verb across all levels of a full cycle (Learning → Practice → Typing → Speech × 5 levels each = 20 levels per verb). Only move to the next verb once the current one is fully mastered across all phases. Verb ordering by language:
+  - **Spanish:** ser → estar → tener → ir → hacer → querer → poder → saber → comer → hablar
+  - **Italian:** essere → avere → andare → fare → volere → potere → sapere → mangiare → parlare → vivere
+  - **French / German / Portuguese:** be → have → go → do → want → can → know → eat → speak → live (standard order)
