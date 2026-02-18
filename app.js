@@ -568,11 +568,14 @@ import {
 
         let word;
         if (isVerbMode()) {
-            // Speak the full conjugation phrase
             const conjugations = VERB_CONJUGATIONS[selectedLanguage]?.[game.currentVerb];
             const pronoun = VERB_PRONOUNS[selectedLanguage]?.[color] || '';
             const conjugation = conjugations?.[color] || '';
-            word = pronoun + ' ' + conjugation;
+            // Learning: speak full phrase so user hears the pronoun too
+            // Practice: pronoun is on screen already — speak only the conjugation (faster)
+            word = getPhaseFromProgress() === 0
+                ? pronoun + ' ' + conjugation
+                : conjugation;
         } else {
             word = getFormTranslation(color, game.currentForm || 'base');
         }
@@ -789,21 +792,20 @@ import {
             const result = event.results[event.results.length - 1];
             const transcript = result[0].transcript.trim().toLowerCase();
             const words = transcript.split(' ');
-            const lastWord = words.pop();
-            // For multi-word forms like "El Perro", show last two words
-            const displayText = words.length > 0 ? words.slice(-1).concat(lastWord).join(' ') : lastWord;
+            const lastWord = words[words.length - 1];
 
-            voiceFeedback.textContent = `Heard: "${displayText}"`;
+            // Show exactly what was heard — one live line, updated each interim result
+            voiceFeedback.textContent = `Heard: "${transcript}"`;
 
             if (result.isFinal) {
                 const matchedColor = matchColorFromSpeech(lastWord, transcript);
                 if (matchedColor) {
                     handleAnswer(matchedColor);
                 } else {
-                    // Log wrong attempt
+                    // Log wrong attempt — show full transcript so user can see what was heard
                     const entry = document.createElement('div');
                     entry.className = 'speech-attempt';
-                    entry.textContent = displayText;
+                    entry.textContent = transcript;
                     speechAttempts.appendChild(entry);
                     speechAttempts.scrollTop = speechAttempts.scrollHeight;
                 }
@@ -896,7 +898,7 @@ import {
             micIcon.classList.add('listening');
             micStatus.textContent = 'Listening...';
             voiceFeedback.textContent = '';
-            speechAttempts.innerHTML = '';
+            // speechAttempts is cleared per-round in nextRound(), not per restart
         } catch (e) {
             console.log('Speech recognition start error:', e);
         }
