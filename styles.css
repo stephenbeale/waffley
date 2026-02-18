@@ -1199,6 +1199,55 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     color: #fff;
 }
 
+/* Pronoun intro overlay */
+#pronoun-intro-overlay {
+    padding: 2rem 1.5rem;
+}
+
+.pronoun-intro-title {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #e94560;
+    margin-bottom: 0.25rem;
+}
+
+.pronoun-intro-subtitle {
+    font-size: 0.95rem;
+    color: #aaa;
+    margin-bottom: 1.5rem;
+}
+
+.pronoun-table {
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+    width: 100%;
+    max-width: 320px;
+}
+
+.pronoun-table td {
+    padding: 0.5rem 1rem;
+    font-size: 1.05rem;
+    border-bottom: 1px solid #2a2a4e;
+}
+
+.pronoun-table td:first-child {
+    color: #aaa;
+    text-align: right;
+    width: 40%;
+}
+
+.pronoun-table td:nth-child(2) {
+    font-size: 1.3rem;
+    text-align: center;
+    width: 15%;
+}
+
+.pronoun-table td:last-child {
+    font-weight: 700;
+    color: #fff;
+    width: 45%;
+}
+
 /* Stats overlay — uses .overlay base, overrides bg opacity */
 #stats-overlay {
     background: rgba(26, 26, 46, 0.98);

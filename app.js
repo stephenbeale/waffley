@@ -9,7 +9,7 @@ import {
     LANGUAGES, LANGUAGE_NAMES, LANGUAGE_FLAGS, TRANSLATIONS, COLOR_CSS,
     CATEGORIES, CATEGORY_DATA,
     SPEECH_LANG_CODES, COLOR_ALIASES,
-    VERB_LIST, VERB_ORDER, PRONOUN_KEYS, VERB_ENGLISH, PRONOUN_LABELS,
+    VERB_LIST, VERB_ORDER, PRONOUN_KEYS, VERB_ENGLISH, PRONOUN_LABELS, PRONOUN_EMOJIS,
     VERB_CONJUGATIONS, VERB_PRONOUNS, VERB_LANGUAGES
 } from './data.js';
 
@@ -548,6 +548,62 @@ import {
         }
         // Practice+ phases: just the conjugation
         return conjugation;
+    }
+
+    // ========== PRONOUN INTRO ==========
+
+    const PRONOUN_INTRO_KEY = 'waffley_pronoun_intro';
+
+    function hasPronounIntroCompleted(lang) {
+        try {
+            const saved = JSON.parse(localStorage.getItem(PRONOUN_INTRO_KEY) || '{}');
+            return !!saved[lang];
+        } catch { return false; }
+    }
+
+    function markPronounIntroCompleted(lang) {
+        try {
+            const saved = JSON.parse(localStorage.getItem(PRONOUN_INTRO_KEY) || '{}');
+            saved[lang] = true;
+            localStorage.setItem(PRONOUN_INTRO_KEY, JSON.stringify(saved));
+        } catch {}
+    }
+
+    function showPronounIntro(onConfirm) {
+        const overlay   = document.getElementById('pronoun-intro-overlay');
+        const titleEl   = document.getElementById('pronoun-intro-title');
+        const subtitleEl= document.getElementById('pronoun-intro-subtitle');
+        const tableEl   = document.getElementById('pronoun-table');
+        const btn       = document.getElementById('pronoun-intro-btn');
+
+        const langName  = LANGUAGE_NAMES[selectedLanguage] || selectedLanguage;
+        const pronouns  = VERB_PRONOUNS[selectedLanguage] || {};
+
+        titleEl.textContent    = `${langName} Pronouns`;
+        subtitleEl.textContent = 'Learn these before your first verb session';
+
+        // Build the pronoun table rows
+        tableEl.innerHTML = PRONOUN_KEYS.map(key => {
+            const english  = PRONOUN_LABELS[key] || key;
+            const emoji    = PRONOUN_EMOJIS[key] || '';
+            const target   = pronouns[key] || '';
+            return `<tr>
+                <td>${english}</td>
+                <td>${emoji}</td>
+                <td>${target}</td>
+            </tr>`;
+        }).join('');
+
+        overlay.classList.add('active');
+        btn.focus();
+
+        function handleConfirm() {
+            btn.removeEventListener('click', handleConfirm);
+            overlay.classList.remove('active');
+            markPronounIntroCompleted(selectedLanguage);
+            onConfirm();
+        }
+        btn.addEventListener('click', handleConfirm);
     }
 
     // ========== AUDIO PRONUNCIATION ==========
@@ -1387,7 +1443,11 @@ import {
 
     startBtn.addEventListener('click', () => {
         warmUpSpeech();
-        startGame();
+        if (isVerbMode() && !hasPronounIntroCompleted(selectedLanguage)) {
+            showPronounIntro(() => startGame());
+        } else {
+            startGame();
+        }
     });
     document.getElementById('restart-btn').addEventListener('click', () => {
         // Clean up speech recognition
