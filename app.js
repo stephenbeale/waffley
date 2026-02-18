@@ -1,6 +1,6 @@
 import {
     MASTERY_THRESHOLD, REMOVAL_STREAK, LEVELS_PER_PHASE, LEVELS_PER_CYCLE,
-    PHASES, PHASE_CLASSES, MAX_TIME, MIN_TIME,
+    PHASES, PHASE_CLASSES, MAX_TIME, MIN_TIME, MIN_TIME_TYPING,
     TIMER_WARNING_RATIO, LEVEL_UP_COUNTDOWN, CYCLE_COMPLETE_COUNTDOWN,
     STARTING_BUTTON_COUNT, BUTTONS_ADD_INTERVAL, MAX_PITCH_SEMITONES,
     TTS_SPEECH_RATE, SPEECH_RESTART_DELAY, SILENT_LEVEL_THRESHOLD,
@@ -310,13 +310,15 @@ import {
     // Level 1 = 10s, Level 2 = 8s, Level 3 = 6s, Level 4 = 4s, Level 5+ = 2s
     function getTimeLimit() {
         const levelInPhase = getLevelInPhase();
-        const timeInSeconds = Math.max(MIN_TIME, MAX_TIME - (levelInPhase - 1) * 2) + game.timeBonus;
+        const minTime = getPhaseFromProgress() === 2 ? MIN_TIME_TYPING : MIN_TIME;
+        const timeInSeconds = Math.max(minTime, MAX_TIME - (levelInPhase - 1) * 2) + game.timeBonus;
         return timeInSeconds * 1000;
     }
 
     function isAtMinTime() {
         const levelInPhase = getLevelInPhase();
-        return Math.max(MIN_TIME, MAX_TIME - (levelInPhase - 1) * 2) <= MIN_TIME;
+        const minTime = getPhaseFromProgress() === 2 ? MIN_TIME_TYPING : MIN_TIME;
+        return Math.max(minTime, MAX_TIME - (levelInPhase - 1) * 2) <= minTime;
     }
 
     // Get time limit in seconds for display
@@ -647,6 +649,26 @@ import {
         gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
         osc.start(ctx.currentTime);
         osc.stop(ctx.currentTime + 0.3);
+    }
+
+    function playLevelUpSound() {
+        if (!audioEnabled || sfxMuted) return;
+        const ctx = getAudioContext();
+        // Short ascending fanfare: C5 → E5 → G5 → C6
+        const notes = [523, 659, 784, 1047];
+        notes.forEach((freq, i) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.type = 'sine';
+            const t = ctx.currentTime + i * 0.12;
+            osc.frequency.setValueAtTime(freq, t);
+            gain.gain.setValueAtTime(0.25, t);
+            gain.gain.exponentialRampToValueAtTime(0.01, t + 0.18);
+            osc.start(t);
+            osc.stop(t + 0.18);
+        });
     }
 
     // ========== DOM ELEMENTS ==========
@@ -1051,6 +1073,19 @@ import {
             levelUpTime.textContent = `Time: ${newTimeSeconds}s (-2 seconds)`;
         } else {
             levelUpTime.textContent = `Time: ${newTimeSeconds}s`;
+        }
+
+        playLevelUpSound();
+
+        // Announce phase change via TTS in English
+        if (phaseChanged && ttsSupported) {
+            const announcements = ['Learning mode', 'Practice mode', 'Typing phase', 'Speech mode'];
+            const msg = new SpeechSynthesisUtterance(announcements[phase] || PHASES[phase]);
+            msg.lang = 'en-GB';
+            msg.rate = 1;
+            msg.volume = 0.8;
+            speechSynthesis.cancel();
+            speechSynthesis.speak(msg);
         }
 
         levelUpOverlay.classList.add('active');
