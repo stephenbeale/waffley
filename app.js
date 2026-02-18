@@ -128,10 +128,18 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
     const DB_CATEGORIES = ['colours', 'adjectives', 'animals', 'food', 'weather'];
 
-    async function syncProgressToDb(lang, category, progressData) {
+    // Debounce timers keyed by "lang:category" — collapses rapid back-to-back saves
+    // (e.g. saveProgress() fires twice within ms at level-up) into a single DB write.
+    const _syncProgressTimers = {};
+
+    function syncProgressToDb(lang, category, progressData) {
         if (!isConfigured()) return;
-        try { await upsertCategoryProgress(lang, category, progressData); }
-        catch (e) { console.debug('[waffley] Progress sync failed:', e.message); }
+        const key = `${lang}:${category}`;
+        clearTimeout(_syncProgressTimers[key]);
+        _syncProgressTimers[key] = setTimeout(async () => {
+            try { await upsertCategoryProgress(lang, category, progressData); }
+            catch (e) { console.debug('[waffley] Progress sync failed:', e.message); }
+        }, 400);
     }
 
     async function syncStatsToDb() {
@@ -341,10 +349,15 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             updateAuthUI();
         }).catch(() => {});
 
+        // Track which user ID we've already synced for — prevents re-flooding the DB
+        // on every page reload when the user is already authenticated.
+        let _syncedForUserId = null;
+
         onAuthChange((event, user) => {
             currentUser = user;
             updateAuthUI();
-            if (event === 'SIGNED_IN' && user && !user.is_anonymous) {
+            if (event === 'SIGNED_IN' && user && !user.is_anonymous && user.id !== _syncedForUserId) {
+                _syncedForUserId = user.id;
                 syncAllProgressToDb();
             }
         });
