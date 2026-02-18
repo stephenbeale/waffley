@@ -188,7 +188,7 @@ Planned features and improvements for Waffley.
 - [x] **Build API layer**
   Created `src/api.js` — a thin browser ES module wrapper around the Supabase JS client. Exports `ensureSession`, `signInWithGoogle`, `signInWithApple`, `signOut`, `getVocabulary`, `getVerbs`, `getPronounTranslations`, `getProgress`, `upsertCategoryProgress`, `recordSession`, `upsertUserStats`. In-memory caching for content. Ready to be imported in `app.js` when frontend migration starts.
 
-- [ ] **Migrate from localStorage to database**
+- [x] **Migrate from localStorage to database**
   Replace localStorage reads/writes with API calls. Support offline fallback for web app.
 
 - [x] **Fix reverse-mode emoji buttons too small on mobile**
@@ -198,7 +198,7 @@ Planned features and improvements for Waffley.
 
 ## Auth & User Accounts
 
-- [ ] **Add Google / Apple OAuth via Supabase Auth**
+- [x] **Add Google / Apple OAuth via Supabase Auth**
   Use Supabase Auth with Google and Apple as providers. Anonymous sessions should be created automatically on first visit (no sign-up wall). On login, migrate the anonymous user's progress to the authenticated account. Apple Sign-In is required for iOS app submissions; Google for Android and web. Use Supabase's built-in JWT handling — do not roll custom auth. Row Level Security (RLS) on all user tables so each user can only read/write their own data.
 
 ---
