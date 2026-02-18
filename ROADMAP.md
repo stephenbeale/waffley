@@ -201,12 +201,10 @@ Planned features and improvements for Waffley.
   Implementation: replace the rotating `getCurrentVerb()` level-index formula with a persistent `currentVerbIndex` stored alongside `levelsCompleted` in progress. Advance the index only on full cycle completion (after all 4 phases for that verb).
 
 - [ ] **Teach subject pronouns before conjugations**
-  Before showing verb conjugations, run a short pronoun introduction phase: teach "Yo = I", "Tú = You", etc. as a prerequisite mini-game. Only needs to pass once per language. Pronoun cards should use gendered emojis to disambiguate:
-  - I → 🧍 (neutral)
-  - You (sing.) → 👉
+  Before showing verb conjugations, run a short pronoun introduction phase: teach "Yo = I", "Tú = You", etc. as a prerequisite mini-game. Only needs to pass once per language. I and You are unambiguous — only he/she/we/they need gendered emojis to disambiguate:
   - He → 👨
   - She → 👩
   - We → 👨‍👩 (mixed, default nosotros) / 👩👩 (nosotras, where applicable)
-  - You (all) → 👥
+  - You (all) → 👥 (vosotros mixed) / 👩👩 (vosotras, where applicable)
   - They → 👨👩 (mixed, ellos) / 👩👩 (ellas, where applicable)
   For Spanish/Italian specifically, surface nosotras/vosotras/ellas variants as additional pronouns with their own emoji groupings (two 👩 for all-female groups, one 👨 + one 👩 for mixed).
