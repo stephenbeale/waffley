@@ -1325,31 +1325,6 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     background: rgba(253, 126, 20, 0.1);
 }
 
-/* Pronoun intro mode — suppress game chrome, show only the card */
-#game-screen.pronoun-intro-mode .game-controls,
-#game-screen.pronoun-intro-mode #vertical-progress-container,
-#game-screen.pronoun-intro-mode .score-display,
-#game-screen.pronoun-intro-mode .reinforcement-label,
-#game-screen.pronoun-intro-mode #timer-bar-container,
-#game-screen.pronoun-intro-mode #speech-ui,
-#game-screen.pronoun-intro-mode #typing-ui,
-#game-screen.pronoun-intro-mode #speech-warning,
-#game-screen.pronoun-intro-mode .time-display {
-    display: none !important;
-}
-
-#game-screen.pronoun-intro-mode #buttons-container {
-    max-height: none;
-    overflow-y: visible;
-}
-
-#game-screen.pronoun-intro-mode #buttons-container .answer-btn {
-    flex: 0 1 auto;
-    min-width: 200px;
-    max-width: 360px;
-    font-size: 1.6rem;
-    padding: 1rem 2rem;
-}
 
 /* Stats overlay — uses .overlay base, overrides bg opacity */
 #stats-overlay {

@@ -791,18 +791,34 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     }
 
     function showPronounIntro(onConfirm) {
-        const pronouns    = VERB_PRONOUNS[selectedLanguage] || {};
+        const pronouns     = VERB_PRONOUNS[selectedLanguage] || {};
         const TOTAL_ROUNDS = 2;
         let index = 0;
         let round = 1;
+        const total = PRONOUN_KEYS.length;
 
-        // Run inside the real game screen — add mode class to suppress chrome
-        gameScreen.classList.add('pronoun-intro-mode');
+        // Set up the game screen identically to a regular round
         phaseBadge.className   = 'phase-badge learning';
         phaseBadge.textContent = 'Pronouns';
+        currentScoreEl.textContent = '0';
+        gameLangFlag.textContent   = LANGUAGE_FLAGS[selectedLanguage] || '';
 
-        // Build a single answer button
-        buttonsContainer.innerHTML    = '';
+        // Timer bar: static full bar — no countdown pressure
+        timerBar.style.transition = 'none';
+        timerBar.style.width      = '100%';
+        timerBar.classList.remove('warning');
+
+        // Reinforcement label — encouraging message shown throughout
+        reinforcementLabel.textContent = 'Easy to start so we learn!';
+
+        // Speech/typing UIs stay hidden (their default state)
+        speechUI.classList.remove('active');
+        typingUI.classList.remove('active');
+        speechWarning.classList.remove('visible');
+        gameScreen.classList.remove('typing-active');
+
+        // Build a single centred answer button
+        buttonsContainer.innerHTML     = '';
         buttonsContainer.style.display = 'flex';
         const btn = document.createElement('button');
         btn.className = 'answer-btn';
@@ -812,27 +828,31 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
         function showCurrent() {
             const key = PRONOUN_KEYS[index];
-            currentLevelEl.textContent = `${index + 1} / ${PRONOUN_KEYS.length}`;
+            currentLevelEl.textContent = `${index + 1} / ${total}`;
+
+            // Vertical progress bar tracks how far through the pronouns we are
+            const pct = (index / total) * 100;
+            verticalProgressBar.style.height      = pct + '%';
+            verticalProgressLabel.textContent     = `${index}/${total}`;
+
             const emoji = PRONOUN_EMOJIS[key] || '';
             colorDisplay.textContent = emoji;
             colorDisplay.className   = emoji ? 'color-display emoji-display' : 'color-display';
-            // Clear any inline colour styles left over from a previous word round
             colorDisplay.style.backgroundColor = '';
-            colorDisplay.style.color = '';
+            colorDisplay.style.color           = '';
             colorDisplay.setAttribute('aria-label', PRONOUN_LABELS[key] || key);
-            promptLabel.textContent  = PRONOUN_LABELS[key] || key;
-            btn.textContent          = pronouns[key] || '';
+            promptLabel.textContent = PRONOUN_LABELS[key] || key;
+            btn.textContent         = pronouns[key] || '';
             setTimeout(() => btn.focus(), 50);
 
-            // Speak the target-language pronoun.
-            // Mark the engine warmed-up on end so the first game question fires instantly.
+            // Speak the target-language pronoun; mark engine warmed-up on end
             const word = pronouns[key];
             if (word && audioEnabled && ttsSupported) {
                 const langCode = SPEECH_LANG_CODES[selectedLanguage] || 'es-ES';
                 speechSynthesis.cancel();
                 const utterance = new SpeechSynthesisUtterance(word);
-                utterance.lang = langCode;
-                utterance.rate = TTS_SPEECH_RATE;
+                utterance.lang  = langCode;
+                utterance.rate  = TTS_SPEECH_RATE;
                 utterance.onend = () => { speechWarmedUp = true; };
                 speechSynthesis.speak(utterance);
             }
@@ -841,14 +861,16 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         function advance() {
             btn.blur();
             index++;
-            if (index >= PRONOUN_KEYS.length) {
+            if (index >= total) {
                 if (round < TOTAL_ROUNDS) {
                     round++;
                     index = 0;
                     showCurrent();
                 } else {
                     btn.removeEventListener('click', advance);
-                    gameScreen.classList.remove('pronoun-intro-mode');
+                    // Fill progress bar to show completion
+                    verticalProgressBar.style.height  = '100%';
+                    verticalProgressLabel.textContent = `${total}/${total}`;
                     markPronounIntroCompleted(selectedLanguage);
                     // Engine has spoken many utterances — it's definitely warm now
                     speechWarmedUp = true;
