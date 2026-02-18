@@ -224,3 +224,173 @@ Planned features and improvements for Waffley.
   - They → 👨👩 (mixed, ellos) / 👩👩 (ellas, where applicable)
   For Spanish/Italian specifically, surface nosotras/vosotras/ellas variants as additional pronouns with their own emoji groupings (two 👩 for all-female groups, one 👨 + one 👩 for mixed).
 
+---
+
+## Future Roadmap
+
+### P1 — Must Have Soon
+
+- [ ] **Daily streaks**
+  Track consecutive days of practice with a streak counter and calendar. Resets if a day is missed. Core retention mechanic — most impactful engagement driver.
+  - Complexity: M
+
+- [ ] **Offline-first architecture**
+  Full gameplay with no network required. Vocabulary and progress cached locally; background sync when online. Essential before mobile app submission.
+  - Complexity: L
+
+- [ ] **GDPR / CCPA compliance**
+  Right to access, portability, and erasure. Clear privacy policy and terms of service in-app. Required before any public launch.
+  - Complexity: M
+
+- [ ] **Debounce API saves** *(in progress)*
+  Collapse rapid back-to-back `saveProgress()` calls (e.g. answer → level-up within ms) into a single DB write per 400ms window. Prevents double-writes and race conditions.
+  - Complexity: S
+
+### P2 — Should Have
+
+- [ ] **Achievement badges**
+  Trophies for milestones: first correct answer, mastering a category, 7-day streak, 100 rounds, perfect accuracy. Displayed on a profile/stats screen.
+  - Complexity: M
+
+- [ ] **Daily challenges**
+  One optional themed daily quest per language (e.g. "20 correct answers", "finish level 3 in verbs") with bonus XP reward. Resets at midnight UTC.
+  - Complexity: M
+
+- [ ] **XP and levelling**
+  Award XP per correct answer scaled by phase difficulty. Visual level bar on profile. Unlocks cosmetic rewards at thresholds. Feeds into streaks and achievements.
+  - Complexity: M
+
+- [ ] **Spaced repetition scheduling**
+  Surface vocabulary items at scientifically optimal intervals based on performance history. Background algorithm schedules review rounds automatically.
+  - Complexity: L
+
+- [ ] **Expand vocabulary categories**
+  Add 5+ new categories: body parts, clothing, household objects, numbers 0–100, family members, professions.
+  - Complexity: M
+
+- [ ] **Expand verb tenses**
+  Add past tense, present perfect, and conditional for Spanish and Italian. Requires updated schema and per-tense conjugation data.
+  - Complexity: L
+
+- [ ] **iOS & Android native apps**
+  Package as a Capacitor app with native splash screen, icons, and offline support. Publish to App Store and Google Play.
+  - Complexity: M
+
+- [ ] **Push notifications**
+  Daily practice reminders, streak alerts, and friend challenge notifications via Firebase Cloud Messaging.
+  - Complexity: M
+
+- [ ] **User profiles**
+  Shareable profiles showing total XP, languages studied, highest cycle per language, and achievement badges.
+  - Complexity: M
+
+- [ ] **Proficiency placement test**
+  Optional 10-question initial assessment to place users at an appropriate starting level, skipping early repetition for those with existing knowledge.
+  - Complexity: M
+
+- [ ] **Screen reader & WCAG 2.1 AA audit**
+  Full accessibility audit with NVDA/JAWS. Fix missing labels, improve heading hierarchy, add live regions for game state announcements.
+  - Complexity: M
+
+- [ ] **Keyboard-only navigation**
+  Full Tab/arrow key support throughout, including button grids. Currently OK but needs a targeted audit for edge cases.
+  - Complexity: S
+
+- [ ] **Dark/light mode toggle**
+  User preference for light mode (currently dark-only). Reduces eye strain and broadens accessibility.
+  - Complexity: S
+
+- [ ] **Error tracking (Sentry)**
+  Capture JavaScript errors, API failures, and performance issues in production. Set up alerts for error rate spikes.
+  - Complexity: S
+
+- [ ] **CI/CD pipeline**
+  Automated lint, test, and deploy on PRs via GitHub Actions. Auto-deploy to staging on merge to master.
+  - Complexity: M
+
+- [ ] **Neural TTS voices**
+  Replace browser TTS with higher-quality neural speech (Google Cloud TTS or Azure Neural) for more natural pronunciation.
+  - Complexity: S
+
+- [ ] **Progress visualisation**
+  Charts showing accuracy over time, items mastered, vocabulary growth curve, and phase difficulty by category.
+  - Complexity: M
+
+- [ ] **Personalised weakness report**
+  Weekly digest showing categories with lowest accuracy, items failed most frequently, and what to focus on next.
+  - Complexity: M
+
+- [ ] **Data export / backup**
+  One-click export of all progress as JSON. GDPR-compliant and gives users confidence their data is portable.
+  - Complexity: S
+
+- [ ] **Add more languages**
+  Expand beyond current 6 languages. Priority: Japanese, Mandarin, Arabic, Russian — each requiring per-language data files and speech code mapping.
+  - Complexity: L per language
+
+- [ ] **Modularise app.js**
+  Split monolithic app.js into ES modules: `state.js`, `game.js`, `ui.js`, `speech.js`, `timer.js`. Prerequisite for unit testing.
+  - Complexity: M
+
+- [ ] **Unit & integration test suite**
+  Jest tests for core game logic (scoring, mastery, level-up). Cypress e2e tests for critical user flows. Target 70%+ logic coverage.
+  - Complexity: L
+
+- [ ] **Admin dashboard**
+  Internal panel showing active users, new sign-ups, top languages, error logs, and user lookup. Role-gated via Supabase RLS.
+  - Complexity: M
+
+### P3 — Nice to Have
+
+- [ ] **Leaderboards**
+  Global and friends rankings by XP, streak, or languages mastered. Optional privacy controls.
+  - Complexity: M
+
+- [ ] **Friend challenges**
+  Challenge a friend to beat your score in a specific category. Async result comparison with bonus XP for winner.
+  - Complexity: M
+
+- [ ] **Progress sharing**
+  One-tap generation of a shareable result card for social media (round score, streak milestone, category mastered).
+  - Complexity: S
+
+- [ ] **Exam prep mode**
+  Curated vocabulary and timed drills for DELE, DELF, TELC etc. Score analytics and targeted weak-area revision.
+  - Complexity: L
+
+- [ ] **Business language track**
+  Specialist vocabulary for meetings, emails, and negotiations per language.
+  - Complexity: M
+
+- [ ] **AI conversation partner**
+  Claude/GPT-powered free-form dialogue practice with grammar and vocabulary correction feedback.
+  - Complexity: XL
+
+- [ ] **Pronunciation scoring AI**
+  ML-based pronunciation evaluation that scores user speech beyond binary right/wrong and highlights specific phonemes to improve.
+  - Complexity: L
+
+- [ ] **User-created flashcard decks**
+  Advanced users can create and share custom vocabulary sets. Community voting on quality.
+  - Complexity: M
+
+- [ ] **UI localisation**
+  Translate the app UI into 10+ languages so non-English speakers can learn their target language with a native-language interface.
+  - Complexity: L
+
+- [ ] **TypeScript migration**
+  Gradual migration of JS to TypeScript starting with the data layer and API client. Improves refactoring safety and IDE support.
+  - Complexity: L
+
+- [ ] **A/B testing framework**
+  Infrastructure to run controlled experiments on timer values, button layouts, onboarding flows, and pricing.
+  - Complexity: L
+
+- [ ] **Home screen widgets**
+  iOS/Android widgets showing current streak, today's XP, and a quick-launch button.
+  - Complexity: M
+
+- [ ] **Premium subscription tier**
+  "Waffley Pro" with ad-free experience, early language access, XP boosts, and exclusive cosmetics. Stripe/RevenueCat integration.
+  - Complexity: L
+
