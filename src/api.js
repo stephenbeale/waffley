@@ -25,6 +25,10 @@ const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || '';
 
 let _client = null;
 
+export function isConfigured() {
+    return !!SUPABASE_URL && !!SUPABASE_ANON_KEY;
+}
+
 function client() {
     if (!_client) {
         if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
@@ -33,6 +37,35 @@ function client() {
         _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
     return _client;
+}
+
+// ---------------------------------------------------------------------------
+// ID-lookup caches (eliminates repeated round-trips per upsert)
+// ---------------------------------------------------------------------------
+
+let _langMap = null;  // { toId: { es: 1, ... }, toCode: { 1: 'es', ... } }
+let _catMap  = null;  // { toId: { colours: 1, ... }, toSlug: { 1: 'colours', ... } }
+
+async function getLangMap() {
+    if (!_langMap) {
+        const { data } = await client().from('languages').select('id, code');
+        _langMap = {
+            toId:   Object.fromEntries(data.map(r => [r.code, r.id])),
+            toCode: Object.fromEntries(data.map(r => [r.id, r.code])),
+        };
+    }
+    return _langMap;
+}
+
+async function getCatMap() {
+    if (!_catMap) {
+        const { data } = await client().from('categories').select('id, slug');
+        _catMap = {
+            toId:   Object.fromEntries(data.map(r => [r.slug, r.id])),
+            toSlug: Object.fromEntries(data.map(r => [r.id, r.slug])),
+        };
+    }
+    return _catMap;
 }
 
 // ---------------------------------------------------------------------------
@@ -214,6 +247,34 @@ export async function getProgress() {
 }
 
 /**
+ * Get all category progress for the current user, keyed by app.js progress key format.
+ * Returns { [key]: { totalAnswers, currentCycle, levelsCompleted }, ... }
+ * where key is langCode for colours, or `${langCode}_${catSlug}` for other categories.
+ */
+export async function getProgressMap() {
+    const user = await ensureSession();
+    const [langMap, catMap] = await Promise.all([getLangMap(), getCatMap()]);
+    const { data, error } = await client()
+        .from('user_category_progress')
+        .select('language_id, category_id, total_correct_answers, current_cycle, levels_completed')
+        .eq('user_id', user.id);
+    if (error) throw error;
+    const result = {};
+    for (const row of data) {
+        const langCode = langMap.toCode[row.language_id];
+        const catSlug  = catMap.toSlug[row.category_id];
+        if (!langCode || !catSlug) continue;
+        const key = catSlug === 'colours' ? langCode : `${langCode}_${catSlug}`;
+        result[key] = {
+            totalAnswers:    row.total_correct_answers,
+            currentCycle:    row.current_cycle,
+            levelsCompleted: row.levels_completed,
+        };
+    }
+    return result;
+}
+
+/**
  * Upsert a category progress row.
  * @param {string} langCode - 'es', 'fr', etc.
  * @param {string} categorySlug - 'colours', 'animals', etc.
@@ -221,27 +282,18 @@ export async function getProgress() {
  */
 export async function upsertCategoryProgress(langCode, categorySlug, progress) {
     const user = await ensureSession();
-
-    // Resolve IDs
-    const [langRes, catRes] = await Promise.all([
-        client().from('languages').select('id').eq('code', langCode).single(),
-        client().from('categories').select('id').eq('slug', categorySlug).single(),
-    ]);
-    if (langRes.error) throw langRes.error;
-    if (catRes.error)  throw catRes.error;
-
+    const [langMap, catMap] = await Promise.all([getLangMap(), getCatMap()]);
     const { error } = await client()
         .from('user_category_progress')
         .upsert({
             user_id:               user.id,
-            language_id:           langRes.data.id,
-            category_id:           catRes.data.id,
+            language_id:           langMap.toId[langCode],
+            category_id:           catMap.toId[categorySlug],
             total_correct_answers: progress.totalAnswers,
             current_cycle:         progress.currentCycle,
             levels_completed:      progress.levelsCompleted,
             updated_at:            new Date().toISOString(),
         }, { onConflict: 'user_id,language_id,category_id' });
-
     if (error) throw error;
 }
 
@@ -251,19 +303,13 @@ export async function upsertCategoryProgress(langCode, categorySlug, progress) {
  */
 export async function recordSession(session) {
     const user = await ensureSession();
+    const [langMap, catMap] = await Promise.all([getLangMap(), getCatMap()]);
 
-    const langRes = await client().from('languages').select('id').eq('code', session.langCode).single();
-    if (langRes.error) throw langRes.error;
-
-    let categoryId = null;
-    if (session.categorySlug) {
-        const catRes = await client().from('categories').select('id').eq('slug', session.categorySlug).single();
-        if (!catRes.error) categoryId = catRes.data.id;
-    }
+    const categoryId = session.categorySlug ? (catMap.toId[session.categorySlug] ?? null) : null;
 
     const { error } = await client().from('game_sessions').insert({
         user_id:         user.id,
-        language_id:     langRes.data.id,
+        language_id:     langMap.toId[session.langCode],
         category_id:     categoryId,
         mode:            session.mode,
         phase:           session.phase,

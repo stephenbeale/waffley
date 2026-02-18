@@ -12,6 +12,7 @@ import {
     VERB_LIST, VERB_ORDER, PRONOUN_KEYS, VERB_ENGLISH, PRONOUN_LABELS, PRONOUN_EMOJIS,
     VERB_CONJUGATIONS, VERB_PRONOUNS, VERB_LANGUAGES
 } from './data.js';
+import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, recordSession } from './src/api.js';
 
     // ========== LEVEL SYSTEM FUNCTIONS ==========
 
@@ -70,12 +71,16 @@ import {
         if (!allProgress.languages) {
             allProgress.languages = {};
         }
-        allProgress.languages[key] = {
+        const progressData = {
             totalAnswers: game.totalCorrectAnswers,
             currentCycle: game.currentCycle,
             levelsCompleted: game.levelsCompleted
         };
+        allProgress.languages[key] = progressData;
         localStorage.setItem('waffley_progress', JSON.stringify(allProgress));
+        if (DB_CATEGORIES.includes(selectedCategory)) {
+            syncProgressToDb(selectedLanguage, selectedCategory, progressData);
+        }
     }
 
     // Switch to a different language - load that language's saved progress
@@ -116,6 +121,48 @@ import {
     // Save statistics to localStorage
     function saveStats() {
         localStorage.setItem('waffley_stats', JSON.stringify(stats));
+        syncStatsToDb();
+    }
+
+    // ========== BACKGROUND DB SYNC (OFFLINE-FIRST) ==========
+
+    const DB_CATEGORIES = ['colours', 'adjectives', 'animals', 'food', 'weather'];
+
+    async function syncProgressToDb(lang, category, progressData) {
+        if (!isConfigured()) return;
+        try { await upsertCategoryProgress(lang, category, progressData); }
+        catch (e) { console.debug('[waffley] Progress sync failed:', e.message); }
+    }
+
+    async function syncStatsToDb() {
+        if (!isConfigured()) return;
+        try {
+            await upsertUserStats({
+                bestStreak:   stats.bestStreak,
+                highestCycle: stats.highestCycle,
+                gamesPlayed:  stats.gamesPlayed,
+            });
+        }
+        catch (e) { console.debug('[waffley] Stats sync failed:', e.message); }
+    }
+
+    async function syncSessionToDb() {
+        if (!isConfigured()) return;
+        try {
+            const catSlug = DB_CATEGORIES.includes(selectedCategory) ? selectedCategory : null;
+            await recordSession({
+                langCode:       selectedLanguage,
+                categorySlug:   catSlug,
+                mode:           selectedMode,
+                phase:          PHASES[game.currentPhase] || 'learning',
+                score:          game.score,
+                totalQuestions: game.totalQuestions,
+                avgResponseMs:  game.responseTimes.length > 0
+                    ? Math.round(game.responseTimes.reduce((a, b) => a + b, 0) / game.responseTimes.length)
+                    : null,
+            });
+        }
+        catch (e) { console.debug('[waffley] Session record failed:', e.message); }
     }
 
     // Update statistics after a game ends
@@ -241,7 +288,24 @@ import {
     // Statistics state
     let stats = loadStats();
 
-
+    // Startup DB merge: if DB has higher totalAnswers for a key, update localStorage
+    if (isConfigured()) {
+        getProgressMap().then(dbProgress => {
+            const local = loadAllProgress();
+            let changed = false;
+            for (const [key, dbData] of Object.entries(dbProgress)) {
+                if (!local.languages?.[key] || dbData.totalAnswers > local.languages[key].totalAnswers) {
+                    if (!local.languages) local.languages = {};
+                    local.languages[key] = dbData;
+                    changed = true;
+                }
+            }
+            if (changed) {
+                localStorage.setItem('waffley_progress', JSON.stringify(local));
+                updateStartScreenProgress();
+            }
+        }).catch(e => console.debug('[waffley] DB progress merge failed:', e.message));
+    }
 
     // Get colours available for a given cycle
     function getActiveColors(cycle) {
@@ -2125,6 +2189,7 @@ import {
     }
 
     function endGame() {
+        syncSessionToDb();
         playWrongSound();
         clearTimeout(game.timeout);
         cancelAnimationFrame(game.timerRAF);
