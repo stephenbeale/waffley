@@ -701,40 +701,52 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     }
 
     function showPronounIntro(onConfirm) {
-        const overlay   = document.getElementById('pronoun-intro-overlay');
-        const titleEl   = document.getElementById('pronoun-intro-title');
-        const subtitleEl= document.getElementById('pronoun-intro-subtitle');
-        const tableEl   = document.getElementById('pronoun-table');
-        const btn       = document.getElementById('pronoun-intro-btn');
+        const overlay    = document.getElementById('pronoun-intro-overlay');
+        const titleEl    = document.getElementById('pronoun-learn-title');
+        const progressEl = document.getElementById('pronoun-learn-progress');
+        const emojiEl    = document.getElementById('pronoun-learn-emoji');
+        const englishEl  = document.getElementById('pronoun-learn-english');
+        const answerBtn  = document.getElementById('pronoun-answer-btn');
 
-        const langName  = LANGUAGE_NAMES[selectedLanguage] || selectedLanguage;
         const pronouns  = VERB_PRONOUNS[selectedLanguage] || {};
+        const langName  = LANGUAGE_NAMES[selectedLanguage] || selectedLanguage;
+        const TOTAL_ROUNDS = 2;
 
-        titleEl.textContent    = `${langName} Pronouns`;
-        subtitleEl.textContent = 'Learn these before your first verb session';
+        titleEl.textContent = `${langName} Pronouns`;
 
-        // Build the pronoun table rows
-        tableEl.innerHTML = PRONOUN_KEYS.map(key => {
-            const english  = PRONOUN_LABELS[key] || key;
-            const emoji    = PRONOUN_EMOJIS[key] || '';
-            const target   = pronouns[key] || '';
-            return `<tr>
-                <td>${english}</td>
-                <td>${emoji}</td>
-                <td>${target}</td>
-            </tr>`;
-        }).join('');
+        let index = 0;
+        let round = 1;
 
-        overlay.classList.add('active');
-        btn.focus();
-
-        function handleConfirm() {
-            btn.removeEventListener('click', handleConfirm);
-            overlay.classList.remove('active');
-            markPronounIntroCompleted(selectedLanguage);
-            onConfirm();
+        function showCurrent() {
+            const key = PRONOUN_KEYS[index];
+            progressEl.textContent = `Round ${round} · ${index + 1} of ${PRONOUN_KEYS.length}`;
+            emojiEl.textContent    = PRONOUN_EMOJIS[key] || '';
+            englishEl.textContent  = PRONOUN_LABELS[key] || key;
+            answerBtn.textContent  = pronouns[key] || '';
+            answerBtn.focus();
         }
-        btn.addEventListener('click', handleConfirm);
+
+        function advance() {
+            index++;
+            if (index >= PRONOUN_KEYS.length) {
+                if (round < TOTAL_ROUNDS) {
+                    round++;
+                    index = 0;
+                    showCurrent();
+                } else {
+                    answerBtn.removeEventListener('click', advance);
+                    overlay.classList.remove('active');
+                    markPronounIntroCompleted(selectedLanguage);
+                    onConfirm();
+                }
+            } else {
+                showCurrent();
+            }
+        }
+
+        answerBtn.addEventListener('click', advance);
+        overlay.classList.add('active');
+        showCurrent();
     }
 
     // ========== AUDIO PRONUNCIATION ==========

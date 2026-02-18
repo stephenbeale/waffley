@@ -1294,53 +1294,73 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     color: rgba(255,255,255,0.8);
 }
 
-/* Pronoun intro overlay */
+/* Pronoun learning overlay */
 #pronoun-intro-overlay {
     padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
 }
 
-.pronoun-intro-title {
-    font-size: 1.8rem;
+.pronoun-learn-title {
+    font-size: 1.6rem;
     font-weight: 900;
     color: #e94560;
-    margin-bottom: 0.25rem;
 }
 
-.pronoun-intro-subtitle {
-    font-size: 0.95rem;
+.pronoun-learn-subtitle {
+    font-size: 0.9rem;
     color: #aaa;
+    margin-bottom: 0.6rem;
+}
+
+.pronoun-learn-progress {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.04em;
     margin-bottom: 1.5rem;
 }
 
-.pronoun-table {
-    border-collapse: collapse;
-    margin-bottom: 2rem;
-    width: 100%;
-    max-width: 320px;
+.pronoun-learn-emoji {
+    font-size: 4rem;
+    line-height: 1;
+    min-height: 4rem;
 }
 
-.pronoun-table td {
-    padding: 0.5rem 1rem;
-    font-size: 1.05rem;
-    border-bottom: 1px solid #2a2a4e;
-}
-
-.pronoun-table td:first-child {
-    color: #aaa;
-    text-align: right;
-    width: 40%;
-}
-
-.pronoun-table td:nth-child(2) {
-    font-size: 1.3rem;
-    text-align: center;
-    width: 15%;
-}
-
-.pronoun-table td:last-child {
+.pronoun-learn-english {
+    font-size: 1.5rem;
     font-weight: 700;
+    color: rgba(255,255,255,0.65);
+    margin-bottom: 2rem;
+}
+
+.pronoun-answer-btn {
+    padding: 1rem 2.5rem;
+    font-size: 1.6rem;
+    font-weight: 900;
+    font-family: inherit;
+    background: #2a2a4e;
     color: #fff;
-    width: 45%;
+    border: 2px solid #4a4a7e;
+    border-radius: 12px;
+    cursor: pointer;
+    min-width: 180px;
+    transition: background 0.15s, border-color 0.15s, transform 0.1s;
+}
+
+.pronoun-answer-btn:hover {
+    background: #3a3a6e;
+    border-color: #e94560;
+    transform: scale(1.04);
+}
+
+.pronoun-answer-btn:active { transform: scale(0.97); }
+
+.pronoun-answer-btn:focus { outline: none; }
+.pronoun-answer-btn:focus-visible {
+    outline: 2px solid #16c79a;
+    outline-offset: 2px;
 }
 
 /* Stats overlay — uses .overlay base, overrides bg opacity */
