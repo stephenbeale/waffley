@@ -1938,6 +1938,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
     function generateButtons() {
         buttonsContainer.innerHTML = '';
+        buttonsContainer.classList.toggle('verb-mode', isVerbMode());
         const phase = getPhaseFromProgress();
         const items = getCategoryItems();
         const currentForm = game.currentForm || 'base';
@@ -2006,6 +2007,8 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     }
 
     function shuffleButtons() {
+        // Verb mode: keep pronouns in fixed grammatical order — shuffling is jarring and unhelpful
+        if (isVerbMode()) return;
         const btns = Array.from(buttonsContainer.children);
         for (let i = btns.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
