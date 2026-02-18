@@ -116,6 +116,26 @@ export async function signOut() {
     if (error) throw error;
 }
 
+/**
+ * Get the current user, or null if no session exists.
+ */
+export async function getUser() {
+    const { data: { session } } = await client().auth.getSession();
+    return session?.user ?? null;
+}
+
+/**
+ * Subscribe to auth state changes.
+ * Calls callback(event, user) whenever sign-in/sign-out happens.
+ * Returns the subscription object (call .unsubscribe() to clean up).
+ */
+export function onAuthChange(callback) {
+    const { data: { subscription } } = client().auth.onAuthStateChange((event, session) => {
+        callback(event, session?.user ?? null);
+    });
+    return subscription;
+}
+
 // ---------------------------------------------------------------------------
 // Content — vocabulary
 // ---------------------------------------------------------------------------

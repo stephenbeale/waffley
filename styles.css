@@ -1205,6 +1205,94 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     color: #fff;
 }
 
+/* Auth section */
+.auth-section {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    text-align: center;
+}
+
+.auth-prompt {
+    margin: 0 0 0.9rem;
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.45);
+}
+
+.auth-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    align-items: center;
+}
+
+.auth-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    width: 100%;
+    max-width: 240px;
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.15s;
+    border: none;
+}
+
+.auth-btn:hover { opacity: 0.88; transform: scale(1.02); }
+.auth-btn:active { transform: scale(0.98); }
+
+.auth-btn-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.auth-btn--google {
+    background: #fff;
+    color: #3c4043;
+}
+
+.auth-btn--apple {
+    background: #000;
+    color: #fff;
+}
+
+#auth-signed-in {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+}
+
+.auth-user-label {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.55);
+}
+
+.auth-signout-btn {
+    padding: 0.3rem 0.8rem;
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 6px;
+    background: transparent;
+    color: rgba(255,255,255,0.55);
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.auth-signout-btn:hover {
+    border-color: rgba(255,255,255,0.4);
+    color: rgba(255,255,255,0.8);
+}
+
 /* Pronoun intro overlay */
 #pronoun-intro-overlay {
     padding: 2rem 1.5rem;
