@@ -1163,10 +1163,10 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
         recog.onend = () => {
             isListening = false;
-            // Restart if still in speech mode and game is active
-            if (getPhaseFromProgress() === 3 && gameScreen.classList.contains('active') && !game.levelUpPending && !game.cycleCompletePending) {
+            // Restart if still in speech mode, game is active, and not paused
+            if (getPhaseFromProgress() === 3 && gameScreen.classList.contains('active') && !game.paused && !game.levelUpPending && !game.cycleCompletePending) {
                 setTimeout(() => {
-                    if (gameScreen.classList.contains('active') && !isListening) {
+                    if (gameScreen.classList.contains('active') && !game.paused && !isListening) {
                         startListening();
                     }
                 }, SPEECH_RESTART_DELAY);
@@ -1338,7 +1338,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         currentLevelEl.textContent = getLevelInCycle();
 
         // Update vertical progress bar with mastery progress
-        const pct = total > 0 ? (mastered / total * 100) : 0;
+        const pct = total > 0 ? Math.min(100, mastered / total * 100) : 0;
         verticalProgressBar.style.height = pct + '%';
         verticalProgressLabel.textContent = `${mastered}/${total}`;
 
@@ -1910,6 +1910,9 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         }
         generateButtons();
         nextRound();
+        // Return focus to the appropriate input after mercy
+        if (isTypingMode()) setTimeout(() => typingInput.focus(), 100);
+        else setTimeout(() => buttonsContainer.querySelector('.answer-btn')?.focus(), 100);
     });
 
     document.getElementById('speed-mercy-add-time').addEventListener('click', function() {
@@ -1924,6 +1927,9 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         updateLevelDisplay();
         generateButtons();
         nextRound();
+        // Return focus to the appropriate input after mercy
+        if (isTypingMode()) setTimeout(() => typingInput.focus(), 100);
+        else setTimeout(() => buttonsContainer.querySelector('.answer-btn')?.focus(), 100);
     });
 
     document.getElementById('speed-mercy-end').addEventListener('click', function() {
@@ -1977,8 +1983,8 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             typingFeedback.textContent = '';
             handleAnswer(matched);
         } else {
-            // Wrong answer — end the game
-            typingFeedback.textContent = '';
+            // Wrong answer — show brief feedback then end the game
+            typingFeedback.textContent = `✗ "${typed}" is incorrect`;
             handleAnswer('__wrong__');
         }
     }
@@ -2007,6 +2013,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             }
         }
         initLevelMastery();
+        speechWarning.classList.remove('visible'); // clear any fallback banner from a previous session
         // Record where we are at session start — first level always gets MAX_TIME
         // so resuming mid-phase never throws the user into a fast timer immediately.
         game.levelsAtSessionStart = game.levelsCompleted;
@@ -2365,9 +2372,10 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
                     const newCycle = game.currentCycle + 1;
                     showCycleComplete(completedCycle, newCycle);
                 } else {
-                    // Normal level-up: randomize items and reset mastery
+                    // Normal level-up: randomize items and reset mastery + session streaks
                     randomizeActiveColors();
                     initLevelMastery();
+                    game.sessionStreak = {};
                     game.pitchStreak = 0;
                     generateButtons();
                     updateLevelDisplay();
@@ -2388,6 +2396,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     }
 
     function showSpeedMercy() {
+        game.roundActive = false; // prevent double-fire if timeout and handleAnswer race
         playWrongSound();
         clearTimeout(game.timeout);
         cancelAnimationFrame(game.timerRAF);
