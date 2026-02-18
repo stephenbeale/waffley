@@ -309,6 +309,11 @@ import {
     // Time resets to 10s at start of each phase (Learning, Practice, Speech)
     // Level 1 = 10s, Level 2 = 8s, Level 3 = 6s, Level 4 = 4s, Level 5+ = 2s
     function getTimeLimit() {
+        // First level of a new session always gets MAX_TIME — prevents resuming
+        // mid-phase from immediately throwing the user into a fast timer.
+        if (game.levelsCompleted === game.levelsAtSessionStart) {
+            return (MAX_TIME + game.timeBonus) * 1000;
+        }
         const levelInPhase = getLevelInPhase();
         const minTime = getPhaseFromProgress() === 2 ? MIN_TIME_TYPING : MIN_TIME;
         const timeInSeconds = Math.max(minTime, MAX_TIME - (levelInPhase - 1) * 2) + game.timeBonus;
@@ -316,6 +321,7 @@ import {
     }
 
     function isAtMinTime() {
+        if (game.levelsCompleted === game.levelsAtSessionStart) return false;
         const levelInPhase = getLevelInPhase();
         const minTime = getPhaseFromProgress() === 2 ? MIN_TIME_TYPING : MIN_TIME;
         return Math.max(minTime, MAX_TIME - (levelInPhase - 1) * 2) <= minTime;
@@ -452,6 +458,9 @@ import {
 
         // Verb mode
         currentVerb: null,
+
+        // Session timing: first level of each session always gets MAX_TIME
+        levelsAtSessionStart: -1,
     };
 
     // Helper: get current category data
@@ -1252,11 +1261,14 @@ import {
                 cycleCompleteOverlay.classList.remove('active');
                 game.cycleCompletePending = false;
 
-                // Update cycle and regenerate
+                // Update cycle and save
                 game.currentCycle = newCycle;
+                saveProgress();
+
                 if (isVerbMode()) {
-                    game.currentVerb = getCurrentVerb();
-                    game.activeItems = [...PRONOUN_KEYS];
+                    // Verb mastered — return to topic screen so next verb starts as a fresh session
+                    refreshProgressFromStorage();
+                    show(topicScreen);
                 } else {
                     game.activeColors = getActiveColors(game.currentCycle);
                     const cycleCount = getButtonCount();
@@ -1265,13 +1277,11 @@ import {
                     } else {
                         game.activeItems = shuffle(getCategoryData().items).slice(0, cycleCount);
                     }
+                    initLevelMastery();
+                    generateButtons();
+                    updateLevelDisplay();
+                    nextRound();
                 }
-                initLevelMastery();
-                saveProgress();
-                generateButtons();
-                updateLevelDisplay();
-
-                nextRound();
             }
         }, 1000);
     }
@@ -1715,6 +1725,9 @@ import {
             }
         }
         initLevelMastery();
+        // Record where we are at session start — first level always gets MAX_TIME
+        // so resuming mid-phase never throws the user into a fast timer immediately.
+        game.levelsAtSessionStart = game.levelsCompleted;
         game.currentForm = 'base';
         game.timeLimit = getTimeLimit();
         game.score = 0;

@@ -168,7 +168,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     justify-content: center;
     gap: 0.5rem;
     max-width: 500px;
-    width: 95vw;
+    width: 100%;
     margin: 0 auto;
     max-height: 40vh;
     overflow-y: auto;
@@ -221,11 +221,17 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     background: #3a3a5e;
 }
 
-/* Reverse mode: emoji/colour swatch buttons need larger tap targets */
+/* Reverse mode: emoji/colour swatch buttons — 3-column grid, large tap targets */
+.buttons.reverse-mode {
+    gap: 0.4rem;
+}
+
 .buttons.reverse-mode .answer-btn {
+    flex: 0 1 calc(33.333% - 0.27rem);
     min-height: 72px;
-    font-size: 2rem;
+    font-size: 2.2rem;
     line-height: 1;
+    padding: 0.6rem 0.25rem;
 }
 
 

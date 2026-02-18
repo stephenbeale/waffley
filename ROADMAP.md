@@ -141,6 +141,18 @@ Planned features and improvements for Waffley.
 - [x] **Fix answer buttons overflowing off-screen on mobile**
   Despite earlier fixes, some answer buttons are still rendered off-screen on smaller mobile viewports. Investigate which screen sizes and button counts trigger this. Ensure buttons are always fully visible and scrollable within the viewport.
 
+- [x] **Fix button container overflow on portrait mobile**
+  `.buttons` had `width: 95vw` which overflows when `#game-screen` has `padding: 2rem` on each side. Fixed by using `width: 100%` so the container respects the parent's padding.
+
+- [x] **Verb cycle completes → return to topic screen**
+  After mastering all 4 phases of a verb, the game was automatically continuing to the next verb in the same session. Changed so that verb cycle completion returns to the topic screen, ensuring each verb is always started as a fresh session.
+
+- [x] **Timer always resets to MAX_TIME at session start**
+  Resuming a game mid-phase previously threw the user straight into a fast timer (e.g. 4s if at level 4). Now the first level of every new session always runs at 10s regardless of progress, so the timer only accelerates within the current session.
+
+- [x] **Reverse-mode emoji buttons: 3-column grid with larger emoji**
+  Emoji/colour swatch buttons were shown 2-per-row at small size. Since emojis are compact, changed to a 3-column grid with `font-size: 2.2rem` and `min-height: 72px` for comfortable, clearly visible tap targets.
+
 ---
 
 ## Gameplay & UX Improvements
