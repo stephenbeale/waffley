@@ -114,8 +114,34 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             bestStreak: 0,
             highestCycle: 1,
             gamesPlayed: 0,
-            languageStats: {}
+            languageStats: {},
+            dailyStreak: 0,
+            bestDailyStreak: 0,
+            lastPlayedDate: null,
         };
+    }
+
+    // Update daily streak — call once per game when at least one correct answer was given.
+    // Increments if the last played date was yesterday, resets if a day was skipped.
+    function updateDailyStreak() {
+        const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+        if (stats.lastPlayedDate === today) return; // already counted today
+
+        if (stats.lastPlayedDate) {
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = yesterday.toISOString().slice(0, 10);
+            stats.dailyStreak = (stats.lastPlayedDate === yesterdayStr)
+                ? (stats.dailyStreak || 0) + 1
+                : 1; // streak broken
+        } else {
+            stats.dailyStreak = 1; // first ever game
+        }
+
+        stats.lastPlayedDate = today;
+        if (stats.dailyStreak > (stats.bestDailyStreak || 0)) {
+            stats.bestDailyStreak = stats.dailyStreak;
+        }
     }
 
     // Save statistics to localStorage
@@ -177,7 +203,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     function updateStatsAfterGame(sessionScore, language) {
         stats.gamesPlayed++;
 
-        // Update best streak
+        // Update best answer streak
         if (sessionScore > stats.bestStreak) {
             stats.bestStreak = sessionScore;
         }
@@ -194,7 +220,13 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         stats.languageStats[language].correct += sessionScore;
         stats.languageStats[language].games++;
 
+        // Update daily streak if at least one correct answer was given
+        if (sessionScore > 0) {
+            updateDailyStreak();
+        }
+
         saveStats();
+        updateStreakBadge();
     }
 
     // Check if this is a new personal best
@@ -246,12 +278,29 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         return total;
     }
 
+    // Update the streak badge on the topic screen
+    function updateStreakBadge() {
+        const badge = document.getElementById('streak-badge');
+        if (!badge) return;
+        const streak = stats.dailyStreak || 0;
+        if (streak >= 1) {
+            badge.textContent = `🔥 ${streak} day streak`;
+            badge.classList.add('active');
+        } else {
+            badge.textContent = 'Start your streak today!';
+            badge.classList.remove('active');
+        }
+    }
+
     // Update the statistics overlay display
     function updateStatsDisplay() {
         document.getElementById('stats-total-correct').textContent = getTotalCorrectAllLanguages();
         document.getElementById('stats-highest-cycle').textContent = stats.highestCycle;
         document.getElementById('stats-best-streak').textContent = stats.bestStreak;
         document.getElementById('stats-games-played').textContent = stats.gamesPlayed;
+        document.getElementById('stats-daily-streak').textContent =
+            (stats.dailyStreak || 0) >= 1 ? `🔥 ${stats.dailyStreak}` : '0';
+        document.getElementById('stats-best-daily').textContent = stats.bestDailyStreak || 0;
 
         // Language stats
         const langList = document.getElementById('language-stats-list');
@@ -295,6 +344,8 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
     // Statistics state
     let stats = loadStats();
+    // Streak badge will be updated once the DOM is ready (called after topic screen renders)
+    // updateStreakBadge() is called from updateStartScreenProgress() and updateStatsAfterGame()
 
     // Startup DB merge: if DB has higher totalAnswers for a key, update localStorage
     if (isConfigured()) {
@@ -362,11 +413,26 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             }
         });
 
+        function showAuthError(msg) {
+            const el = document.getElementById('auth-error');
+            if (!el) return;
+            el.textContent = msg;
+            el.style.display = 'block';
+            clearTimeout(el._hideTimer);
+            el._hideTimer = setTimeout(() => { el.style.display = 'none'; }, 5000);
+        }
+
         document.getElementById('google-signin-btn')?.addEventListener('click', () => {
-            signInWithGoogle().catch(e => console.debug('[waffley] Google sign-in failed:', e.message));
+            signInWithGoogle().catch(e => {
+                console.debug('[waffley] Google sign-in failed:', e.message);
+                showAuthError('Google sign-in is not available yet. Check back soon!');
+            });
         });
         document.getElementById('apple-signin-btn')?.addEventListener('click', () => {
-            signInWithApple().catch(e => console.debug('[waffley] Apple sign-in failed:', e.message));
+            signInWithApple().catch(e => {
+                console.debug('[waffley] Apple sign-in failed:', e.message);
+                showAuthError('Apple sign-in is not available yet. Check back soon!');
+            });
         });
         document.getElementById('signout-btn')?.addEventListener('click', () => {
             signOut().then(() => {
@@ -1200,6 +1266,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         startTimeLimitEl.textContent = getTimeLimitSeconds();
         startCycleEl.textContent = game.currentCycle;
         updateStartButtonText();
+        updateStreakBadge();
     }
 
     // Update start button text based on current phase
