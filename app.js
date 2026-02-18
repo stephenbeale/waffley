@@ -701,29 +701,35 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     }
 
     function showPronounIntro(onConfirm) {
-        const overlay    = document.getElementById('pronoun-intro-overlay');
-        const titleEl    = document.getElementById('pronoun-learn-title');
-        const progressEl = document.getElementById('pronoun-learn-progress');
-        const emojiEl    = document.getElementById('pronoun-learn-emoji');
-        const englishEl  = document.getElementById('pronoun-learn-english');
-        const answerBtn  = document.getElementById('pronoun-answer-btn');
-
-        const pronouns  = VERB_PRONOUNS[selectedLanguage] || {};
-        const langName  = LANGUAGE_NAMES[selectedLanguage] || selectedLanguage;
+        const pronouns    = VERB_PRONOUNS[selectedLanguage] || {};
         const TOTAL_ROUNDS = 2;
-
-        titleEl.textContent = `${langName} Pronouns`;
-
         let index = 0;
         let round = 1;
 
+        // Run inside the real game screen — add mode class to suppress chrome
+        gameScreen.classList.add('pronoun-intro-mode');
+        phaseBadge.className   = 'phase-badge learning';
+        phaseBadge.textContent = 'Pronouns';
+
+        // Build a single answer button
+        buttonsContainer.innerHTML    = '';
+        buttonsContainer.style.display = 'flex';
+        const btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        buttonsContainer.appendChild(btn);
+
+        show(gameScreen);
+
         function showCurrent() {
             const key = PRONOUN_KEYS[index];
-            progressEl.textContent = `Round ${round} · ${index + 1} of ${PRONOUN_KEYS.length}`;
-            emojiEl.textContent    = PRONOUN_EMOJIS[key] || '';
-            englishEl.textContent  = PRONOUN_LABELS[key] || key;
-            answerBtn.textContent  = pronouns[key] || '';
-            answerBtn.focus();
+            currentLevelEl.textContent = `${index + 1} / ${PRONOUN_KEYS.length}`;
+            const emoji = PRONOUN_EMOJIS[key] || '';
+            colorDisplay.textContent = emoji;
+            colorDisplay.className   = emoji ? 'color-display emoji-display' : 'color-display';
+            colorDisplay.setAttribute('aria-label', PRONOUN_LABELS[key] || key);
+            promptLabel.textContent  = PRONOUN_LABELS[key] || key;
+            btn.textContent          = pronouns[key] || '';
+            setTimeout(() => btn.focus(), 50);
 
             // Speak the target-language pronoun
             const word = pronouns[key];
@@ -738,6 +744,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         }
 
         function advance() {
+            btn.blur();
             index++;
             if (index >= PRONOUN_KEYS.length) {
                 if (round < TOTAL_ROUNDS) {
@@ -745,8 +752,8 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
                     index = 0;
                     showCurrent();
                 } else {
-                    answerBtn.removeEventListener('click', advance);
-                    overlay.classList.remove('active');
+                    btn.removeEventListener('click', advance);
+                    gameScreen.classList.remove('pronoun-intro-mode');
                     markPronounIntroCompleted(selectedLanguage);
                     onConfirm();
                 }
@@ -755,8 +762,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             }
         }
 
-        answerBtn.addEventListener('click', advance);
-        overlay.classList.add('active');
+        btn.addEventListener('click', advance);
         showCurrent();
     }
 
