@@ -159,6 +159,14 @@ export const CATEGORY_DATA = {
 
 // ========== VERB DATA ==========
 export const VERB_LIST = ['be', 'have', 'go', 'do', 'want', 'can', 'know', 'eat', 'speak', 'live'];
+
+// Language-specific verb ordering for pedagogical progression.
+// One verb is practiced for an entire cycle (all 4 phases) before advancing.
+// Spanish: ser first (permanent "to be"), hablar earlier as a core conversational verb.
+// Languages not listed use VERB_LIST as the default order.
+export const VERB_ORDER = {
+    es: ['be', 'have', 'go', 'speak', 'do', 'want', 'can', 'know', 'eat', 'live'],
+};
 export const PRONOUN_KEYS = ['I', 'you', 'he', 'she', 'we', 'you_pl', 'they'];
 
 export const VERB_ENGLISH = {

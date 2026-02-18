@@ -9,7 +9,7 @@ import {
     LANGUAGES, LANGUAGE_NAMES, LANGUAGE_FLAGS, TRANSLATIONS, COLOR_CSS,
     CATEGORIES, CATEGORY_DATA,
     SPEECH_LANG_CODES, COLOR_ALIASES,
-    VERB_LIST, PRONOUN_KEYS, VERB_ENGLISH, PRONOUN_LABELS,
+    VERB_LIST, VERB_ORDER, PRONOUN_KEYS, VERB_ENGLISH, PRONOUN_LABELS,
     VERB_CONJUGATIONS, VERB_PRONOUNS, VERB_LANGUAGES
 } from './data.js';
 
@@ -525,10 +525,12 @@ import {
         return VERB_LANGUAGES.includes(selectedLanguage);
     }
 
-    // Get current verb based on level number (1 verb per level, 10 verbs cycle)
+    // Get current verb — one verb per full cycle (all 4 phases), then advance to the next.
+    // Uses a language-specific ordering where defined (e.g. Spanish: ser first),
+    // falling back to the default VERB_LIST order.
     function getCurrentVerb() {
-        const levelInPhase = (game.levelsCompleted % LEVELS_PER_PHASE);
-        return VERB_LIST[levelInPhase % VERB_LIST.length];
+        const order = VERB_ORDER[selectedLanguage] || VERB_LIST;
+        return order[(game.currentCycle - 1) % order.length];
     }
 
     // Get verb conjugation translation for a pronoun key
