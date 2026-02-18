@@ -132,32 +132,32 @@ Planned features and improvements for Waffley.
 
 ## Bugs & Fixes
 
-- [ ] **Fix first question audio delay**
+- [x] **Fix first question audio delay**
   The pronunciation audio for the very first question of a session still fires too slowly. The existing `warmUpSpeech()` call isn't sufficient. Investigate whether a longer pre-warm or a silent utterance queued earlier (e.g. on language select) resolves the delay. This must be fixed.
 
-- [ ] **Never repeat the same answer in consecutive rounds**
+- [x] **Never repeat the same answer in consecutive rounds**
   The same item can currently be asked twice in a row, which feels confusing and broken. The `nextRound()` pick loop already attempts to avoid repeats, but it's not working reliably. Investigate and fix the deduplication logic so consecutive questions always show a different item.
 
-- [ ] **Fix answer buttons overflowing off-screen on mobile**
+- [x] **Fix answer buttons overflowing off-screen on mobile**
   Despite earlier fixes, some answer buttons are still rendered off-screen on smaller mobile viewports. Investigate which screen sizes and button counts trigger this. Ensure buttons are always fully visible and scrollable within the viewport.
 
 ---
 
 ## Gameplay & UX Improvements
 
-- [ ] **Reduce levels per phase from 10 to 5**
+- [x] **Reduce levels per phase from 10 to 5**
   The current 10 levels per phase feels too long and repetitive. Reduce to 5 levels per phase (20 per cycle instead of 40). This makes progression feel snappier and more rewarding. Evaluate whether mastery thresholds need adjusting to compensate.
 
-- [ ] **Reduce typing phase minimum time to 4 seconds**
+- [x] **Reduce typing phase minimum time to 4 seconds**
   The 2-second floor is too aggressive for typing. Set a separate minimum of 4 seconds for the Typing phase, since typing inherently requires more time than tapping a button. The speed curve should still decrease but bottom out at 4s.
 
-- [ ] **Use TTS to announce phase transitions**
+- [x] **Use TTS to announce phase transitions**
   When the user moves between phases (Learning -> Practice -> Typing -> Speech), use text-to-speech to announce the change (e.g. "Practice mode" or "Now type the answer"). Gives clear audio feedback about what's changed, especially useful when the visual level-up card auto-dismisses.
 
-- [ ] **Add a triumphant sound on level completion**
+- [x] **Add a triumphant sound on level completion**
   Play a short celebratory sound effect (fanfare or chime) when the user completes a level. Distinct from the per-answer correct sound. Provides a satisfying reward moment at each level-up.
 
-- [ ] **Improve end-game flow — return to language home page**
+- [x] **Improve end-game flow — return to language home page**
   The current "Play Again" end screen is confusing. After a game ends, the user should be returned to the topic screen for their selected language (not the language picker). Make the flow: end game -> show score -> "Continue" returns to topic screen with progress updated.
 
 - [ ] **Add gameplay variations to reduce repetitiveness**

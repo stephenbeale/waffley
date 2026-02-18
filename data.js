@@ -16,6 +16,7 @@ export const PHASES = ['Learning', 'Practice', 'Typing', 'Speech'];
 export const PHASE_CLASSES = ['learning', 'practice', 'typing', 'speech'];
 export const MAX_TIME = 10;           // seconds
 export const MIN_TIME = 2;            // seconds (floor for time limit)
+export const MIN_TIME_TYPING = 4;     // seconds (floor for typing phase — typing needs more time)
 
 // ========== UI / GAMEPLAY CONSTANTS ==========
 export const TIMER_WARNING_RATIO = 0.6;       // show warning when 60% of time elapsed
