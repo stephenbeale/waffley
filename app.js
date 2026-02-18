@@ -726,12 +726,16 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             const emoji = PRONOUN_EMOJIS[key] || '';
             colorDisplay.textContent = emoji;
             colorDisplay.className   = emoji ? 'color-display emoji-display' : 'color-display';
+            // Clear any inline colour styles left over from a previous word round
+            colorDisplay.style.backgroundColor = '';
+            colorDisplay.style.color = '';
             colorDisplay.setAttribute('aria-label', PRONOUN_LABELS[key] || key);
             promptLabel.textContent  = PRONOUN_LABELS[key] || key;
             btn.textContent          = pronouns[key] || '';
             setTimeout(() => btn.focus(), 50);
 
-            // Speak the target-language pronoun
+            // Speak the target-language pronoun.
+            // Mark the engine warmed-up on end so the first game question fires instantly.
             const word = pronouns[key];
             if (word && audioEnabled && ttsSupported) {
                 const langCode = SPEECH_LANG_CODES[selectedLanguage] || 'es-ES';
@@ -739,6 +743,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
                 const utterance = new SpeechSynthesisUtterance(word);
                 utterance.lang = langCode;
                 utterance.rate = TTS_SPEECH_RATE;
+                utterance.onend = () => { speechWarmedUp = true; };
                 speechSynthesis.speak(utterance);
             }
         }
@@ -755,6 +760,8 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
                     btn.removeEventListener('click', advance);
                     gameScreen.classList.remove('pronoun-intro-mode');
                     markPronounIntroCompleted(selectedLanguage);
+                    // Engine has spoken many utterances — it's definitely warm now
+                    speechWarmedUp = true;
                     onConfirm();
                 }
             } else {
