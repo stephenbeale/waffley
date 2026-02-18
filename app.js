@@ -485,11 +485,13 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         }
     }
 
-    // Reset session streak for the current item+form on wrong answer
+    // Reset session streak and mastery progress for the current item+form on wrong answer
     function resetSessionStreak() {
         const form = game.currentForm || 'base';
         const key = form === 'base' ? game.currentColor : `${game.currentColor}:${form}`;
         game.sessionStreak[key] = 0;
+        // Reset mastery so the item must be answered correctly N times in a row from scratch
+        if (key in game.levelMastery) game.levelMastery[key] = 0;
     }
 
     // Remove a mastered item+form from the active pool (button stays visible)
@@ -1969,7 +1971,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
                 btn.classList.add('practice-mode');
             }
 
-            btn.addEventListener('click', () => handleAnswer(item));
+            btn.addEventListener('click', () => { btn.blur(); handleAnswer(item); });
             buttonsContainer.appendChild(btn);
         });
     }
