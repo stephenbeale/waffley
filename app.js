@@ -447,6 +447,9 @@ import {
         timeBonus: 0,
         mercyUsed: false,
 
+        // Gameplay variation
+        isReverseRound: false,  // true = show foreign word, pick emoji/colour
+
         // Verb mode
         currentVerb: null,
     };
@@ -1676,6 +1679,9 @@ import {
             const phase = getPhaseFromProgress();
             return phase === 0 ? 'Match the translation' : 'What is the conjugation?';
         }
+        if (game.isReverseRound) {
+            return isColorCategory() ? 'Which colour is this?' : 'Which one matches?';
+        }
         const isEmojiMode = !isColorCategory();
         if (form === 'feminine') return 'How does she feel?';
         if (form === 'article') return 'What is this with its article?';
@@ -1808,6 +1814,11 @@ import {
         game.currentColor = pick.item;
         game.currentForm = pick.form;
 
+        // Reverse mode: ~30% of rounds in Practice phase flip display
+        // (show foreign word as question; user picks emoji/colour)
+        const phaseNow = getPhaseFromProgress();
+        game.isReverseRound = !isVerbMode() && phaseNow === 1 && Math.random() < 0.3;
+
         // Display: verb text, emoji, or colour swatch
         if (isVerbMode()) {
             const verb = game.currentVerb;
@@ -1828,6 +1839,13 @@ import {
                 const englishVerb = VERB_ENGLISH[verb]?.I?.replace('I ', '') || '';
                 colorDisplay.innerHTML = `<div class="verb-display">${targetPronoun}</div><div class="verb-context">${infinitive} (to ${englishVerb})</div>`;
             }
+        } else if (game.isReverseRound) {
+            // Reverse mode: show the foreign word as the question
+            const foreignWord = getFormTranslation(game.currentColor, game.currentForm);
+            colorDisplay.style.backgroundColor = 'transparent';
+            colorDisplay.classList.remove('plural-display');
+            colorDisplay.classList.add('emoji-display');
+            colorDisplay.innerHTML = `<div class="verb-display">${foreignWord}</div>`;
         } else {
             const emoji = getCategoryDisplay(game.currentColor);
             if (emoji) {
@@ -1865,10 +1883,33 @@ import {
             promptLabel.textContent = getPromptText(currentForm);
         }
 
-        // Update button text for current form
+        // Update button content for current round (text or visual in reverse mode)
         const btns = buttonsContainer.querySelectorAll('.answer-btn');
         btns.forEach(btn => {
-            btn.textContent = getFormTranslation(btn.dataset.color, currentForm);
+            const item = btn.dataset.color;
+            if (game.isReverseRound) {
+                if (isColorCategory()) {
+                    // Show colour swatch — empty text, coloured background
+                    btn.textContent = '';
+                    btn.className = 'answer-btn learning-mode';
+                    btn.style.backgroundColor = getCategoryData().display[item];
+                    btn.style.color = (item === 'yellow' || item === 'white') ? '#222' : '';
+                    btn.style.textShadow = (item === 'yellow' || item === 'white') ? 'none' : '';
+                } else {
+                    // Show emoji as the visual answer option
+                    btn.textContent = getCategoryDisplay(item) || item;
+                    btn.className = 'answer-btn practice-mode';
+                    btn.style.backgroundColor = '';
+                    btn.style.color = '';
+                    btn.style.textShadow = '';
+                }
+            } else {
+                btn.textContent = getFormTranslation(item, currentForm);
+                btn.className = 'answer-btn practice-mode';
+                btn.style.backgroundColor = '';
+                btn.style.color = '';
+                btn.style.textShadow = '';
+            }
         });
 
         // Show reinforcement label in level 1 of learning phase for non-colour categories
