@@ -14,7 +14,7 @@
 
 import { createClient } from '@supabase/supabase-js';
 import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 import { dirname, join } from 'path';
 
 // ---------------------------------------------------------------------------
@@ -44,12 +44,12 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 // ---------------------------------------------------------------------------
 const rootDir = join(__dirname, '..');
 const [es, fr, de, it, cy, pt] = await Promise.all([
-    import(join(rootDir, 'lang', 'es.js')).then(m => m.default),
-    import(join(rootDir, 'lang', 'fr.js')).then(m => m.default),
-    import(join(rootDir, 'lang', 'de.js')).then(m => m.default),
-    import(join(rootDir, 'lang', 'it.js')).then(m => m.default),
-    import(join(rootDir, 'lang', 'cy.js')).then(m => m.default),
-    import(join(rootDir, 'lang', 'pt.js')).then(m => m.default),
+    import(pathToFileURL(join(rootDir, 'lang', 'es.js')).href).then(m => m.default),
+    import(pathToFileURL(join(rootDir, 'lang', 'fr.js')).href).then(m => m.default),
+    import(pathToFileURL(join(rootDir, 'lang', 'de.js')).href).then(m => m.default),
+    import(pathToFileURL(join(rootDir, 'lang', 'it.js')).href).then(m => m.default),
+    import(pathToFileURL(join(rootDir, 'lang', 'cy.js')).href).then(m => m.default),
+    import(pathToFileURL(join(rootDir, 'lang', 'pt.js')).href).then(m => m.default),
 ]);
 
 // ---------------------------------------------------------------------------
