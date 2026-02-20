@@ -483,7 +483,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     function randomizeActiveColors() {
         if (isVerbLikeMode()) {
             if (isVerbMode()) game.currentVerb = getCurrentVerb();
-            game.activeItems = [...PRONOUN_KEYS];
+            game.activeItems = shuffle([...PRONOUN_KEYS]);
             return;
         }
         const count = getButtonCount();
@@ -757,6 +757,21 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         return VERB_PRONOUNS[selectedLanguage]?.[key] || '';
     }
 
+    // Get disambiguated button label for a pronoun key.
+    // Some languages have identical pronoun forms (e.g. German "Sie" for she/they).
+    // When duplicates exist, append the emoji to distinguish them.
+    function getPronounButtonText(key) {
+        const translation = getPronounTranslation(key);
+        const hasDuplicate = PRONOUN_KEYS.some(other =>
+            other !== key && getPronounTranslation(other) === translation
+        );
+        if (hasDuplicate) {
+            const emoji = PRONOUN_EMOJIS[key] || '';
+            return emoji ? `${translation} ${emoji}` : `${translation} (${PRONOUN_LABELS[key]})`;
+        }
+        return translation;
+    }
+
     function isVerbSupported() {
         return VERB_LANGUAGES.includes(selectedLanguage);
     }
@@ -851,13 +866,13 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
             const emoji = PRONOUN_EMOJIS[key] || '';
             const label = PRONOUN_LABELS[key] || key;
-            colorDisplay.className   = emoji ? 'color-display emoji-display' : 'color-display';
+            colorDisplay.className   = emoji ? 'color-display emoji-display pronoun-display' : 'color-display';
             colorDisplay.style.backgroundColor = '';
             colorDisplay.style.color           = '';
             colorDisplay.setAttribute('aria-label', label);
             // Show English label below the emoji (not in promptLabel which is uppercase)
             if (emoji) {
-                colorDisplay.innerHTML = `${emoji}<div class="pronoun-english-label">${label}</div>`;
+                colorDisplay.innerHTML = `<span class="pronoun-emoji">${emoji}</span><div class="pronoun-english-label">${label}</div>`;
             } else {
                 colorDisplay.innerHTML = `<div class="pronoun-english-label">${label}</div>`;
             }
@@ -2047,7 +2062,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     function startGame() {
         if (isVerbLikeMode()) {
             if (isVerbMode()) game.currentVerb = getCurrentVerb();
-            game.activeItems = [...PRONOUN_KEYS];
+            game.activeItems = shuffle([...PRONOUN_KEYS]);
             game.activeColors = [];
         } else {
             game.activeColors = getActiveColors(game.currentCycle);
@@ -2173,7 +2188,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             const btn = document.createElement('button');
             btn.className = 'answer-btn';
             btn.dataset.color = item;
-            btn.textContent = getFormTranslation(item, currentForm);
+            btn.textContent = isPronounMode() ? getPronounButtonText(item) : getFormTranslation(item, currentForm);
 
             // Apply styling based on current phase and category
             if (phase === 0 && isColorCategory()) {
@@ -2245,18 +2260,18 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             const label = PRONOUN_LABELS[key] || key;
             colorDisplay.style.backgroundColor = 'transparent';
             colorDisplay.classList.remove('plural-display');
-            colorDisplay.classList.add('emoji-display');
+            colorDisplay.classList.add('emoji-display', 'pronoun-display');
             if (emoji) {
-                colorDisplay.innerHTML = `${emoji}<div class="pronoun-english-label">${label}</div>`;
+                colorDisplay.innerHTML = `<span class="pronoun-emoji">${emoji}</span><div class="pronoun-english-label">${label}</div>`;
             } else {
-                colorDisplay.innerHTML = `<div class="verb-display">${label}</div>`;
+                colorDisplay.innerHTML = `<div class="pronoun-english-label">${label}</div>`;
             }
         } else if (isVerbMode()) {
             const verb = game.currentVerb;
             const pronoun = game.currentColor; // pronoun key
             const phase = getPhaseFromProgress();
             colorDisplay.style.backgroundColor = 'transparent';
-            colorDisplay.classList.remove('plural-display');
+            colorDisplay.classList.remove('plural-display', 'pronoun-display');
             colorDisplay.classList.add('emoji-display');
 
             if (phase === 0) {
@@ -2274,10 +2289,11 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             // Reverse mode: show the foreign word as the question
             const foreignWord = getFormTranslation(game.currentColor, game.currentForm);
             colorDisplay.style.backgroundColor = 'transparent';
-            colorDisplay.classList.remove('plural-display');
+            colorDisplay.classList.remove('plural-display', 'pronoun-display');
             colorDisplay.classList.add('emoji-display');
             colorDisplay.innerHTML = `<div class="verb-display">${foreignWord}</div>`;
         } else {
+            colorDisplay.classList.remove('pronoun-display');
             const emoji = getCategoryDisplay(game.currentColor);
             if (emoji) {
                 colorDisplay.style.backgroundColor = 'transparent';
@@ -2314,34 +2330,37 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             promptLabel.textContent = getPromptText(currentForm);
         }
 
-        // Update button content for current round (text or visual in reverse mode)
-        const btns = buttonsContainer.querySelectorAll('.answer-btn');
-        btns.forEach(btn => {
-            const item = btn.dataset.color;
-            if (game.isReverseRound) {
-                if (isColorCategory()) {
-                    // Show colour swatch — empty text, coloured background
-                    btn.textContent = '';
-                    btn.className = 'answer-btn learning-mode';
-                    btn.style.backgroundColor = getCategoryData().display[item];
-                    btn.style.color = (item === 'yellow' || item === 'white') ? '#222' : '';
-                    btn.style.textShadow = (item === 'yellow' || item === 'white') ? 'none' : '';
+        // Update button content for current round (text or visual in reverse mode).
+        // Verb-like modes: button text never changes between rounds — skip to avoid flicker.
+        if (!isVerbLikeMode()) {
+            const btns = buttonsContainer.querySelectorAll('.answer-btn');
+            btns.forEach(btn => {
+                const item = btn.dataset.color;
+                if (game.isReverseRound) {
+                    if (isColorCategory()) {
+                        // Show colour swatch — empty text, coloured background
+                        btn.textContent = '';
+                        btn.className = 'answer-btn learning-mode';
+                        btn.style.backgroundColor = getCategoryData().display[item];
+                        btn.style.color = (item === 'yellow' || item === 'white') ? '#222' : '';
+                        btn.style.textShadow = (item === 'yellow' || item === 'white') ? 'none' : '';
+                    } else {
+                        // Show emoji as the visual answer option
+                        btn.textContent = getCategoryDisplay(item) || item;
+                        btn.className = 'answer-btn practice-mode';
+                        btn.style.backgroundColor = '';
+                        btn.style.color = '';
+                        btn.style.textShadow = '';
+                    }
                 } else {
-                    // Show emoji as the visual answer option
-                    btn.textContent = getCategoryDisplay(item) || item;
+                    btn.textContent = getFormTranslation(item, currentForm);
                     btn.className = 'answer-btn practice-mode';
                     btn.style.backgroundColor = '';
                     btn.style.color = '';
                     btn.style.textShadow = '';
                 }
-            } else {
-                btn.textContent = getFormTranslation(item, currentForm);
-                btn.className = 'answer-btn practice-mode';
-                btn.style.backgroundColor = '';
-                btn.style.color = '';
-                btn.style.textShadow = '';
-            }
-        });
+            });
+        }
 
         // Show reinforcement label in level 1 of learning phase for non-colour categories
         if (!isColorCategory() && !isVerbLikeMode() && getPhaseFromProgress() === 0 && getLevelInPhase() === 1) {
@@ -2356,7 +2375,9 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         // Clear speech wrong attempts for the new round
         speechAttempts.innerHTML = '';
 
-        shuffleButtons();
+        // Verb/pronoun modes: items are shuffled once at level start; skip per-round
+        // DOM reorder to prevent visual flicker. Other modes shuffle each round.
+        if (!isVerbLikeMode()) shuffleButtons();
 
         // Timer setup
         timerBar.style.transition = 'none';
