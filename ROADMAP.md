@@ -224,13 +224,16 @@ Planned features and improvements for Waffley.
   - They → 👨👩 (mixed, ellos) / 👩👩 (ellas, where applicable)
   For Spanish/Italian specifically, surface nosotras/vosotras/ellas variants as additional pronouns with their own emoji groupings (two 👩 for all-female groups, one 👨 + one 👩 for mixed).
 
+- [x] **Make pronouns a full game category with 4 learning phases**
+  Pronouns now follow the same 4-phase pattern (Learning → Practice → Typing → Speech) as all other vocabulary categories instead of being a passive tap-through walkthrough. Intro remains obligatory for first-timers. Journey tracker shows phase/level progress. Duplicate pronoun translations (e.g. German "Sie" for she/they) are disambiguated with emoji on buttons. Verb/pronoun buttons use 3-column grid with larger text. Button flicker eliminated by shuffling items once at level start instead of per-round DOM reorder.
+
 ---
 
 ## Future Roadmap
 
 ### P1 — Must Have Soon
 
-- [ ] **Daily streaks**
+- [x] **Daily streaks**
   Track consecutive days of practice with a streak counter and calendar. Resets if a day is missed. Core retention mechanic — most impactful engagement driver.
   - Complexity: M
 

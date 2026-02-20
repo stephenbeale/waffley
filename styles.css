@@ -176,7 +176,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     width: 100%;
     margin: 0 auto;
     max-height: 40vh;
-    overflow-y: hidden;
+    overflow: hidden;
     flex-shrink: 1;
 }
 
@@ -194,7 +194,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     background: #2a2a4e;
     color: #fff;
     cursor: pointer;
-    transition: transform 0.1s, border-color 0.2s, background 0.2s;
+    transition: border-color 0.2s, background 0.2s;
     text-transform: capitalize;
 }
 
@@ -205,8 +205,8 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 }
 
 .answer-btn:hover {
-    transform: scale(1.05);
     border-color: #e94560;
+    background: #3a3a5e;
 }
 
 /* Learning mode: buttons have colored backgrounds */
@@ -225,6 +225,13 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 
 .answer-btn.practice-mode:hover {
     background: #3a3a5e;
+}
+
+/* Verb/pronoun mode: 3-column grid, larger text for short words */
+.buttons.verb-mode .answer-btn {
+    flex: 0 1 calc(33.333% - 0.35rem);
+    font-size: 1.3rem;
+    padding: 0.8rem 0.3rem;
 }
 
 /* Reverse mode: emoji/colour swatch buttons — 3-column grid, large tap targets */
@@ -399,7 +406,16 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     margin-top: 0.25rem;
 }
 
-/* Pronoun English label (below emoji in intro and game display) */
+/* Pronoun display: stack emoji above English label */
+.color-display.pronoun-display {
+    flex-direction: column;
+}
+
+.pronoun-emoji {
+    font-size: 6rem;
+    line-height: 1;
+}
+
 .pronoun-english-label {
     font-size: 1.8rem;
     font-weight: 700;
