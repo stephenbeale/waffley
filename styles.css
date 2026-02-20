@@ -227,6 +227,13 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     background: #3a3a5e;
 }
 
+/* Verb/pronoun mode: 3-column grid, larger text for short words */
+.buttons.verb-mode .answer-btn {
+    flex: 0 1 calc(33.333% - 0.35rem);
+    font-size: 1.3rem;
+    padding: 0.8rem 0.3rem;
+}
+
 /* Reverse mode: emoji/colour swatch buttons — 3-column grid, large tap targets */
 .buttons.reverse-mode {
     gap: 0.4rem;
