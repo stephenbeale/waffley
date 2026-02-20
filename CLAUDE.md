@@ -239,3 +239,52 @@ All user-facing features are complete. Only technical debt remains:
 - Progressive button count formula: `Math.min(4 + Math.floor((currentLevel - 1) / 2), activeItems.length)`
 - Speech wrong attempts stored as array, rendered as scrolling list with CSS flexbox column-reverse
 - Mobile-specific layout uses media queries at 480px breakpoint for compact UI
+
+### 2026-02-20 - Pronouns as Full Category + Button Fixes
+
+**Work Completed:**
+
+1. **PR #53 — feat: make pronouns a full game category with 4 learning phases** (MERGED)
+   - Added `isVerbLikeMode()` and `getPronounTranslation()` helper functions
+   - Replaced `isVerbMode()` with `isVerbLikeMode()` at 8 infrastructure locations (shared verb/pronoun logic)
+   - Added `isPronounMode()` branches at 12+ verb-specific locations for pronoun-specific text/logic
+   - Fixed start button flow: intro shown once for first-timers, then `startGame()` directly
+   - Fixed intro display: English label below emoji (not uppercase above)
+   - Journey tracker now shown for pronouns (was hidden)
+   - Start button text shows phase-based text like other categories
+
+2. **PR #54 — fix: disambiguate duplicate pronoun buttons and eliminate button flicker** (MERGED)
+   - `getPronounButtonText()` disambiguates duplicate translations with emoji (e.g. German "Sie 👩" / "Sie 👥")
+   - Eliminated button flicker: shuffle items once at level start, skip per-round DOM reorder for verb-like modes, skip button content update loop when text doesn't change
+   - Removed `transform: scale(1.05)` from button hover; changed `overflow-y: hidden` to `overflow: hidden` on button container
+   - Verb/pronoun buttons use 3-column grid with 1.3rem font (`.verb-mode` class)
+   - Pronoun emoji stacks above English label via `flex-direction: column` (`.pronoun-display` class)
+   - ROADMAP.md updated: daily streaks marked complete, new completed item for pronouns-as-full-category
+
+**PRs Merged This Session:**
+- #53 - feat: make pronouns a full game category with 4 learning phases
+- #54 - fix: disambiguate duplicate pronoun buttons and eliminate button flicker
+
+**Branches Cleaned Up:**
+- `fix/pronoun-duplicates-and-flicker` (deleted locally after merge)
+
+**Current State:**
+- Working tree clean, fully synchronized with origin/master (commit `cb1855d`)
+- No unpushed commits, no uncommitted changes
+- One legacy open PR remaining (see below)
+
+**Unfinished Git Workflows:**
+- **PR #45** (`fix/button-layout`) is OPEN and superseded. It contains a single commit from 2026-02-18 that addressed the same scrollbar and verb layout issues later handled more completely by PR #54. This PR should be reviewed and closed as superseded, or cherry-picked if any unique changes remain. It has no CI checks configured, no reviews, and has not been merged.
+
+**Next Steps:**
+1. Close PR #45 (`fix/button-layout`) — its changes are superseded by PR #54 which is now merged
+2. Add emojis for "I" (🙋) and "You" (🫵) in `PRONOUN_EMOJIS` — currently blank in display
+3. Disable `text-transform: capitalize` for verb-like buttons (German capitalization matters — "Sie" must stay capitalised, but "ich" must not be capitalised)
+4. Consider highlighting the correct answer button in the Learning phase for pronouns (guided reinforcement)
+5. Test longer verb conjugations in 3-column layout on mobile — may need a 2-column fallback for verbs with long text
+
+**Technical Notes:**
+- `isVerbLikeMode()` returns true for both verb mode and pronoun mode — use this for shared infrastructure (button grid, shuffle behaviour, no per-round reorder)
+- `isPronounMode()` is the narrower check for pronoun-specific logic (display layout, button text via `getPronounButtonText()`, intro text)
+- `getPronounButtonText()` detects duplicates by checking if any other active key shares the same foreign translation — only appends emoji when a clash exists
+- Stash `stash@{0}` ("WIP: stash before creating feature/pronouns-full-category branch") is likely obsolete; safe to drop after confirming it contains no unique work
