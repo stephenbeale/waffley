@@ -469,8 +469,8 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
     // Get number of visible buttons based on level within phase
     function getButtonCount() {
-        // Verb mode: always 6 buttons (one per pronoun)
-        if (isVerbMode()) return PRONOUN_KEYS.length;
+        // Verb/pronoun mode: always 7 buttons (one per pronoun)
+        if (isVerbLikeMode()) return PRONOUN_KEYS.length;
         const maxCount = game.activeColors.length;
         const levelInPhase = getLevelInPhase();
         // Start with 4 buttons (or max if fewer), add 1 every 2 levels
@@ -481,8 +481,8 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
     // Randomly select new items from the full pool
     function randomizeActiveColors() {
-        if (isVerbMode()) {
-            game.currentVerb = getCurrentVerb();
+        if (isVerbLikeMode()) {
+            if (isVerbMode()) game.currentVerb = getCurrentVerb();
             game.activeItems = [...PRONOUN_KEYS];
             return;
         }
@@ -546,7 +546,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         items.forEach(item => {
             forms.forEach(form => {
                 // Skip article/plural forms for items without form data (e.g. uncountable nouns)
-                if (form !== 'base' && !isVerbMode()) {
+                if (form !== 'base' && !isVerbLikeMode()) {
                     const formData = getCategoryData().forms?.[selectedLanguage]?.[item];
                     if (!formData) return;
                 }
@@ -677,7 +677,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     }
 
     function isColorCategory() {
-        if (isVerbMode()) return false;
+        if (isVerbLikeMode()) return false;
         return getCategoryData().displayType === 'color';
     }
 
@@ -690,7 +690,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     }
 
     function getAvailableForms() {
-        if (isVerbMode()) return ['base'];
+        if (isVerbLikeMode()) return ['base'];
         if (isAdjectiveCategory()) {
             if (game.currentCycle >= FEMININE_CYCLE) return ['base', 'feminine'];
             return ['base'];
@@ -702,6 +702,10 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     }
 
     function getFormTranslation(item, form) {
+        // Pronoun mode: item is a pronoun key, return target-language pronoun
+        if (isPronounMode()) {
+            return getPronounTranslation(item);
+        }
         // Verb mode: item is a pronoun key, return conjugation
         if (isVerbMode()) {
             return getVerbTranslation(item);
@@ -740,6 +744,17 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
     function isVerbMode() {
         return selectedMode === 'verbs' && !isPronounMode();
+    }
+
+    // Returns true for both verbs and pronouns — they share infrastructure
+    // (7 buttons, PRONOUN_KEYS as items, no reverse rounds, base form only)
+    function isVerbLikeMode() {
+        return selectedMode === 'verbs';
+    }
+
+    // Get target-language pronoun translation for a pronoun key
+    function getPronounTranslation(key) {
+        return VERB_PRONOUNS[selectedLanguage]?.[key] || '';
     }
 
     function isVerbSupported() {
@@ -835,12 +850,18 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             verticalProgressLabel.textContent     = `${index}/${total}`;
 
             const emoji = PRONOUN_EMOJIS[key] || '';
-            colorDisplay.textContent = emoji;
+            const label = PRONOUN_LABELS[key] || key;
             colorDisplay.className   = emoji ? 'color-display emoji-display' : 'color-display';
             colorDisplay.style.backgroundColor = '';
             colorDisplay.style.color           = '';
-            colorDisplay.setAttribute('aria-label', PRONOUN_LABELS[key] || key);
-            promptLabel.textContent = PRONOUN_LABELS[key] || key;
+            colorDisplay.setAttribute('aria-label', label);
+            // Show English label below the emoji (not in promptLabel which is uppercase)
+            if (emoji) {
+                colorDisplay.innerHTML = `${emoji}<div class="pronoun-english-label">${label}</div>`;
+            } else {
+                colorDisplay.innerHTML = `<div class="pronoun-english-label">${label}</div>`;
+            }
+            promptLabel.textContent = 'Tap to continue';
             btn.textContent         = pronouns[key] || '';
             setTimeout(() => btn.focus(), 50);
 
@@ -904,7 +925,9 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         if (getPhaseFromProgress() === 0 && getLevelInPhase() >= SILENT_LEVEL_THRESHOLD) return;
 
         let word;
-        if (isVerbMode()) {
+        if (isPronounMode()) {
+            word = getPronounTranslation(color);
+        } else if (isVerbMode()) {
             const conjugations = VERB_CONJUGATIONS[selectedLanguage]?.[game.currentVerb];
             const pronoun = VERB_PRONOUNS[selectedLanguage]?.[color] || '';
             const conjugation = conjugations?.[color] || '';
@@ -1180,6 +1203,17 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         const items = getCategoryItems();
         const lowerWord = word.toLowerCase();
 
+        // Pronoun mode: match against target-language pronouns
+        if (isPronounMode()) {
+            for (const key of items) {
+                const pronoun = getPronounTranslation(key);
+                if (pronoun && normalizeForComparison(pronoun) === normalizeForComparison(word)) {
+                    return key;
+                }
+            }
+            return null;
+        }
+
         // Verb mode: match against conjugations
         if (isVerbMode()) {
             for (const pronoun of items) {
@@ -1276,9 +1310,8 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
     // Update start screen progress display
     function updateStartScreenProgress() {
-        // Pronoun mode has no cycle-based progress to display
         const progressDisplay = document.getElementById('progress-display');
-        if (progressDisplay) progressDisplay.style.display = isPronounMode() ? 'none' : '';
+        if (progressDisplay) progressDisplay.style.display = '';
 
         const currentPhase = getPhaseFromProgress();
         const levelInPhase = getLevelInPhase();
@@ -1309,7 +1342,13 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     // Update start button text based on current phase
     function updateStartButtonText() {
         if (isPronounMode()) {
-            startBtn.textContent = 'Learn Pronouns';
+            const phase = getPhaseFromProgress();
+            const levelInPhase = getLevelInPhase();
+            if (levelInPhase === 1 && phase === 0) {
+                startBtn.textContent = 'Start Learning Pronouns';
+            } else {
+                startBtn.textContent = `Start Pronouns from ${PHASES[phase]}`;
+            }
             return;
         }
         const phase = getPhaseFromProgress();
@@ -1385,7 +1424,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             } else if (phase === 2) {
                 levelUpPhase.textContent = 'Now type the answer! Tip: hold a key for accents';
             } else if (phase === 3) {
-                const item = isVerbMode() ? 'the conjugation' : isColorCategory() ? 'the colour' : 'the word';
+                const item = isPronounMode() ? 'the pronoun' : isVerbMode() ? 'the conjugation' : isColorCategory() ? 'the colour' : 'the word';
                 levelUpPhase.textContent = speechSupported
                     ? `Now it's your turn to speak ${item}!`
                     : `Speech mode (voice not supported - using buttons)`;
@@ -1403,7 +1442,9 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         }
 
         // Show info about what's active
-        if (isVerbMode() && game.currentVerb) {
+        if (isPronounMode()) {
+            levelUpInfo.textContent = 'New pronouns selected!';
+        } else if (isVerbMode() && game.currentVerb) {
             const verbData = VERB_CONJUGATIONS[selectedLanguage]?.[game.currentVerb];
             const infinitive = verbData?.infinitive || '';
             const englishVerb = VERB_ENGLISH[game.currentVerb]?.I?.replace('I ', '') || '';
@@ -1482,8 +1523,14 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
         cycleCompleteMessage.textContent = `You finished Cycle ${completedCycle}!`;
 
+        // Pronoun mode: cycle complete
+        if (isPronounMode()) {
+            cycleCompleteColors.textContent = 'All pronouns mastered! Starting again with faster time.';
+            newColorBadges.innerHTML = '';
+        }
+
         // Verb mode: simple cycle complete message
-        if (isVerbMode()) {
+        else if (isVerbMode()) {
             cycleCompleteColors.textContent = 'All verbs mastered! Starting again with faster time.';
             newColorBadges.innerHTML = '';
         }
@@ -1544,8 +1591,8 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
                 game.currentCycle = newCycle;
                 saveProgress();
 
-                if (isVerbMode()) {
-                    // Verb mastered — return to topic screen so next verb starts as a fresh session
+                if (isVerbLikeMode()) {
+                    // Verb/pronoun cycle complete — return to topic screen
                     refreshProgressFromStorage();
                     show(topicScreen);
                 } else {
@@ -1732,10 +1779,9 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
     startBtn.addEventListener('click', () => {
         warmUpSpeech();
-        if (isPronounMode()) {
-            // Pronoun review: always show intro, return to topic screen when done
-            showPronounIntro(() => show(topicScreen));
-        } else if (isVerbMode() && !hasPronounIntroCompleted(selectedLanguage)) {
+        // Both pronouns and verbs need the pronoun intro first time
+        const needsIntro = (isPronounMode() || isVerbMode()) && !hasPronounIntroCompleted(selectedLanguage);
+        if (needsIntro) {
             showPronounIntro(() => startGame());
         } else {
             startGame();
@@ -1999,8 +2045,8 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     // ========== GAME FUNCTIONS ==========
 
     function startGame() {
-        if (isVerbMode()) {
-            game.currentVerb = getCurrentVerb();
+        if (isVerbLikeMode()) {
+            if (isVerbMode()) game.currentVerb = getCurrentVerb();
             game.activeItems = [...PRONOUN_KEYS];
             game.activeColors = [];
         } else {
@@ -2041,6 +2087,10 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     }
 
     function getPromptText(form) {
+        if (isPronounMode()) {
+            const phase = getPhaseFromProgress();
+            return phase === 0 ? 'Match the pronoun' : 'What is the pronoun?';
+        }
         if (isVerbMode()) {
             const phase = getPhaseFromProgress();
             return phase === 0 ? 'Match the translation' : 'What is the conjugation?';
@@ -2057,6 +2107,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     }
 
     function getTypingPrompt(form) {
+        if (isPronounMode()) return 'Type the pronoun!';
         if (isVerbMode()) return 'Type the conjugation!';
         if (form === 'feminine') return 'Type the feminine!';
         if (form === 'article') return 'Type it with the article!';
@@ -2066,6 +2117,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     }
 
     function getSpeechPrompt(form) {
+        if (isPronounMode()) return 'Say the pronoun!';
         if (isVerbMode()) return 'Say the conjugation!';
         if (form === 'feminine') return 'Say the feminine!';
         if (form === 'article') return 'Say it with the article!';
@@ -2183,11 +2235,23 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         // Reverse mode: ~30% of rounds in Practice phase flip display
         // (show foreign word as question; user picks emoji/colour)
         const phaseNow = getPhaseFromProgress();
-        game.isReverseRound = !isVerbMode() && phaseNow === 1 && Math.random() < 0.3;
+        game.isReverseRound = !isVerbLikeMode() && phaseNow === 1 && Math.random() < 0.3;
         buttonsContainer.classList.toggle('reverse-mode', game.isReverseRound);
 
-        // Display: verb text, emoji, or colour swatch
-        if (isVerbMode()) {
+        // Display: pronoun emoji+label, verb text, emoji, or colour swatch
+        if (isPronounMode()) {
+            const key = game.currentColor; // pronoun key
+            const emoji = PRONOUN_EMOJIS[key] || '';
+            const label = PRONOUN_LABELS[key] || key;
+            colorDisplay.style.backgroundColor = 'transparent';
+            colorDisplay.classList.remove('plural-display');
+            colorDisplay.classList.add('emoji-display');
+            if (emoji) {
+                colorDisplay.innerHTML = `${emoji}<div class="pronoun-english-label">${label}</div>`;
+            } else {
+                colorDisplay.innerHTML = `<div class="verb-display">${label}</div>`;
+            }
+        } else if (isVerbMode()) {
             const verb = game.currentVerb;
             const pronoun = game.currentColor; // pronoun key
             const phase = getPhaseFromProgress();
@@ -2280,7 +2344,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         });
 
         // Show reinforcement label in level 1 of learning phase for non-colour categories
-        if (!isColorCategory() && !isVerbMode() && getPhaseFromProgress() === 0 && getLevelInPhase() === 1) {
+        if (!isColorCategory() && !isVerbLikeMode() && getPhaseFromProgress() === 0 && getLevelInPhase() === 1) {
             reinforcementLabel.textContent = getFormTranslation(game.currentColor, currentForm);
         } else {
             reinforcementLabel.textContent = '';
@@ -2462,7 +2526,11 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         }
 
         if (game.score === 0) {
-            if (isVerbMode()) {
+            if (isPronounMode()) {
+                const answerWord = getPronounTranslation(game.currentColor);
+                const label = PRONOUN_LABELS[game.currentColor] || game.currentColor;
+                endMessage.textContent = `The answer was "${answerWord}" (${label})`;
+            } else if (isVerbMode()) {
                 const answerWord = getVerbTranslation(game.currentColor);
                 const pronoun = PRONOUN_LABELS[game.currentColor] || game.currentColor;
                 endMessage.textContent = `The answer was "${answerWord}" (${pronoun})`;

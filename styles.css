@@ -399,6 +399,16 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     margin-top: 0.25rem;
 }
 
+/* Pronoun English label (below emoji in intro and game display) */
+.pronoun-english-label {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #fff;
+    text-transform: none;
+    margin-top: 0.25rem;
+    line-height: 1.3;
+}
+
 /* Emoji display (replaces colour square for emoji categories) */
 .emoji-display {
     font-size: 5rem;
