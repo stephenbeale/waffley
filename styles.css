@@ -1,9 +1,48 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* ========== THEME VARIABLES ========== */
+:root {
+    --bg-page: #1a1a2e;
+    --bg-overlay: rgba(26,26,46,0.95);
+    --bg-overlay-solid: rgba(26,26,46,0.98);
+    --bg-card: #2a2a4e;
+    --bg-card-hover: #3a3a5e;
+    --bg-card-glass: rgba(42,42,78,0.9);
+    --border-default: #444;
+    --border-track: #333;
+    --border-dot: #555;
+    --text-body: #eee;
+    --text-heading: #fff;
+    --text-muted: #aaa;
+    --text-dim: #888;
+    --text-faint: #666;
+    --divider: rgba(255,255,255,0.08);
+    --divider-mid: rgba(255,255,255,0.1);
+}
+
+body[data-theme="light"] {
+    --bg-page: #f4f4f8;
+    --bg-overlay: rgba(244,244,248,0.95);
+    --bg-overlay-solid: rgba(244,244,248,0.98);
+    --bg-card: #ffffff;
+    --bg-card-hover: #ebebf2;
+    --bg-card-glass: rgba(255,255,255,0.9);
+    --border-default: #ccc;
+    --border-track: #ddd;
+    --border-dot: #bbb;
+    --text-body: #1a1a2e;
+    --text-heading: #111;
+    --text-muted: #555;
+    --text-dim: #666;
+    --text-faint: #888;
+    --divider: rgba(0,0,0,0.08);
+    --divider-mid: rgba(0,0,0,0.1);
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #1a1a2e;
-    color: #eee;
+    background: var(--bg-page);
+    color: var(--text-body);
     height: 100vh;
     display: flex;
     flex-direction: column;
@@ -22,7 +61,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(26, 26, 46, 0.95);
+    background: var(--bg-overlay);
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -65,16 +104,16 @@ body {
 .btn--secondary {
     padding: 0.5rem 1.2rem;
     font-size: 0.9rem;
-    border: 2px solid #444;
+    border: 2px solid var(--border-default);
     border-radius: 6px;
     background: transparent;
-    color: #aaa;
+    color: var(--text-muted);
     transition: all 0.2s;
 }
 
 .btn--secondary:hover {
-    border-color: #666;
-    color: #fff;
+    border-color: var(--text-faint);
+    color: var(--text-heading);
 }
 
 .btn--secondary:focus-visible {
@@ -106,11 +145,11 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     text-align: center;
     line-height: 1.6;
     margin-bottom: 2rem;
-    color: #aaa;
+    color: var(--text-muted);
     font-size: 1.1rem;
 }
 
-.instructions strong { color: #fff; }
+.instructions strong { color: var(--text-heading); }
 
 /* #start-btn and #restart-btn use .btn.btn--primary */
 
@@ -139,7 +178,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 .reinforcement-label {
     font-size: 1.3rem;
     font-weight: 600;
-    color: #fff;
+    color: var(--text-heading);
     margin-top: 0.5rem;
     margin-bottom: 1.5rem;
     min-height: 1.8rem;
@@ -151,7 +190,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     width: 400px;
     max-width: 70vw;
     height: 8px;
-    background: #333;
+    background: var(--border-track);
     border-radius: 4px;
     margin-bottom: 2rem;
     overflow: hidden;
@@ -189,10 +228,10 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     padding: 0.8rem 0.5rem;
     font-size: 1.1rem;
     font-weight: 600;
-    border: 2px solid #444;
+    border: 2px solid var(--border-default);
     border-radius: 10px;
-    background: #2a2a4e;
-    color: #fff;
+    background: var(--bg-card);
+    color: var(--text-heading);
     cursor: pointer;
     transition: border-color 0.2s, background 0.2s;
     text-transform: capitalize;
@@ -206,7 +245,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 
 .answer-btn:hover {
     border-color: #e94560;
-    background: #3a3a5e;
+    background: var(--bg-card-hover);
 }
 
 /* Learning mode: buttons have colored backgrounds */
@@ -220,11 +259,11 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 
 /* Practice mode: neutral backgrounds, text only */
 .answer-btn.practice-mode {
-    background: #2a2a4e;
+    background: var(--bg-card);
 }
 
 .answer-btn.practice-mode:hover {
-    background: #3a3a5e;
+    background: var(--bg-card-hover);
 }
 
 /* Verb/pronoun mode: 3-column grid, larger text, preserve original case */
@@ -284,14 +323,14 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 }
 
 #end-message {
-    color: #aaa;
+    color: var(--text-muted);
     font-size: 1.2rem;
     margin-bottom: 2rem;
 }
 
 .prompt-label {
     font-size: 1.2rem;
-    color: #aaa;
+    color: var(--text-muted);
     margin-bottom: 1.5rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
@@ -309,17 +348,17 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     padding: 0.8rem 1.5rem;
     font-size: 1.1rem;
     font-weight: 600;
-    border: 2px solid #444;
+    border: 2px solid var(--border-default);
     border-radius: 6px;
     background: transparent;
-    color: #aaa;
+    color: var(--text-muted);
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .language-btn:hover {
-    border-color: #666;
-    color: #fff;
+    border-color: var(--text-faint);
+    color: var(--text-heading);
 }
 
 .language-btn.selected {
@@ -332,7 +371,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     font-size: 1.5rem;
     font-weight: 700;
     margin-bottom: 1.5rem;
-    color: #fff;
+    color: var(--text-heading);
 }
 
 /* .back-btn uses .btn.btn--secondary */
@@ -341,7 +380,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 }
 
 .setting-label {
-    color: #666;
+    color: var(--text-faint);
     font-size: 0.9rem;
     margin-bottom: 0.5rem;
     text-transform: uppercase;
@@ -360,17 +399,17 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     padding: 0.6rem 1.2rem;
     font-size: 0.95rem;
     font-weight: 600;
-    border: 2px solid #444;
+    border: 2px solid var(--border-default);
     border-radius: 6px;
     background: transparent;
-    color: #aaa;
+    color: var(--text-muted);
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .category-btn:hover {
-    border-color: #666;
-    color: #fff;
+    border-color: var(--text-faint);
+    color: var(--text-heading);
 }
 
 .category-btn.selected {
@@ -391,17 +430,17 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     padding: 0.6rem 1.5rem;
     font-size: 1rem;
     font-weight: 600;
-    border: 2px solid #444;
+    border: 2px solid var(--border-default);
     border-radius: 8px;
     background: transparent;
-    color: #aaa;
+    color: var(--text-muted);
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .mode-btn:hover {
-    border-color: #666;
-    color: #fff;
+    border-color: var(--text-faint);
+    color: var(--text-heading);
 }
 
 .mode-btn.selected {
@@ -419,7 +458,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 .verb-display {
     font-size: 1.8rem;
     font-weight: 700;
-    color: #fff;
+    color: var(--text-heading);
     text-align: center;
     line-height: 1.3;
     max-width: 90vw;
@@ -428,7 +467,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 
 .verb-context {
     font-size: 1rem;
-    color: #aaa;
+    color: var(--text-muted);
     margin-top: 0.25rem;
 }
 
@@ -445,7 +484,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 .pronoun-english-label {
     font-size: 1.8rem;
     font-weight: 700;
-    color: #fff;
+    color: var(--text-heading);
     text-transform: none;
     margin-top: 0.25rem;
     line-height: 1.3;
@@ -487,7 +526,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 .audio-toggle-slider {
     width: 44px;
     height: 24px;
-    background: #444;
+    background: var(--border-default);
     border-radius: 12px;
     position: relative;
     transition: background 0.3s;
@@ -524,7 +563,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 }
 
 .audio-toggle-label {
-    color: #aaa;
+    color: var(--text-muted);
     font-size: 0.9rem;
 }
 
@@ -566,7 +605,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 
 .stat-label {
     font-size: 0.8rem;
-    color: #666;
+    color: var(--text-faint);
     text-transform: uppercase;
     letter-spacing: 0.1em;
 }
@@ -582,7 +621,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 .level-info {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #fff;
+    color: var(--text-heading);
     margin-bottom: 0.3rem;
 }
 
@@ -639,10 +678,10 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     font-family: inherit;
     font-weight: 600;
     text-align: center;
-    border: 2px solid #444;
+    border: 2px solid var(--border-default);
     border-radius: 10px;
-    background: #2a2a4e;
-    color: #fff;
+    background: var(--bg-card);
+    color: var(--text-heading);
     outline: none;
     text-transform: capitalize;
 }
@@ -667,13 +706,13 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 
 .typing-feedback {
     font-size: 1rem;
-    color: #aaa;
+    color: var(--text-muted);
     min-height: 1.5em;
 }
 
 .typing-hint {
     font-size: 0.75rem;
-    color: #666;
+    color: var(--text-faint);
     font-style: italic;
 }
 
@@ -691,10 +730,10 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 .accent-btn {
     width: 36px;
     height: 36px;
-    border: 2px solid #444;
+    border: 2px solid var(--border-default);
     border-radius: 6px;
-    background: #2a2a4e;
-    color: #fff;
+    background: var(--bg-card);
+    color: var(--text-heading);
     font-size: 1.1rem;
     font-family: inherit;
     cursor: pointer;
@@ -707,7 +746,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 
 .accent-btn:hover {
     border-color: #6f42c1;
-    background: #3a3a5e;
+    background: var(--bg-card-hover);
 }
 
 .accent-btn:active {
@@ -805,13 +844,13 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 
 .speech-prompt {
     font-size: 1.2rem;
-    color: #fff;
+    color: var(--text-heading);
     text-align: center;
 }
 
 .voice-feedback {
     font-size: 1rem;
-    color: #aaa;
+    color: var(--text-muted);
     min-height: 1.5em;
 }
 
@@ -866,13 +905,13 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     transform: translateY(-50%);
     width: 30px;
     height: 200px;
-    background: #333;
+    background: var(--border-track);
     border-radius: 15px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    border: 2px solid #444;
+    border: 2px solid var(--border-default);
 }
 
 .vertical-progress-bar {
@@ -889,7 +928,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     left: 50%;
     transform: translateX(-50%);
     font-size: 0.75rem;
-    color: #aaa;
+    color: var(--text-muted);
     white-space: nowrap;
 }
 
@@ -917,7 +956,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 
 .time-display {
     font-size: 0.8rem;
-    color: #aaa;
+    color: var(--text-muted);
     margin-top: 0.3rem;
 }
 
@@ -935,9 +974,9 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     width: 44px;
     height: 44px;
     border-radius: 10px;
-    background: rgba(42, 42, 78, 0.9);
+    background: var(--bg-card-glass);
     border: none;
-    color: #fff;
+    color: var(--text-heading);
     font-size: 1.4rem;
     font-weight: 700;
     cursor: pointer;
@@ -950,7 +989,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 }
 
 .game-control-btn:hover {
-    background: rgba(60, 60, 100, 0.95);
+    background: var(--bg-card-hover);
 }
 
 .game-control-btn:focus-visible {
@@ -963,7 +1002,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 .pause-title {
     font-size: 3rem;
     font-weight: 900;
-    color: #fff;
+    color: var(--text-heading);
     margin-bottom: 2rem;
 }
 
@@ -996,7 +1035,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 
 .level-up-message {
     font-size: 1.3rem;
-    color: #aaa;
+    color: var(--text-muted);
     margin-bottom: 0.5rem;
 }
 
@@ -1050,7 +1089,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 
 .progress-title {
     font-size: 0.8rem;
-    color: #666;
+    color: var(--text-faint);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     margin-bottom: 0.75rem;
@@ -1083,7 +1122,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 }
 
 .journey-phase:hover {
-    background: rgba(255, 255, 255, 0.06);
+    background: var(--divider);
 }
 
 .journey-phase:focus-visible {
@@ -1104,7 +1143,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     height: 24px;
     min-width: 24px;
     border-radius: 50%;
-    border: 2px solid #555;
+    border: 2px solid var(--border-dot);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1158,7 +1197,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 .journey-connector {
     width: 2px;
     height: 16px;
-    background: #333;
+    background: var(--border-track);
     margin-left: 11px;
 }
 
@@ -1174,17 +1213,17 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 .journey-phase-name {
     font-size: 1rem;
     font-weight: 700;
-    color: #fff;
+    color: var(--text-heading);
 }
 
 .journey-phase-desc {
     font-size: 0.75rem;
-    color: #888;
+    color: var(--text-dim);
 }
 
 .journey-phase-progress {
     font-size: 0.75rem;
-    color: #aaa;
+    color: var(--text-muted);
     margin-top: 1px;
 }
 
@@ -1194,13 +1233,13 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     gap: 0.5rem;
     margin-top: 0.75rem;
     padding-top: 0.75rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid var(--divider-mid);
     font-size: 0.8rem;
-    color: #888;
+    color: var(--text-dim);
 }
 
 .journey-stats-sep {
-    color: #555;
+    color: var(--border-dot);
 }
 
 /* Cycle complete overlay — uses .overlay base */
@@ -1215,7 +1254,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 
 .cycle-complete-message {
     font-size: 1.3rem;
-    color: #aaa;
+    color: var(--text-muted);
     margin-bottom: 0.5rem;
 }
 
@@ -1240,7 +1279,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 
 .cycle-complete-info {
     font-size: 1rem;
-    color: #aaa;
+    color: var(--text-muted);
     margin-bottom: 2rem;
 }
 
@@ -1267,32 +1306,33 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 #stats-btn {
     padding: 0.6rem 1.2rem;
     font-size: 0.9rem;
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    border: 2px solid var(--divider-mid);
     border-radius: 8px;
     background: transparent;
-    color: #fff;
+    color: var(--text-heading);
     cursor: pointer;
     transition: all 0.2s;
     margin-top: 0.5rem;
 }
 
 #stats-btn:hover {
-    border-color: rgba(255, 255, 255, 0.5);
-    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--border-default);
+    background: var(--divider);
 }
 
 /* Auth section */
 .auth-section {
     margin-top: 2rem;
     padding-top: 1.5rem;
-    border-top: 1px solid rgba(255,255,255,0.08);
+    border-top: 1px solid var(--divider);
     text-align: center;
 }
 
 .auth-prompt {
     margin: 0 0 0.9rem;
     font-size: 0.8rem;
-    color: rgba(255,255,255,0.45);
+    color: var(--text-muted);
+    opacity: 0.7;
 }
 
 .auth-buttons {
@@ -1348,7 +1388,8 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 
 .auth-user-label {
     font-size: 0.8rem;
-    color: rgba(255,255,255,0.55);
+    color: var(--text-muted);
+    opacity: 0.7;
 }
 
 .auth-signout-btn {
@@ -1356,17 +1397,17 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     font-family: inherit;
     font-size: 0.78rem;
     font-weight: 600;
-    border: 1px solid rgba(255,255,255,0.2);
+    border: 1px solid var(--border-default);
     border-radius: 6px;
     background: transparent;
-    color: rgba(255,255,255,0.55);
+    color: var(--text-muted);
     cursor: pointer;
     transition: all 0.15s;
 }
 
 .auth-signout-btn:hover {
-    border-color: rgba(255,255,255,0.4);
-    color: rgba(255,255,255,0.8);
+    border-color: var(--text-dim);
+    color: var(--text-heading);
 }
 
 /* Auth error message */
@@ -1385,11 +1426,11 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 /* Daily streak badge on topic screen */
 .streak-badge {
     font-size: 0.85rem;
-    color: #666;
+    color: var(--text-faint);
     margin-bottom: 1rem;
     padding: 0.3rem 0.8rem;
     border-radius: 20px;
-    border: 1px solid #333;
+    border: 1px solid var(--border-track);
     text-align: center;
 }
 
@@ -1402,7 +1443,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 
 /* Stats overlay — uses .overlay base, overrides bg opacity */
 #stats-overlay {
-    background: rgba(26, 26, 46, 0.98);
+    background: var(--bg-overlay-solid);
     padding: 2rem;
     overflow-y: auto;
 }
@@ -1438,12 +1479,12 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 .stats-card-value {
     font-size: 2rem;
     font-weight: 900;
-    color: #fff;
+    color: var(--text-heading);
 }
 
 .stats-card-label {
     font-size: 0.8rem;
-    color: #666;
+    color: var(--text-faint);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     margin-top: 0.3rem;
@@ -1457,7 +1498,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 
 .language-stats-title {
     font-size: 1rem;
-    color: #aaa;
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     margin-bottom: 0.75rem;
@@ -1469,16 +1510,16 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem 0;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid var(--border-track);
 }
 
 .language-stat-name {
-    color: #fff;
+    color: var(--text-heading);
     font-weight: 600;
 }
 
 .language-stat-data {
-    color: #aaa;
+    color: var(--text-muted);
     font-size: 0.9rem;
 }
 
@@ -1546,7 +1587,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 
 .speed-mercy-message {
     font-size: 1.2rem;
-    color: #aaa;
+    color: var(--text-muted);
     margin-bottom: 0.5rem;
     text-align: center;
 }
@@ -1601,7 +1642,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 
 .best-streak-display {
     font-size: 0.85rem;
-    color: #666;
+    color: var(--text-faint);
     margin-top: 0.5rem;
 }
 
@@ -1653,20 +1694,22 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 .legal-link {
     background: none;
     border: none;
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--text-muted);
+    opacity: 0.5;
     font-family: inherit;
     font-size: 0.75rem;
     cursor: pointer;
     padding: 0;
-    transition: color 0.15s;
+    transition: color 0.15s, opacity 0.15s;
 }
 
 .legal-link:hover {
-    color: rgba(255, 255, 255, 0.6);
+    opacity: 0.8;
 }
 
 .legal-separator {
-    color: rgba(255, 255, 255, 0.2);
+    color: var(--text-muted);
+    opacity: 0.4;
     font-size: 0.75rem;
 }
 
@@ -1674,7 +1717,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 
 #privacy-overlay,
 #terms-overlay {
-    background: rgba(26, 26, 46, 0.98);
+    background: var(--bg-overlay-solid);
     padding: 2rem;
     overflow-y: auto;
     align-items: center;
@@ -1702,7 +1745,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     right: 0;
     background: none;
     border: none;
-    color: #aaa;
+    color: var(--text-muted);
     font-size: 2rem;
     cursor: pointer;
     padding: 0.25rem 0.5rem;
@@ -1711,7 +1754,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 }
 
 .legal-close-btn:hover {
-    color: #fff;
+    color: var(--text-heading);
 }
 
 .legal-close-btn:focus-visible {
@@ -1720,13 +1763,13 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 }
 
 .legal-text {
-    color: #ccc;
+    color: var(--text-muted);
     font-size: 0.9rem;
     line-height: 1.7;
 }
 
 .legal-text h3 {
-    color: #fff;
+    color: var(--text-heading);
     font-size: 1rem;
     margin-top: 1.5rem;
     margin-bottom: 0.5rem;
@@ -1764,7 +1807,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 .stats-buttons--data {
     margin-top: 1rem;
     padding-top: 1rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid var(--divider-mid);
 }
 
 #export-data-btn {
@@ -1801,4 +1844,178 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 #delete-account-btn:hover {
     background: #dc3545;
     color: #fff;
+}
+
+/* ========== DAILY CHALLENGE SYSTEM ========== */
+
+/* Toast notification — slides in from top */
+.challenge-toast {
+    position: fixed;
+    top: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #28a745;
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    z-index: 200;
+    transition: top 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 20px rgba(40, 167, 69, 0.4);
+    white-space: nowrap;
+}
+
+.challenge-toast.visible {
+    top: 1rem;
+}
+
+.challenge-toast-emoji {
+    font-size: 1.3rem;
+}
+
+/* Daily challenge card on topic screen */
+.daily-challenge-card {
+    background: rgba(15, 52, 96, 0.2);
+    border: 2px solid #0f3460;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    min-width: 250px;
+    max-width: 400px;
+    width: 100%;
+}
+
+.daily-challenge-card.completed {
+    border-color: #28a745;
+    background: rgba(40, 167, 69, 0.1);
+}
+
+.daily-challenge-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    margin-bottom: 0.4rem;
+}
+
+.daily-challenge-emoji {
+    font-size: 1.2rem;
+}
+
+.daily-challenge-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.daily-challenge-desc {
+    font-size: 0.9rem;
+    color: var(--text-heading);
+    margin-bottom: 0.5rem;
+}
+
+.daily-challenge-progress-bar {
+    width: 100%;
+    height: 6px;
+    background: var(--border-track);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 0.3rem;
+}
+
+.daily-challenge-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: #e94560;
+    border-radius: 3px;
+    transition: width 0.4s ease;
+}
+
+.daily-challenge-card.completed .daily-challenge-progress-fill {
+    background: #28a745;
+}
+
+.daily-challenge-status {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+}
+
+.daily-challenge-card.completed .daily-challenge-status {
+    color: #28a745;
+    font-weight: 600;
+}
+
+/* End screen — daily challenge indicator */
+.daily-challenge-end {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    background: rgba(15, 52, 96, 0.2);
+    border: 1px solid #0f3460;
+    margin-top: 0.5rem;
+}
+
+.daily-challenge-end.completed {
+    color: #28a745;
+    border-color: #28a745;
+    background: rgba(40, 167, 69, 0.1);
+    font-weight: 600;
+}
+
+.daily-challenge-end-emoji {
+    font-size: 1rem;
+}
+
+/* Stats overlay — daily challenge section */
+.daily-challenge-stats {
+    max-width: 400px;
+    width: 100%;
+    margin-bottom: 1.5rem;
+    background: rgba(15, 52, 96, 0.2);
+    border: 2px solid #0f3460;
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+}
+
+.daily-challenge-stats.completed {
+    border-color: #28a745;
+    background: rgba(40, 167, 69, 0.1);
+}
+
+.daily-challenge-stats-title {
+    font-size: 1rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+}
+
+.daily-challenge-stats-desc {
+    font-size: 0.9rem;
+    color: var(--text-heading);
+    margin-bottom: 0.5rem;
+}
+
+.daily-challenge-stats-status {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-top: 0.3rem;
+}
+
+.daily-challenge-stats.completed .daily-challenge-stats-status {
+    color: #28a745;
+    font-weight: 600;
 }
