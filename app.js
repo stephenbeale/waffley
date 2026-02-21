@@ -2370,6 +2370,17 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             reinforcementLabel.textContent = '';
         }
 
+        // Highlight the correct button in Learning phase for verb-like modes
+        if (isVerbLikeMode() && getPhaseFromProgress() === 0) {
+            buttonsContainer.querySelectorAll('.answer-btn').forEach(btn => {
+                btn.classList.toggle('learning-highlight', btn.dataset.color === game.currentColor);
+            });
+        } else if (isVerbLikeMode()) {
+            buttonsContainer.querySelectorAll('.answer-btn.learning-highlight').forEach(btn => {
+                btn.classList.remove('learning-highlight');
+            });
+        }
+
         // Speak the word if audio is enabled
         speakColor(game.currentColor, selectedLanguage);
 

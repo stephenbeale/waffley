@@ -231,24 +231,24 @@ Planned features and improvements for Waffley.
 
 ## Pronoun & Verb UX Polish
 
-- [ ] **Add emojis for "I" and "You" pronouns**
-  Currently `PRONOUN_EMOJIS` has no entries for "I" or "You", so those pronouns show no emoji in the display area — just a text label. Add 🙋 for I and 🫵 for You so all 7 pronouns are visually consistent.
+- [x] **Add emojis for "I" and "You" pronouns**
+  Added 🙋 for I and 🫵 for You in `PRONOUN_EMOJIS` so all 7 pronouns have visual icons.
   - Complexity: S
 
-- [ ] **Disable text-transform: capitalize for verb/pronoun buttons**
-  German capitalisation matters: "Sie" (formal you/they) vs "sie" (she). The CSS `text-transform: capitalize` on `.answer-btn` can interfere. Also affects typing input where case-sensitive matching is needed.
+- [x] **Disable text-transform: capitalize for verb/pronoun buttons**
+  Added `text-transform: none` to `.verb-mode .answer-btn` so German "Sie" vs "ich" capitalisation is preserved from data.
   - Complexity: S
 
-- [ ] **Highlight correct button in pronoun Learning phase**
-  In Learning phase for pronouns, give the correct answer button a distinct border or glow so the user learns by association — similar to how colour categories get coloured backgrounds in Learning mode.
+- [x] **Highlight correct button in pronoun Learning phase**
+  In Learning phase for verb-like modes, the correct answer button gets a green border glow (`.learning-highlight`). Removed on other phases.
   - Complexity: S
 
 - [ ] **Responsive verb button layout — 2-column fallback for long conjugations**
   The 3-column grid works well for short pronoun words but longer verb conjugations (e.g. Spanish "nosotros hablamos") may overflow on mobile. Add a media query or content-based fallback to 2 columns for verb mode when text is too long.
   - Complexity: S
 
-- [ ] **Balance 7-button grid layout**
-  With 3 columns and 7 items, the last row has 1 centred button which looks unbalanced. Consider a 4-3 split (4 top, 3 bottom) with wider bottom buttons, or a different grid arrangement.
+- [x] **Balance 7-button grid layout**
+  Last button on an orphaned row (7th of 7 in 3-column grid) now gets `flex: 50%` via `:last-child:nth-child(3n+1)` selector.
   - Complexity: S
 
 ---
