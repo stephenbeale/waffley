@@ -273,8 +273,8 @@ Planned features and improvements for Waffley.
   Right to access, portability, and erasure. Clear privacy policy and terms of service in-app. Required before any public launch.
   - Complexity: M
 
-- [ ] **Debounce API saves** *(in progress)*
-  Collapse rapid back-to-back `saveProgress()` calls (e.g. answer → level-up within ms) into a single DB write per 400ms window. Prevents double-writes and race conditions.
+- [x] **Debounce API saves**
+  Both `syncProgressToDb()` and `syncStatsToDb()` use 400ms debounce timers to collapse rapid back-to-back saves into single DB writes. Progress debounce is keyed per `lang:category`; stats uses a single global timer.
   - Complexity: S
 
 ### P2 — Should Have

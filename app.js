@@ -168,16 +168,20 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         }, 400);
     }
 
-    async function syncStatsToDb() {
+    let _syncStatsTimer;
+    function syncStatsToDb() {
         if (!isConfigured()) return;
-        try {
-            await upsertUserStats({
-                bestStreak:   stats.bestStreak,
-                highestCycle: stats.highestCycle,
-                gamesPlayed:  stats.gamesPlayed,
-            });
-        }
-        catch (e) { console.debug('[waffley] Stats sync failed:', e.message); }
+        clearTimeout(_syncStatsTimer);
+        _syncStatsTimer = setTimeout(async () => {
+            try {
+                await upsertUserStats({
+                    bestStreak:   stats.bestStreak,
+                    highestCycle: stats.highestCycle,
+                    gamesPlayed:  stats.gamesPlayed,
+                });
+            }
+            catch (e) { console.debug('[waffley] Stats sync failed:', e.message); }
+        }, 400);
     }
 
     async function syncSessionToDb() {
