@@ -243,8 +243,8 @@ Planned features and improvements for Waffley.
   In Learning phase for verb-like modes, the correct answer button gets a green border glow (`.learning-highlight`). Removed on other phases.
   - Complexity: S
 
-- [ ] **Responsive verb button layout — 2-column fallback for long conjugations**
-  The 3-column grid works well for short pronoun words but longer verb conjugations (e.g. Spanish "nosotros hablamos") may overflow on mobile. Add a media query or content-based fallback to 2 columns for verb mode when text is too long.
+- [x] **Responsive verb button layout — 2-column fallback for long conjugations**
+  Added `@media (max-width: 380px)` breakpoint that switches `.verb-mode` buttons from 3-column to 2-column with slightly smaller font, preventing text overflow for long verb conjugations on narrow mobile screens.
   - Complexity: S
 
 - [x] **Balance 7-button grid layout**
