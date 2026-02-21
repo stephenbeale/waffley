@@ -33,6 +33,7 @@ async function loadSupabase() {
     } catch (e) {
         _supabaseLoadFailed = true;
         console.debug('[waffley] Supabase SDK failed to load:', e.message);
+        window.Sentry?.captureException(e);
         return null;
     }
 }
@@ -119,7 +120,8 @@ async function flushSyncQueue() {
             } else if (entry.fn === 'recordSession') {
                 await _doRecordSession(...entry.args);
             }
-        } catch {
+        } catch (e) {
+            window.Sentry?.captureException(e);
             keep.push(entry); // retry next time
         }
     }

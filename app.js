@@ -164,7 +164,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         clearTimeout(_syncProgressTimers[key]);
         _syncProgressTimers[key] = setTimeout(async () => {
             try { await upsertCategoryProgress(lang, category, progressData); }
-            catch (e) { console.debug('[waffley] Progress sync failed:', e.message); }
+            catch (e) { console.debug('[waffley] Progress sync failed:', e.message); window.Sentry?.captureException(e); }
         }, 400);
     }
 
@@ -177,7 +177,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
                 gamesPlayed:  stats.gamesPlayed,
             });
         }
-        catch (e) { console.debug('[waffley] Stats sync failed:', e.message); }
+        catch (e) { console.debug('[waffley] Stats sync failed:', e.message); window.Sentry?.captureException(e); }
     }
 
     async function syncSessionToDb() {
@@ -196,7 +196,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
                     : null,
             });
         }
-        catch (e) { console.debug('[waffley] Session record failed:', e.message); }
+        catch (e) { console.debug('[waffley] Session record failed:', e.message); window.Sentry?.captureException(e); }
     }
 
     // Update statistics after a game ends
@@ -370,7 +370,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
                 localStorage.setItem('waffley_progress', JSON.stringify(local));
                 updateStartScreenProgress();
             }
-        }).catch(e => console.debug('[waffley] DB progress merge failed:', e.message));
+        }).catch(e => { console.debug('[waffley] DB progress merge failed:', e.message); window.Sentry?.captureException(e); });
     }
 
     // ========== AUTH ==========
@@ -432,12 +432,14 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         document.getElementById('google-signin-btn')?.addEventListener('click', () => {
             signInWithGoogle().catch(e => {
                 console.debug('[waffley] Google sign-in failed:', e.message);
+                window.Sentry?.captureException(e);
                 showAuthError('Google sign-in is not available yet. Check back soon!');
             });
         });
         document.getElementById('apple-signin-btn')?.addEventListener('click', () => {
             signInWithApple().catch(e => {
                 console.debug('[waffley] Apple sign-in failed:', e.message);
+                window.Sentry?.captureException(e);
                 showAuthError('Apple sign-in is not available yet. Check back soon!');
             });
         });
@@ -445,7 +447,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             signOut().then(() => {
                 currentUser = null;
                 updateAuthUI();
-            }).catch(e => console.debug('[waffley] Sign-out failed:', e.message));
+            }).catch(e => { console.debug('[waffley] Sign-out failed:', e.message); window.Sentry?.captureException(e); });
         });
     }
 
