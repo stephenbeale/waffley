@@ -275,7 +275,7 @@ Planned features and improvements for Waffley.
   Full gameplay with no network required. Vocabulary and progress cached locally; background sync when online. Essential before mobile app submission.
   - Complexity: L
 
-- [ ] **GDPR / CCPA compliance**
+- [x] **GDPR / CCPA compliance**
   Right to access, portability, and erasure. Clear privacy policy and terms of service in-app. Required before any public launch.
   - Complexity: M
 
@@ -357,7 +357,7 @@ Planned features and improvements for Waffley.
   Weekly digest showing categories with lowest accuracy, items failed most frequently, and what to focus on next.
   - Complexity: M
 
-- [ ] **Data export / backup**
+- [x] **Data export / backup**
   One-click export of all progress as JSON. GDPR-compliant and gives users confidence their data is portable.
   - Complexity: S
 

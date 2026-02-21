@@ -62,6 +62,12 @@
             <button id="signout-btn" class="auth-signout-btn">Sign out</button>
         </div>
     </div>
+
+    <div class="legal-links">
+        <button class="legal-link" id="privacy-link">Privacy Policy</button>
+        <span class="legal-separator">&middot;</span>
+        <button class="legal-link" id="terms-link">Terms of Service</button>
+    </div>
 </div>
 
 <div id="topic-screen">
@@ -180,6 +186,10 @@
         <button id="reset-stats-btn">Reset Stats</button>
         <button id="reset-progress-btn">Reset Progress</button>
     </div>
+    <div class="stats-buttons stats-buttons--data">
+        <button id="export-data-btn">Export My Data</button>
+        <button id="delete-account-btn">Delete All My Data</button>
+    </div>
 </div>
 
 <div id="game-screen">
@@ -292,6 +302,89 @@
     </div>
     <br><br>
     <button id="restart-btn" class="btn btn--primary">Continue</button>
+</div>
+
+<div id="privacy-overlay" class="overlay" role="dialog" aria-label="Privacy Policy">
+    <div class="legal-overlay-content">
+        <h2 class="legal-title">Privacy Policy</h2>
+        <button class="legal-close-btn" id="close-privacy-btn" aria-label="Close">&times;</button>
+        <div class="legal-text">
+            <p><strong>Last updated:</strong> 21 February 2026</p>
+
+            <h3>What data we collect</h3>
+            <p>Waffley collects only what is needed to provide the service:</p>
+            <ul>
+                <li><strong>Account information</strong> &mdash; If you sign in with Google or Apple, we receive your display name and email address from that provider. Anonymous users have no personal information stored.</li>
+                <li><strong>Learning progress</strong> &mdash; Scores, levels completed, streaks, mastery data, and game session history for each language and category you study.</li>
+                <li><strong>Preferences</strong> &mdash; Your audio and display settings.</li>
+            </ul>
+
+            <h3>How we use your data</h3>
+            <ul>
+                <li>To save and sync your learning progress across devices.</li>
+                <li>To display your statistics and streaks.</li>
+                <li>To improve the app experience.</li>
+            </ul>
+            <p>We do <strong>not</strong> sell your data, show advertising, or share data with third parties for marketing purposes.</p>
+
+            <h3>Where your data is stored</h3>
+            <p>Server-side data is stored in a Supabase-hosted PostgreSQL database (EU/US regions). Local data is stored in your browser's localStorage. All connections use HTTPS encryption.</p>
+
+            <h3>Your rights</h3>
+            <p>Under GDPR, CCPA, and similar regulations you have the right to:</p>
+            <ul>
+                <li><strong>Access</strong> &mdash; View all data we hold about you.</li>
+                <li><strong>Portability</strong> &mdash; Export your data as a JSON file at any time.</li>
+                <li><strong>Erasure</strong> &mdash; Permanently delete your account and all associated data.</li>
+            </ul>
+            <p>You can exercise all of these rights from the <strong>Statistics</strong> screen using the "Export My Data" and "Delete All My Data" buttons.</p>
+
+            <h3>Anonymous users</h3>
+            <p>If you use Waffley without signing in, an anonymous session is created. Anonymous accounts have no email or name attached. You can delete an anonymous account the same way as any other account.</p>
+
+            <h3>Data retention</h3>
+            <p>Your data is retained for as long as your account exists. When you delete your account, all server-side data is permanently removed immediately. Local browser data (localStorage) is also cleared at deletion time.</p>
+
+            <h3>Contact</h3>
+            <p>For privacy questions or data requests, contact us at <strong>privacy@waffley.app</strong>.</p>
+        </div>
+    </div>
+</div>
+
+<div id="terms-overlay" class="overlay" role="dialog" aria-label="Terms of Service">
+    <div class="legal-overlay-content">
+        <h2 class="legal-title">Terms of Service</h2>
+        <button class="legal-close-btn" id="close-terms-btn" aria-label="Close">&times;</button>
+        <div class="legal-text">
+            <p><strong>Last updated:</strong> 21 February 2026</p>
+
+            <h3>1. Service description</h3>
+            <p>Waffley is a free language-learning game that teaches vocabulary and verb conjugations through interactive exercises. The service is provided "as is" without warranty.</p>
+
+            <h3>2. Accounts</h3>
+            <p>You may use Waffley anonymously or sign in with Google or Apple. You are responsible for maintaining the security of your sign-in credentials. One account per person.</p>
+
+            <h3>3. Acceptable use</h3>
+            <p>You agree not to:</p>
+            <ul>
+                <li>Attempt to access other users' data.</li>
+                <li>Interfere with or disrupt the service.</li>
+                <li>Use automated tools to scrape or exploit the service.</li>
+            </ul>
+
+            <h3>4. Data and privacy</h3>
+            <p>Your use of Waffley is also governed by our <button class="legal-inline-link" id="terms-to-privacy-link">Privacy Policy</button>, which explains what data we collect and your rights regarding that data.</p>
+
+            <h3>5. Changes to these terms</h3>
+            <p>We may update these terms from time to time. Continued use of the service after changes constitutes acceptance of the updated terms.</p>
+
+            <h3>6. Limitation of liability</h3>
+            <p>To the maximum extent permitted by law, Waffley and its creators shall not be liable for any indirect, incidental, or consequential damages arising from your use of the service. The service is provided for educational purposes and makes no guarantees about learning outcomes.</p>
+
+            <h3>7. Termination</h3>
+            <p>You may delete your account at any time from the Statistics screen. We reserve the right to suspend accounts that violate these terms.</p>
+        </div>
+    </div>
 </div>
 
 <script>

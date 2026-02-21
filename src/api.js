@@ -469,6 +469,28 @@ export async function upsertUserStats(stats) {
 }
 
 // ---------------------------------------------------------------------------
+// GDPR — data export and account deletion
+// ---------------------------------------------------------------------------
+
+export async function exportUserData() {
+    const cl = await getClient();
+    if (!cl) return null;
+    await ensureSession();
+    const { data, error } = await cl.rpc('export_user_data');
+    if (error) throw error;
+    return data;
+}
+
+export async function deleteAccount() {
+    const cl = await getClient();
+    if (!cl) throw new Error('Cannot delete account while offline');
+    await ensureSession();
+    const { error } = await cl.rpc('delete_my_account');
+    if (error) throw error;
+    await cl.auth.signOut();
+}
+
+// ---------------------------------------------------------------------------
 // Startup: try to load SDK and flush any queued writes
 // ---------------------------------------------------------------------------
 if (isConfigured()) {
