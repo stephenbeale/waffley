@@ -2468,16 +2468,19 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             // For pronouns, credit the actual target (not the button key which may differ for duplicates)
             game.totalCorrectAnswers++;
             recordMasteryAnswer(game.currentColor);
-            saveProgress();
             updateLevelDisplay();
 
             // Check if all items in this level are mastered
-            if (isLevelMastered()) {
-                const previousPhase = getPhaseFromProgress();
-                const timeChanged = willTimeChange();
+            const mastered = isLevelMastered();
+            let previousPhase, timeChanged;
+            if (mastered) {
+                previousPhase = getPhaseFromProgress();
+                timeChanged = willTimeChange();
                 game.levelsCompleted++;
-                saveProgress();
+            }
+            saveProgress();
 
+            if (mastered) {
                 // Check for cycle completion (levelsCompleted crossed a cycle boundary)
                 if (game.levelsCompleted % LEVELS_PER_CYCLE === 0) {
                     const completedCycle = game.currentCycle;

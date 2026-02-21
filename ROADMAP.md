@@ -273,7 +273,7 @@ Planned features and improvements for Waffley.
   Right to access, portability, and erasure. Clear privacy policy and terms of service in-app. Required before any public launch.
   - Complexity: M
 
-- [ ] **Debounce API saves** *(in progress)*
+- [x] **Debounce API saves**
   Collapse rapid back-to-back `saveProgress()` calls (e.g. answer → level-up within ms) into a single DB write per 400ms window. Prevents double-writes and race conditions.
   - Complexity: S
 
