@@ -12,7 +12,7 @@ import {
     VERB_LIST, VERB_ORDER, PRONOUN_KEYS, VERB_ENGLISH, PRONOUN_LABELS, PRONOUN_EMOJIS,
     VERB_CONJUGATIONS, VERB_PRONOUNS, VERB_LANGUAGES
 } from './data.js';
-import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, recordSession, signInWithGoogle, signInWithApple, signOut, getUser, onAuthChange } from './src/api.js';
+import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, recordSession, signInWithGoogle, signInWithApple, signOut, getUser, onAuthChange, exportUserData, deleteAccount } from './src/api.js';
 
     // ========== LEVEL SYSTEM FUNCTIONS ==========
 
@@ -1827,6 +1827,84 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             resetProgress();
             hideStats();
         }
+    });
+
+    // ========== LEGAL OVERLAYS ==========
+
+    const privacyOverlay = document.getElementById('privacy-overlay');
+    const termsOverlay   = document.getElementById('terms-overlay');
+
+    function openOverlay(overlay) {
+        overlay.classList.add('active');
+        overlay.querySelector('.legal-close-btn').focus();
+    }
+
+    function closeOverlay(overlay) {
+        overlay.classList.remove('active');
+    }
+
+    document.getElementById('privacy-link').addEventListener('click', () => openOverlay(privacyOverlay));
+    document.getElementById('terms-link').addEventListener('click', () => openOverlay(termsOverlay));
+    document.getElementById('close-privacy-btn').addEventListener('click', () => closeOverlay(privacyOverlay));
+    document.getElementById('close-terms-btn').addEventListener('click', () => closeOverlay(termsOverlay));
+
+    // Cross-link from terms to privacy
+    document.getElementById('terms-to-privacy-link').addEventListener('click', () => {
+        closeOverlay(termsOverlay);
+        openOverlay(privacyOverlay);
+    });
+
+    // ========== DATA EXPORT & ACCOUNT DELETION ==========
+
+    document.getElementById('export-data-btn').addEventListener('click', async () => {
+        const localData = {
+            waffley_progress: JSON.parse(localStorage.getItem('waffley_progress') || 'null'),
+            waffley_stats: JSON.parse(localStorage.getItem('waffley_stats') || 'null'),
+            waffley_audio: localStorage.getItem('waffley_audio'),
+            waffley_pronoun_intro: JSON.parse(localStorage.getItem('waffley_pronoun_intro') || 'null'),
+            waffley_sync_queue: JSON.parse(localStorage.getItem('waffley_sync_queue') || 'null'),
+        };
+
+        let serverData = null;
+        try {
+            serverData = await exportUserData();
+        } catch (e) {
+            console.debug('[waffley] Server export failed:', e.message);
+        }
+
+        const exportPayload = {
+            exported_at: new Date().toISOString(),
+            local_data: localData,
+            server_data: serverData,
+        };
+
+        const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `waffley-data-${new Date().toISOString().slice(0, 10)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('delete-account-btn').addEventListener('click', async () => {
+        if (!confirm('Are you sure you want to permanently delete your account and ALL your data? This cannot be undone.')) return;
+        if (!confirm('This is irreversible. All your progress, stats, and game history will be permanently deleted. Continue?')) return;
+
+        try {
+            await deleteAccount();
+        } catch (e) {
+            alert('Could not delete account: ' + e.message + '. Please check your internet connection and try again.');
+            return;
+        }
+
+        localStorage.removeItem('waffley_progress');
+        localStorage.removeItem('waffley_stats');
+        localStorage.removeItem('waffley_audio');
+        localStorage.removeItem('waffley_pronoun_intro');
+        localStorage.removeItem('waffley_sync_queue');
+
+        window.location.reload();
     });
 
     function show(screen) {

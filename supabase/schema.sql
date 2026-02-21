@@ -389,3 +389,96 @@ RETURNS TABLE (
     JOIN languages l             ON l.id = pt.language_id AND l.code = p_lang
     ORDER BY p.sort_order;
 $$;
+
+-- Export all user data (GDPR right to access / portability)
+-- SECURITY INVOKER: runs as the calling user, respects RLS
+CREATE OR REPLACE FUNCTION export_user_data()
+RETURNS JSONB LANGUAGE plpgsql SECURITY INVOKER AS $$
+DECLARE
+    uid UUID := auth.uid();
+    result JSONB;
+BEGIN
+    SELECT jsonb_build_object(
+        'user', (
+            SELECT to_jsonb(u.*)
+            FROM users u WHERE u.id = uid
+        ),
+        'category_progress', (
+            SELECT COALESCE(jsonb_agg(to_jsonb(cp) || jsonb_build_object(
+                'language_code', l.code,
+                'category_slug', c.slug
+            )), '[]'::jsonb)
+            FROM user_category_progress cp
+            JOIN languages l ON l.id = cp.language_id
+            JOIN categories c ON c.id = cp.category_id
+            WHERE cp.user_id = uid
+        ),
+        'verb_progress', (
+            SELECT COALESCE(jsonb_agg(to_jsonb(vp) || jsonb_build_object(
+                'language_code', l.code,
+                'tense_key', t.tense_key
+            )), '[]'::jsonb)
+            FROM user_verb_progress vp
+            JOIN languages l ON l.id = vp.language_id
+            JOIN tenses t ON t.id = vp.tense_id
+            WHERE vp.user_id = uid
+        ),
+        'stats', (
+            SELECT to_jsonb(s.*)
+            FROM user_stats s WHERE s.user_id = uid
+        ),
+        'language_stats', (
+            SELECT COALESCE(jsonb_agg(to_jsonb(ls) || jsonb_build_object(
+                'language_code', l.code
+            )), '[]'::jsonb)
+            FROM user_language_stats ls
+            JOIN languages l ON l.id = ls.language_id
+            WHERE ls.user_id = uid
+        ),
+        'item_mastery', (
+            SELECT COALESCE(jsonb_agg(to_jsonb(im) || jsonb_build_object(
+                'language_code', l.code,
+                'item_key', vi.item_key,
+                'category_slug', c.slug
+            )), '[]'::jsonb)
+            FROM user_item_mastery im
+            JOIN languages l ON l.id = im.language_id
+            JOIN vocabulary_items vi ON vi.id = im.item_id
+            JOIN categories c ON c.id = vi.category_id
+            WHERE im.user_id = uid
+        ),
+        'game_sessions', (
+            SELECT COALESCE(jsonb_agg(to_jsonb(gs) || jsonb_build_object(
+                'language_code', l.code,
+                'category_slug', c.slug
+            )), '[]'::jsonb)
+            FROM game_sessions gs
+            JOIN languages l ON l.id = gs.language_id
+            LEFT JOIN categories c ON c.id = gs.category_id
+            WHERE gs.user_id = uid
+        ),
+        'exported_at', NOW()
+    ) INTO result;
+
+    RETURN result;
+END;
+$$;
+
+-- Delete user account and all associated data (GDPR right to erasure)
+-- SECURITY DEFINER: needs elevated privileges to delete from auth.users
+CREATE OR REPLACE FUNCTION delete_my_account()
+RETURNS VOID LANGUAGE plpgsql SECURITY DEFINER AS $$
+DECLARE
+    uid UUID := auth.uid();
+BEGIN
+    IF uid IS NULL THEN
+        RAISE EXCEPTION 'Not authenticated';
+    END IF;
+
+    -- Delete from public.users — cascades to all child tables
+    DELETE FROM public.users WHERE id = uid;
+
+    -- Delete from auth.users
+    DELETE FROM auth.users WHERE id = uid;
+END;
+$$;
