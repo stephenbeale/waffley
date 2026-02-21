@@ -119,6 +119,8 @@ async function flushSyncQueue() {
                 await _doUpsertUserStats(...entry.args);
             } else if (entry.fn === 'recordSession') {
                 await _doRecordSession(...entry.args);
+            } else if (entry.fn === 'upsertAchievements') {
+                await _doUpsertAchievements(...entry.args);
             }
         } catch (e) {
             window.Sentry?.captureException(e);
@@ -467,6 +469,33 @@ export async function upsertUserStats(stats) {
         await _doUpsertUserStats(stats);
     } catch {
         enqueue('upsertUserStats', [stats]);
+    }
+}
+
+async function _doUpsertAchievements(achievements) {
+    const cl = await getClient();
+    if (!cl) throw new Error('offline');
+    const user = await ensureSession();
+    if (!user) throw new Error('no session');
+
+    const rows = achievements.map(a => ({
+        user_id:     user.id,
+        achievement: a.achievement,
+        unlocked_at: a.unlockedAt,
+    }));
+
+    const { error } = await cl
+        .from('user_achievements')
+        .upsert(rows, { onConflict: 'user_id,achievement' });
+
+    if (error) throw error;
+}
+
+export async function upsertAchievements(achievements) {
+    try {
+        await _doUpsertAchievements(achievements);
+    } catch {
+        enqueue('upsertAchievements', [achievements]);
     }
 }
 

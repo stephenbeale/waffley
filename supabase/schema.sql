@@ -231,6 +231,13 @@ CREATE TABLE IF NOT EXISTS game_sessions (
 CREATE INDEX IF NOT EXISTS idx_sessions_user ON game_sessions(user_id);
 CREATE INDEX IF NOT EXISTS idx_sessions_user_time ON game_sessions(user_id, started_at DESC);
 
+CREATE TABLE IF NOT EXISTS user_achievements (
+    user_id       UUID        NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    achievement   VARCHAR(30) NOT NULL,
+    unlocked_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    PRIMARY KEY (user_id, achievement)
+);
+
 -- ============================================================
 -- MATERIALISED VIEW — hot path for vocabulary loading
 -- ============================================================
@@ -265,6 +272,7 @@ ALTER TABLE user_stats             ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_language_stats    ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_item_mastery      ENABLE ROW LEVEL SECURITY;
 ALTER TABLE game_sessions          ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_achievements      ENABLE ROW LEVEL SECURITY;
 
 -- Users can only read/write their own row
 CREATE POLICY "users_self" ON users
@@ -286,6 +294,9 @@ CREATE POLICY "uim_self" ON user_item_mastery
     FOR ALL USING (auth.uid() = user_id);
 
 CREATE POLICY "gs_self" ON game_sessions
+    FOR ALL USING (auth.uid() = user_id);
+
+CREATE POLICY "ua_self" ON user_achievements
     FOR ALL USING (auth.uid() = user_id);
 
 -- Content tables: public read, no write from client

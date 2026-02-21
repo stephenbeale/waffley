@@ -12,7 +12,7 @@ import {
     VERB_LIST, VERB_ORDER, PRONOUN_KEYS, VERB_ENGLISH, PRONOUN_LABELS, PRONOUN_EMOJIS,
     VERB_CONJUGATIONS, VERB_PRONOUNS, VERB_LANGUAGES
 } from './data.js';
-import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, recordSession, signInWithGoogle, signInWithApple, signOut, getUser, onAuthChange, exportUserData, deleteAccount } from './src/api.js';
+import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, upsertAchievements, recordSession, signInWithGoogle, signInWithApple, signOut, getUser, onAuthChange, exportUserData, deleteAccount } from './src/api.js';
 
     // ========== LEVEL SYSTEM FUNCTIONS ==========
 
@@ -118,6 +118,65 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             dailyStreak: 0,
             bestDailyStreak: 0,
             lastPlayedDate: null,
+            achievements: [],
+        };
+    }
+
+    // ========== ACHIEVEMENT SYSTEM ==========
+
+    const ACHIEVEMENTS = [
+        { key: 'first_steps',    emoji: '\u{1F463}', title: 'First Steps',    check: (s) => s.bestStreak >= 1 },
+        { key: 'getting_started',emoji: '\u{1F3AE}', title: 'Getting Started',check: (s) => s.gamesPlayed >= 5 },
+        { key: 'century',        emoji: '\u{1F4AF}', title: 'Century',        check: (s, ctx) => ctx.totalCorrect >= 100 },
+        { key: 'polyglot',       emoji: '\u{1F30D}', title: 'Polyglot',       check: (s) => Object.keys(s.languageStats).filter(l => s.languageStats[l].games > 0).length >= 3 },
+        { key: 'on_fire',        emoji: '\u{1F525}', title: 'On Fire',        check: (s) => (s.bestDailyStreak || 0) >= 7 },
+        { key: 'dedicated',      emoji: '\u{1F4C5}', title: 'Dedicated',      check: (s) => (s.bestDailyStreak || 0) >= 30 },
+        { key: 'sharpshooter',   emoji: '\u{1F3AF}', title: 'Sharpshooter',   check: (s, ctx) => ctx.perfectGame && ctx.sessionScore >= 5 },
+        { key: 'speed_demon',    emoji: '\u26A1',     title: 'Speed Demon',    check: (s, ctx) => ctx.sessionPhase === 'Speech' },
+        { key: 'well_rounded',   emoji: '\u{1F3C5}', title: 'Well Rounded',   check: (s) => s.gamesPlayed >= 100 },
+        { key: 'master',         emoji: '\u{1F3C6}', title: 'Master',         check: (s) => s.highestCycle >= 3 },
+        { key: 'thousand_club',  emoji: '\u{1F31F}', title: 'Thousand Club',  check: (s, ctx) => ctx.totalCorrect >= 1000 },
+        { key: 'streak_king',    emoji: '\u{1F451}', title: 'Streak King',    check: (s) => s.bestStreak >= 25 },
+    ];
+
+    function checkAchievements(ctx, silent) {
+        if (!stats.achievements) stats.achievements = [];
+        const newlyUnlocked = [];
+
+        for (const ach of ACHIEVEMENTS) {
+            if (stats.achievements.includes(ach.key)) continue;
+            if (ach.check(stats, ctx)) {
+                stats.achievements.push(ach.key);
+                newlyUnlocked.push(ach);
+            }
+        }
+
+        if (newlyUnlocked.length > 0) {
+            saveStats();
+            syncAchievementsToDb(newlyUnlocked);
+            if (!silent) {
+                newlyUnlocked.forEach((ach, i) => {
+                    setTimeout(() => showAchievementToast(ach), i * 2000);
+                });
+            }
+        }
+    }
+
+    function syncAchievementsToDb(newAchievements) {
+        if (!isConfigured()) return;
+        const rows = newAchievements.map(a => ({
+            achievement: a.key,
+            unlockedAt: new Date().toISOString(),
+        }));
+        upsertAchievements(rows);
+    }
+
+    function buildAchievementCtx() {
+        return {
+            totalCorrect: getTotalCorrectAllLanguages(),
+            perfectGame: false,
+            sessionPhase: '',
+            sessionScore: 0,
         };
     }
 
@@ -335,6 +394,34 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             row.appendChild(data);
             langList.appendChild(row);
         });
+
+        // Achievement badges
+        const grid = document.getElementById('achievements-grid');
+        if (grid) {
+            grid.innerHTML = '';
+            const unlocked = stats.achievements || [];
+            for (const ach of ACHIEVEMENTS) {
+                const isUnlocked = unlocked.includes(ach.key);
+                const badge = document.createElement('div');
+                badge.className = 'achievement-badge' + (isUnlocked ? ' unlocked' : ' locked');
+                badge.title = ach.title;
+                badge.setAttribute('aria-label', ach.title + (isUnlocked ? ' (unlocked)' : ' (locked)'));
+                badge.innerHTML = `<span class="achievement-badge-icon">${isUnlocked ? ach.emoji : '\u{1F512}'}</span>`
+                    + `<span class="achievement-badge-title">${ach.title}</span>`;
+                grid.appendChild(badge);
+            }
+        }
+    }
+
+    // Show achievement toast notification
+    function showAchievementToast(achievement) {
+        const toast = document.getElementById('achievement-toast');
+        if (!toast) return;
+        toast.innerHTML = `<span class="achievement-toast-emoji">${achievement.emoji}</span>`
+            + `<div><div class="achievement-toast-label">Achievement Unlocked</div>`
+            + `<div class="achievement-toast-title">${achievement.title}</div></div>`;
+        toast.classList.add('visible');
+        setTimeout(() => toast.classList.remove('visible'), 3000);
     }
 
     // Show statistics overlay
@@ -351,6 +438,10 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
     // Statistics state
     let stats = loadStats();
+    // Ensure achievements array exists for older localStorage data
+    if (!stats.achievements) stats.achievements = [];
+    // Retroactive achievement check for returning users (silent — no toasts)
+    checkAchievements(buildAchievementCtx(), true);
     // Streak badge will be updated once the DOM is ready (called after topic screen renders)
     // updateStreakBadge() is called from updateStartScreenProgress() and updateStatsAfterGame()
 
@@ -1581,6 +1672,18 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             newColorBadges.innerHTML = '';
         }
 
+        // Update highest cycle in stats immediately so achievements can detect it
+        if (newCycle > stats.highestCycle) {
+            stats.highestCycle = newCycle;
+            saveStats();
+        }
+        checkAchievements({
+            totalCorrect: getTotalCorrectAllLanguages(),
+            perfectGame: false,
+            sessionPhase: PHASES[game.currentPhase] || '',
+            sessionScore: game.score,
+        });
+
         cycleCompleteOverlay.classList.add('active');
 
         // Longer countdown for cycle complete
@@ -2634,6 +2737,14 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
         // Update statistics
         updateStatsAfterGame(game.score, selectedLanguage);
+
+        // Check achievements
+        checkAchievements({
+            totalCorrect: getTotalCorrectAllLanguages(),
+            perfectGame: accuracy === 100,
+            sessionPhase: PHASES[game.currentPhase] || '',
+            sessionScore: game.score,
+        });
 
         finalScore.textContent = game.score;
         document.getElementById('accuracy-stat').textContent = accuracy + '%';

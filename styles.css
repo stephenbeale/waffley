@@ -1802,3 +1802,111 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     background: #dc3545;
     color: #fff;
 }
+
+/* ========== ACHIEVEMENT TOAST ========== */
+
+#achievement-toast {
+    position: fixed;
+    top: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.25rem;
+    background: rgba(26, 26, 46, 0.95);
+    border: 2px solid #16c79a;
+    border-radius: 12px;
+    z-index: 200;
+    transition: top 0.4s ease;
+    white-space: nowrap;
+}
+
+#achievement-toast.visible {
+    top: 20px;
+}
+
+.achievement-toast-emoji {
+    font-size: 1.8rem;
+    line-height: 1;
+}
+
+.achievement-toast-label {
+    font-size: 0.7rem;
+    color: #16c79a;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+}
+
+.achievement-toast-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+/* ========== ACHIEVEMENTS SECTION (stats overlay) ========== */
+
+.achievements-section {
+    max-width: 400px;
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
+
+.achievements-title {
+    font-size: 1rem;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.75rem;
+    text-align: center;
+}
+
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+}
+
+.achievement-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem 0.25rem;
+    border: 2px solid #333;
+    border-radius: 8px;
+    background: rgba(15, 52, 96, 0.15);
+    text-align: center;
+}
+
+.achievement-badge.unlocked {
+    border-color: #16c79a;
+    background: rgba(22, 199, 154, 0.1);
+}
+
+.achievement-badge.locked {
+    opacity: 0.4;
+    filter: grayscale(1);
+}
+
+.achievement-badge-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.achievement-badge-title {
+    font-size: 0.6rem;
+    color: #aaa;
+    line-height: 1.2;
+}
+
+.achievement-badge.unlocked .achievement-badge-title {
+    color: #fff;
+}
+
+@media (max-width: 360px) {
+    .achievements-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
