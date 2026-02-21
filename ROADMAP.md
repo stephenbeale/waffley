@@ -285,7 +285,7 @@ Planned features and improvements for Waffley.
 
 ### P2 — Should Have
 
-- [ ] **Achievement badges**
+- [x] **Achievement badges**
   Trophies for milestones: first correct answer, mastering a category, 7-day streak, 100 rounds, perfect accuracy. Displayed on a profile/stats screen.
   - Complexity: M
 
