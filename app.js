@@ -2380,13 +2380,10 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             reinforcementLabel.textContent = '';
         }
 
-        // Highlight the correct button in Learning phase for verb-like modes
-        if (isVerbLikeMode() && getPhaseFromProgress() === 0) {
+        // Highlight the correct button in Learning phase for verbs (not pronouns)
+        if (isVerbLikeMode() && !isPronounMode() && getPhaseFromProgress() === 0) {
             buttonsContainer.querySelectorAll('.answer-btn').forEach(btn => {
-                const match = isPronounMode()
-                    ? isPronounMatch(btn.dataset.color, game.currentColor)
-                    : btn.dataset.color === game.currentColor;
-                btn.classList.toggle('learning-highlight', match);
+                btn.classList.toggle('learning-highlight', btn.dataset.color === game.currentColor);
             });
         } else if (isVerbLikeMode()) {
             buttonsContainer.querySelectorAll('.answer-btn.learning-highlight').forEach(btn => {
