@@ -1,54 +1,144 @@
 /**
  * Waffley API Client
  *
- * Thin wrapper around the Supabase JS client.
- * Import this module in app.js when migrating from localStorage.
+ * Thin wrapper around the Supabase JS client with offline-first support.
+ * The Supabase SDK is loaded lazily via dynamic import so the app can
+ * start and run gameplay entirely offline.
  *
- * Configuration: set SUPABASE_URL and SUPABASE_ANON_KEY as global
- * constants in index.html before this module loads, or replace the
- * values below with your project credentials.
- *
- * Usage:
- *   import { getVocabulary, getVerbs, getProgress, upsertProgress, recordSession } from './src/api.js';
+ * Failed DB writes are queued in localStorage and replayed when
+ * connectivity returns.
  */
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
 // ---------------------------------------------------------------------------
-// Client initialisation
+// Client initialisation — lazy dynamic import
 // ---------------------------------------------------------------------------
-// These will be replaced with real values when the frontend migration happens.
-// For now, they are set here as placeholders; use environment injection or
-// a config block in index.html to supply the real values at runtime.
 const SUPABASE_URL      = window.SUPABASE_URL      || '';
 const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || '';
 
+let _createClient = null;
 let _client = null;
+let _supabaseLoadFailed = false;
 
 export function isConfigured() {
     return !!SUPABASE_URL && !!SUPABASE_ANON_KEY;
 }
 
-function client() {
-    if (!_client) {
-        if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-            throw new Error('Supabase credentials not configured. Set window.SUPABASE_URL and window.SUPABASE_ANON_KEY.');
-        }
-        _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+async function loadSupabase() {
+    if (_createClient) return _createClient;
+    try {
+        const mod = await import('https://esm.sh/@supabase/supabase-js@2');
+        _createClient = mod.createClient;
+        _supabaseLoadFailed = false;
+        return _createClient;
+    } catch (e) {
+        _supabaseLoadFailed = true;
+        console.debug('[waffley] Supabase SDK failed to load:', e.message);
+        return null;
     }
+}
+
+async function getClient() {
+    if (_client) return _client;
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return null;
+    const create = await loadSupabase();
+    if (!create) return null;
+    _client = create(SUPABASE_URL, SUPABASE_ANON_KEY);
     return _client;
+}
+
+// Retry loading SDK when coming back online
+if (typeof window !== 'undefined') {
+    window.addEventListener('online', async () => {
+        if (_supabaseLoadFailed) {
+            const create = await loadSupabase();
+            if (create) {
+                await getClient();
+                flushSyncQueue();
+            }
+        }
+    });
+}
+
+// ---------------------------------------------------------------------------
+// Sync retry queue — localStorage-based
+// ---------------------------------------------------------------------------
+const SYNC_QUEUE_KEY = 'waffley_sync_queue';
+const SYNC_QUEUE_MAX = 50;
+const SYNC_QUEUE_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+function readQueue() {
+    try {
+        return JSON.parse(localStorage.getItem(SYNC_QUEUE_KEY) || '[]');
+    } catch { return []; }
+}
+
+function writeQueue(queue) {
+    localStorage.setItem(SYNC_QUEUE_KEY, JSON.stringify(queue));
+}
+
+function enqueue(fn, args) {
+    const queue = readQueue();
+
+    // Deduplicate: for category progress and stats, keep only the latest per key
+    if (fn === 'upsertCategoryProgress') {
+        const dedupeKey = `${args[0]}:${args[1]}`;
+        const idx = queue.findIndex(e => e.fn === fn && `${e.args[0]}:${e.args[1]}` === dedupeKey);
+        if (idx !== -1) queue.splice(idx, 1);
+    } else if (fn === 'upsertUserStats') {
+        const idx = queue.findIndex(e => e.fn === fn);
+        if (idx !== -1) queue.splice(idx, 1);
+    }
+
+    queue.push({ fn, args, ts: Date.now() });
+
+    // Cap queue size
+    while (queue.length > SYNC_QUEUE_MAX) queue.shift();
+
+    writeQueue(queue);
+}
+
+async function flushSyncQueue() {
+    const cl = await getClient();
+    if (!cl) return;
+
+    const queue = readQueue();
+    if (!queue.length) return;
+
+    const now = Date.now();
+    const keep = [];
+
+    for (const entry of queue) {
+        // Drop entries older than TTL
+        if (now - entry.ts > SYNC_QUEUE_TTL) continue;
+
+        try {
+            if (entry.fn === 'upsertCategoryProgress') {
+                await _doUpsertCategoryProgress(...entry.args);
+            } else if (entry.fn === 'upsertUserStats') {
+                await _doUpsertUserStats(...entry.args);
+            } else if (entry.fn === 'recordSession') {
+                await _doRecordSession(...entry.args);
+            }
+        } catch {
+            keep.push(entry); // retry next time
+        }
+    }
+
+    writeQueue(keep);
 }
 
 // ---------------------------------------------------------------------------
 // ID-lookup caches (eliminates repeated round-trips per upsert)
 // ---------------------------------------------------------------------------
 
-let _langMap = null;  // { toId: { es: 1, ... }, toCode: { 1: 'es', ... } }
-let _catMap  = null;  // { toId: { colours: 1, ... }, toSlug: { 1: 'colours', ... } }
+let _langMap = null;
+let _catMap  = null;
 
 async function getLangMap() {
     if (!_langMap) {
-        const { data } = await client().from('languages').select('id, code');
+        const cl = await getClient();
+        if (!cl) return null;
+        const { data } = await cl.from('languages').select('id, code');
         _langMap = {
             toId:   Object.fromEntries(data.map(r => [r.code, r.id])),
             toCode: Object.fromEntries(data.map(r => [r.id, r.code])),
@@ -59,7 +149,9 @@ async function getLangMap() {
 
 async function getCatMap() {
     if (!_catMap) {
-        const { data } = await client().from('categories').select('id, slug');
+        const cl = await getClient();
+        if (!cl) return null;
+        const { data } = await cl.from('categories').select('id, slug');
         _catMap = {
             toId:   Object.fromEntries(data.map(r => [r.slug, r.id])),
             toSlug: Object.fromEntries(data.map(r => [r.id, r.slug])),
@@ -72,94 +164,94 @@ async function getCatMap() {
 // Anonymous session management
 // ---------------------------------------------------------------------------
 
-/**
- * Ensure the user has a session (anonymous if not signed in).
- * Returns the user object.
- */
 export async function ensureSession() {
-    const { data: { session } } = await client().auth.getSession();
+    const cl = await getClient();
+    if (!cl) return null;
+    const { data: { session } } = await cl.auth.getSession();
     if (session) return session.user;
 
-    // Sign in anonymously
-    const { data, error } = await client().auth.signInAnonymously();
+    const { data, error } = await cl.auth.signInAnonymously();
     if (error) throw error;
     return data.user;
 }
 
-/**
- * Sign in with Google OAuth.
- */
 export async function signInWithGoogle() {
-    const { error } = await client().auth.signInWithOAuth({
+    const cl = await getClient();
+    if (!cl) return;
+    const { error } = await cl.auth.signInWithOAuth({
         provider: 'google',
         options: { redirectTo: window.location.origin },
     });
     if (error) throw error;
 }
 
-/**
- * Sign in with Apple OAuth.
- */
 export async function signInWithApple() {
-    const { error } = await client().auth.signInWithOAuth({
+    const cl = await getClient();
+    if (!cl) return;
+    const { error } = await cl.auth.signInWithOAuth({
         provider: 'apple',
         options: { redirectTo: window.location.origin },
     });
     if (error) throw error;
 }
 
-/**
- * Sign out.
- */
 export async function signOut() {
-    const { error } = await client().auth.signOut();
+    const cl = await getClient();
+    if (!cl) return;
+    const { error } = await cl.auth.signOut();
     if (error) throw error;
 }
 
-/**
- * Get the current user, or null if no session exists.
- */
 export async function getUser() {
-    const { data: { session } } = await client().auth.getSession();
+    const cl = await getClient();
+    if (!cl) return null;
+    const { data: { session } } = await cl.auth.getSession();
     return session?.user ?? null;
 }
 
-/**
- * Subscribe to auth state changes.
- * Calls callback(event, user) whenever sign-in/sign-out happens.
- * Returns the subscription object (call .unsubscribe() to clean up).
- */
 export function onAuthChange(callback) {
-    const { data: { subscription } } = client().auth.onAuthStateChange((event, session) => {
-        callback(event, session?.user ?? null);
-    });
-    return subscription;
+    // Callers expect a synchronous return. If client is already loaded, subscribe
+    // immediately. Otherwise, defer subscription setup until the client is ready.
+    let _sub = null;
+    const wrapper = {
+        unsubscribe() { if (_sub) _sub.unsubscribe(); },
+    };
+    if (_client) {
+        const { data: { subscription } } = _client.auth.onAuthStateChange((event, session) => {
+            callback(event, session?.user ?? null);
+        });
+        _sub = subscription;
+    } else {
+        getClient().then((cl) => {
+            if (!cl) return;
+            const { data: { subscription } } = cl.auth.onAuthStateChange((event, session) => {
+                callback(event, session?.user ?? null);
+            });
+            _sub = subscription;
+        });
+    }
+    return wrapper;
 }
 
 // ---------------------------------------------------------------------------
 // Content — vocabulary
 // ---------------------------------------------------------------------------
 
-/**
- * Get full vocabulary for a category in a given language.
- * Returns an array of { item_key, display_value, translation, form_type, form_text, alias }
- * (multiple rows per item when forms/aliases exist).
- *
- * Results are cached in memory for the session lifetime.
- */
 const _vocabCache = new Map();
 
 export async function getVocabulary(langCode, categorySlug) {
     const cacheKey = `${langCode}:${categorySlug}`;
     if (_vocabCache.has(cacheKey)) return _vocabCache.get(cacheKey);
 
-    const { data, error } = await client().rpc('get_category_vocab', {
+    const cl = await getClient();
+    if (!cl) return [];
+
+    const { data, error } = await cl.rpc('get_category_vocab', {
         p_lang: langCode,
         p_category: categorySlug,
     });
     if (error) throw error;
 
-    // Normalise: group forms and aliases per item
     const itemMap = new Map();
     for (const row of data) {
         if (!itemMap.has(row.item_key)) {
@@ -185,21 +277,17 @@ export async function getVocabulary(langCode, categorySlug) {
 // Content — verbs
 // ---------------------------------------------------------------------------
 
-/**
- * Get all verb conjugations for a language.
- * Returns an array of { verb_key, emoji, infinitive, pronoun_key, conjugation, english }
- *
- * Results are cached in memory for the session lifetime.
- */
 const _verbCache = new Map();
 
 export async function getVerbs(langCode) {
     if (_verbCache.has(langCode)) return _verbCache.get(langCode);
 
-    const { data, error } = await client().rpc('get_verb_conjugations', { p_lang: langCode });
+    const cl = await getClient();
+    if (!cl) return {};
+
+    const { data, error } = await cl.rpc('get_verb_conjugations', { p_lang: langCode });
     if (error) throw error;
 
-    // Normalise: nest by verb_key → pronoun_key
     const verbMap = new Map();
     for (const row of data) {
         if (!verbMap.has(row.verb_key)) {
@@ -221,16 +309,15 @@ export async function getVerbs(langCode) {
     return result;
 }
 
-/**
- * Get pronoun translations for a language.
- * Returns { pronoun_key → translation } map.
- */
 const _pronounCache = new Map();
 
 export async function getPronounTranslations(langCode) {
     if (_pronounCache.has(langCode)) return _pronounCache.get(langCode);
 
-    const { data, error } = await client().rpc('get_pronoun_translations', { p_lang: langCode });
+    const cl = await getClient();
+    if (!cl) return {};
+
+    const { data, error } = await cl.rpc('get_pronoun_translations', { p_lang: langCode });
     if (error) throw error;
 
     const result = Object.fromEntries(data.map(r => [r.pronoun_key, r.translation]));
@@ -242,20 +329,17 @@ export async function getPronounTranslations(langCode) {
 // User progress
 // ---------------------------------------------------------------------------
 
-/**
- * Get all progress rows for the current user.
- * Returns { categoryProgress: [...], verbProgress: [...] }
- */
 export async function getProgress() {
+    const cl = await getClient();
+    if (!cl) return { categoryProgress: [], verbProgress: [] };
     const user = await ensureSession();
+    if (!user) return { categoryProgress: [], verbProgress: [] };
 
     const [catRes, verbRes] = await Promise.all([
-        client()
-            .from('user_category_progress')
+        cl.from('user_category_progress')
             .select('language_id, category_id, total_correct_answers, current_cycle, levels_completed, updated_at')
             .eq('user_id', user.id),
-        client()
-            .from('user_verb_progress')
+        cl.from('user_verb_progress')
             .select('language_id, tense_id, total_correct_answers, levels_completed, current_cycle, updated_at')
             .eq('user_id', user.id),
     ]);
@@ -266,15 +350,14 @@ export async function getProgress() {
     return { categoryProgress: catRes.data, verbProgress: verbRes.data };
 }
 
-/**
- * Get all category progress for the current user, keyed by app.js progress key format.
- * Returns { [key]: { totalAnswers, currentCycle, levelsCompleted }, ... }
- * where key is langCode for colours, or `${langCode}_${catSlug}` for other categories.
- */
 export async function getProgressMap() {
+    const cl = await getClient();
+    if (!cl) return {};
     const user = await ensureSession();
+    if (!user) return {};
     const [langMap, catMap] = await Promise.all([getLangMap(), getCatMap()]);
-    const { data, error } = await client()
+    if (!langMap || !catMap) return {};
+    const { data, error } = await cl
         .from('user_category_progress')
         .select('language_id, category_id, total_correct_answers, current_cycle, levels_completed')
         .eq('user_id', user.id);
@@ -294,16 +377,17 @@ export async function getProgressMap() {
     return result;
 }
 
-/**
- * Upsert a category progress row.
- * @param {string} langCode - 'es', 'fr', etc.
- * @param {string} categorySlug - 'colours', 'animals', etc.
- * @param {object} progress - { totalAnswers, currentCycle, levelsCompleted }
- */
-export async function upsertCategoryProgress(langCode, categorySlug, progress) {
+// ---------------------------------------------------------------------------
+// Write operations — raw implementations + queue-on-failure wrappers
+// ---------------------------------------------------------------------------
+
+async function _doUpsertCategoryProgress(langCode, categorySlug, progress) {
+    const cl = await getClient();
+    if (!cl) throw new Error('offline');
     const user = await ensureSession();
+    if (!user) throw new Error('no session');
     const [langMap, catMap] = await Promise.all([getLangMap(), getCatMap()]);
-    const { error } = await client()
+    const { error } = await cl
         .from('user_category_progress')
         .upsert({
             user_id:               user.id,
@@ -317,17 +401,24 @@ export async function upsertCategoryProgress(langCode, categorySlug, progress) {
     if (error) throw error;
 }
 
-/**
- * Record a completed game session.
- * @param {object} session - { langCode, categorySlug, mode, phase, score, totalQuestions, avgResponseMs }
- */
-export async function recordSession(session) {
+export async function upsertCategoryProgress(langCode, categorySlug, progress) {
+    try {
+        await _doUpsertCategoryProgress(langCode, categorySlug, progress);
+    } catch {
+        enqueue('upsertCategoryProgress', [langCode, categorySlug, progress]);
+    }
+}
+
+async function _doRecordSession(session) {
+    const cl = await getClient();
+    if (!cl) throw new Error('offline');
     const user = await ensureSession();
+    if (!user) throw new Error('no session');
     const [langMap, catMap] = await Promise.all([getLangMap(), getCatMap()]);
 
     const categoryId = session.categorySlug ? (catMap.toId[session.categorySlug] ?? null) : null;
 
-    const { error } = await client().from('game_sessions').insert({
+    const { error } = await cl.from('game_sessions').insert({
         user_id:         user.id,
         language_id:     langMap.toId[session.langCode],
         category_id:     categoryId,
@@ -342,14 +433,21 @@ export async function recordSession(session) {
     if (error) throw error;
 }
 
-/**
- * Update user stats after a game.
- * @param {object} stats - { bestStreak, highestCycle, gamesPlayed }
- */
-export async function upsertUserStats(stats) {
-    const user = await ensureSession();
+export async function recordSession(session) {
+    try {
+        await _doRecordSession(session);
+    } catch {
+        enqueue('recordSession', [session]);
+    }
+}
 
-    const { error } = await client()
+async function _doUpsertUserStats(stats) {
+    const cl = await getClient();
+    if (!cl) throw new Error('offline');
+    const user = await ensureSession();
+    if (!user) throw new Error('no session');
+
+    const { error } = await cl
         .from('user_stats')
         .upsert({
             user_id:       user.id,
@@ -360,4 +458,21 @@ export async function upsertUserStats(stats) {
         }, { onConflict: 'user_id' });
 
     if (error) throw error;
+}
+
+export async function upsertUserStats(stats) {
+    try {
+        await _doUpsertUserStats(stats);
+    } catch {
+        enqueue('upsertUserStats', [stats]);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Startup: try to load SDK and flush any queued writes
+// ---------------------------------------------------------------------------
+if (isConfigured()) {
+    getClient().then((cl) => {
+        if (cl) flushSyncQueue();
+    });
 }

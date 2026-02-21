@@ -265,7 +265,7 @@ Planned features and improvements for Waffley.
   Track consecutive days of practice with a streak counter and calendar. Resets if a day is missed. Core retention mechanic — most impactful engagement driver.
   - Complexity: M
 
-- [ ] **Offline-first architecture**
+- [x] **Offline-first architecture**
   Full gameplay with no network required. Vocabulary and progress cached locally; background sync when online. Essential before mobile app submission.
   - Complexity: L
 
