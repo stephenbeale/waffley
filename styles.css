@@ -240,6 +240,14 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     flex: 0 1 calc(50% - 0.25rem);
 }
 
+/* Narrow screens: 2-column fallback for verb/pronoun buttons (long conjugations) */
+@media (max-width: 380px) {
+    .buttons.verb-mode .answer-btn {
+        flex: 0 1 calc(50% - 0.25rem);
+        font-size: 1.1rem;
+    }
+}
+
 /* Learning phase highlight on the correct answer button */
 .answer-btn.learning-highlight {
     border-color: #28a745;
