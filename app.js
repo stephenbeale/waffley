@@ -339,6 +339,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
     // Show statistics overlay
     function showStats() {
+        saveFocus();
         updateStatsDisplay();
         document.getElementById('stats-overlay').classList.add('active');
         document.getElementById('close-stats-btn').focus();
@@ -347,6 +348,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     // Hide statistics overlay
     function hideStats() {
         document.getElementById('stats-overlay').classList.remove('active');
+        restoreFocus('stats-btn');
     }
 
     // Statistics state
@@ -1492,6 +1494,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         }
 
         levelUpOverlay.classList.add('active');
+        setTimeout(() => document.getElementById('level-up-menu-btn').focus(), 100);
 
         // Countdown
         let count = LEVEL_UP_COUNTDOWN;
@@ -1582,6 +1585,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         }
 
         cycleCompleteOverlay.classList.add('active');
+        setTimeout(() => document.getElementById('cycle-complete-menu-btn').focus(), 100);
 
         // Longer countdown for cycle complete
         let count = CYCLE_COMPLETE_COUNTDOWN;
@@ -1831,18 +1835,47 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         }
     });
 
+    // ========== FOCUS MANAGEMENT ==========
+
+    let _savedFocus = null;
+
+    function saveFocus() {
+        _savedFocus = document.activeElement;
+    }
+
+    function restoreFocus(fallback) {
+        const target = _savedFocus || (fallback && document.getElementById(fallback));
+        if (target && typeof target.focus === 'function') target.focus();
+        _savedFocus = null;
+    }
+
+    function trapFocus(e, overlay) {
+        if (e.key !== 'Tab') return;
+        const focusable = overlay.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey) {
+            if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+        } else {
+            if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
+    }
+
     // ========== LEGAL OVERLAYS ==========
 
     const privacyOverlay = document.getElementById('privacy-overlay');
     const termsOverlay   = document.getElementById('terms-overlay');
 
     function openOverlay(overlay) {
+        saveFocus();
         overlay.classList.add('active');
         overlay.querySelector('.legal-close-btn').focus();
     }
 
     function closeOverlay(overlay) {
         overlay.classList.remove('active');
+        restoreFocus();
     }
 
     document.getElementById('privacy-link').addEventListener('click', () => openOverlay(privacyOverlay));
@@ -1854,6 +1887,72 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     document.getElementById('terms-to-privacy-link').addEventListener('click', () => {
         closeOverlay(termsOverlay);
         openOverlay(privacyOverlay);
+    });
+
+    // ========== KEYBOARD NAVIGATION ==========
+
+    document.addEventListener('keydown', function(e) {
+        // Escape to close overlays
+        if (e.key === 'Escape') {
+            const statsOverlay = document.getElementById('stats-overlay');
+            if (statsOverlay.classList.contains('active')) { hideStats(); return; }
+            if (privacyOverlay.classList.contains('active')) { closeOverlay(privacyOverlay); return; }
+            if (termsOverlay.classList.contains('active')) { closeOverlay(termsOverlay); return; }
+            if (pauseOverlay.classList.contains('active')) { resumeGame(); return; }
+            // Speed-mercy, level-up, cycle-complete: ignore (user must choose / auto-dismiss)
+        }
+
+        // Focus trapping in active modal overlays
+        if (e.key === 'Tab') {
+            const statsOverlay = document.getElementById('stats-overlay');
+            if (statsOverlay.classList.contains('active')) { trapFocus(e, statsOverlay); return; }
+            if (pauseOverlay.classList.contains('active')) { trapFocus(e, pauseOverlay); return; }
+            if (speedMercyOverlay.classList.contains('active')) { trapFocus(e, speedMercyOverlay); return; }
+            if (privacyOverlay.classList.contains('active')) { trapFocus(e, privacyOverlay); return; }
+            if (termsOverlay.classList.contains('active')) { trapFocus(e, termsOverlay); return; }
+        }
+    });
+
+    // Arrow-key navigation in answer button grid
+    buttonsContainer.addEventListener('keydown', function(e) {
+        if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) return;
+        const btns = Array.from(buttonsContainer.querySelectorAll('.answer-btn'));
+        const idx = btns.indexOf(document.activeElement);
+        if (idx === -1) return;
+        e.preventDefault();
+
+        if (e.key === 'ArrowRight') {
+            btns[(idx + 1) % btns.length].focus();
+        } else if (e.key === 'ArrowLeft') {
+            btns[(idx - 1 + btns.length) % btns.length].focus();
+        } else {
+            // Up/Down: detect columns from offsetTop
+            const rows = [];
+            let currentRow = [btns[0]];
+            for (let i = 1; i < btns.length; i++) {
+                if (btns[i].offsetTop !== btns[i - 1].offsetTop) {
+                    rows.push(currentRow);
+                    currentRow = [btns[i]];
+                } else {
+                    currentRow.push(btns[i]);
+                }
+            }
+            rows.push(currentRow);
+            let row = 0, col = 0;
+            for (let r = 0; r < rows.length; r++) {
+                const c = rows[r].indexOf(btns[idx]);
+                if (c !== -1) { row = r; col = c; break; }
+            }
+            if (e.key === 'ArrowDown') {
+                const nextRow = (row + 1) % rows.length;
+                const nextCol = Math.min(col, rows[nextRow].length - 1);
+                rows[nextRow][nextCol].focus();
+            } else {
+                const prevRow = (row - 1 + rows.length) % rows.length;
+                const prevCol = Math.min(col, rows[prevRow].length - 1);
+                rows[prevRow][prevCol].focus();
+            }
+        }
     });
 
     // ========== DATA EXPORT & ACCOUNT DELETION ==========
@@ -1920,6 +2019,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         if (game.paused || !gameScreen.classList.contains('active')) return;
         if (game.levelUpPending || game.cycleCompletePending) return;
 
+        saveFocus();
         game.paused = true;
         game.pausedTimeRemaining = game.timeLimit - (performance.now() - game.timerStart);
         if (game.pausedTimeRemaining < 0) game.pausedTimeRemaining = 0;
@@ -1948,6 +2048,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
         game.paused = false;
         pauseOverlay.classList.remove('active');
+        restoreFocus();
 
         // Restart timer bar from frozen position
         void timerBar.offsetWidth; // force reflow

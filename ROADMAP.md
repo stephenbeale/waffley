@@ -329,7 +329,7 @@ Planned features and improvements for Waffley.
   Full accessibility audit with NVDA/JAWS. Fix missing labels, improve heading hierarchy, add live regions for game state announcements.
   - Complexity: M
 
-- [ ] **Keyboard-only navigation**
+- [x] **Keyboard-only navigation**
   Full Tab/arrow key support throughout, including button grids. Currently OK but needs a targeted audit for edge cases.
   - Complexity: S
 
