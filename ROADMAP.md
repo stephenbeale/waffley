@@ -345,7 +345,7 @@ Planned features and improvements for Waffley.
   Automated lint, test, and deploy on PRs via GitHub Actions. Auto-deploy to staging on merge to master.
   - Complexity: M
 
-- [ ] **Neural TTS voices**
+- [x] **Neural TTS voices**
   Replace browser TTS with higher-quality neural speech (Google Cloud TTS or Azure Neural) for more natural pronunciation.
   - Complexity: S
 
