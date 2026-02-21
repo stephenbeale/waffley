@@ -233,6 +233,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     font-size: 1.3rem;
     padding: 0.8rem 0.3rem;
     text-transform: none;
+    overflow-wrap: break-word;
 }
 
 /* Balance the 7th button: when it's alone on the last row, make it wider */
@@ -241,7 +242,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 }
 
 /* Narrow screens: 2-column fallback for verb/pronoun buttons (long conjugations) */
-@media (max-width: 380px) {
+@media (max-width: 420px) {
     .buttons.verb-mode .answer-btn {
         flex: 0 1 calc(50% - 0.25rem);
         font-size: 1.1rem;
