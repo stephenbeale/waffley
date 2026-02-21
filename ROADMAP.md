@@ -153,6 +153,12 @@ Planned features and improvements for Waffley.
 - [x] **Reverse-mode emoji buttons: 3-column grid with larger emoji**
   Emoji/colour swatch buttons were shown 2-per-row at small size. Since emojis are compact, changed to a 3-column grid with `font-size: 2.2rem` and `min-height: 72px` for comfortable, clearly visible tap targets.
 
+- [ ] **Pronouns Learning phase should not highlight the correct answer**
+  The `.learning-highlight` green border glow is applied to the correct button in the Learning phase for verb-like modes, but it shouldn't apply to pronouns. Users should have to figure out the answer themselves rather than having it highlighted.
+
+- [ ] **Consider single-column layout for first pronoun round**
+  The first pronoun round (Learning phase, early levels) may benefit from a single-column button layout instead of the 3-column verb grid, since pronoun buttons contain short text and a stacked layout could be clearer for initial learning.
+
 ---
 
 ## Gameplay & UX Improvements
