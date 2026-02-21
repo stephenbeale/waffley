@@ -2139,6 +2139,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     function generateButtons() {
         buttonsContainer.innerHTML = '';
         buttonsContainer.classList.toggle('verb-mode', isVerbLikeMode());
+        buttonsContainer.classList.toggle('pronoun-learning', isPronounMode() && getPhaseFromProgress() === 0);
         const phase = getPhaseFromProgress();
         const items = getCategoryItems();
         const currentForm = game.currentForm || 'base';

@@ -241,6 +241,11 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     flex: 0 1 calc(50% - 0.25rem);
 }
 
+/* Pronoun Learning phase: single-column layout for clearer initial learning */
+.buttons.pronoun-learning .answer-btn {
+    flex: 0 1 100%;
+}
+
 /* Narrow screens: 2-column fallback for verb/pronoun buttons (long conjugations) */
 @media (max-width: 420px) {
     .buttons.verb-mode .answer-btn {

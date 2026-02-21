@@ -156,7 +156,7 @@ Planned features and improvements for Waffley.
 - [x] **Pronouns Learning phase should not highlight the correct answer**
   The `.learning-highlight` green border glow is applied to the correct button in the Learning phase for verb-like modes, but it shouldn't apply to pronouns. Users should have to figure out the answer themselves rather than having it highlighted.
 
-- [ ] **Consider single-column layout for first pronoun round**
+- [x] **Consider single-column layout for first pronoun round**
   The first pronoun round (Learning phase, early levels) may benefit from a single-column button layout instead of the 3-column verb grid, since pronoun buttons contain short text and a stacked layout could be clearer for initial learning.
 
 ---
