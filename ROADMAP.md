@@ -293,7 +293,7 @@ Planned features and improvements for Waffley.
   One optional themed daily quest per language (e.g. "20 correct answers", "finish level 3 in verbs") with bonus XP reward. Resets at midnight UTC.
   - Complexity: M
 
-- [ ] **XP and levelling**
+- [x] **XP and levelling**
   Award XP per correct answer scaled by phase difficulty. Visual level bar on profile. Unlocks cosmetic rewards at thresholds. Feeds into streaks and achievements.
   - Complexity: M
 
