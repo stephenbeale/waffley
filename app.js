@@ -118,6 +118,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             dailyStreak: 0,
             bestDailyStreak: 0,
             lastPlayedDate: null,
+            dailyChallenge: null,
         };
     }
 
@@ -225,6 +226,10 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             updateDailyStreak();
         }
 
+        // Update daily challenge progress
+        const accuracy = game.totalQuestions > 0 ? Math.round((game.score / game.totalQuestions) * 100) : 0;
+        updateDailyChallengeProgress(sessionScore, accuracy, language);
+
         saveStats();
         updateStreakBadge();
     }
@@ -237,6 +242,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     // Reset all statistics and all progress
     function resetStats() {
         stats = getDefaultStats();
+        ensureDailyChallenge(stats);
         saveStats();
         // Also clear all progress and pronoun intro flags for all languages
         localStorage.removeItem('waffley_progress');
@@ -335,6 +341,8 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             row.appendChild(data);
             langList.appendChild(row);
         });
+
+        updateStatsDailyChallenge();
     }
 
     // Show statistics overlay
@@ -452,6 +460,225 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             }).catch(e => { console.debug('[waffley] Sign-out failed:', e.message); window.Sentry?.captureException(e); });
         });
     }
+
+    // ========== DAILY CHALLENGE SYSTEM ==========
+
+    const DAILY_CHALLENGE_TYPES = [
+        {
+            key: 'correct_answers',
+            emoji: '🎯',
+            targets: [10, 15, 20, 25],
+            label: (target, langName) => `Get ${target} correct answers in ${langName}`,
+            languageSpecific: true,
+        },
+        {
+            key: 'play_games',
+            emoji: '🎮',
+            targets: [2, 3, 4, 5],
+            label: (target, langName) => `Play ${target} games in ${langName}`,
+            languageSpecific: true,
+        },
+        {
+            key: 'answer_streak',
+            emoji: '🔥',
+            targets: [5, 8, 10, 12],
+            label: (target, langName) => `Get a streak of ${target} in ${langName}`,
+            languageSpecific: true,
+        },
+        {
+            key: 'perfect_accuracy',
+            emoji: '💯',
+            targets: [1],
+            label: () => 'Score 100% accuracy in a game',
+            languageSpecific: false,
+        },
+    ];
+
+    function hashDateString(dateStr) {
+        let hash = 5381;
+        for (let i = 0; i < dateStr.length; i++) {
+            hash = ((hash << 5) + hash) + dateStr.charCodeAt(i);
+            hash = hash & hash; // Convert to 32-bit integer
+        }
+        return Math.abs(hash);
+    }
+
+    function getTodayUTC() {
+        const now = new Date();
+        return now.toISOString().slice(0, 10);
+    }
+
+    function generateDailyChallenge() {
+        const today = getTodayUTC();
+        const seed = hashDateString(today);
+
+        const langKeys = Object.keys(LANGUAGE_NAMES);
+        const langIndex = seed % langKeys.length;
+        const language = langKeys[langIndex];
+
+        const typeIndex = Math.floor(seed / langKeys.length) % DAILY_CHALLENGE_TYPES.length;
+        const challengeType = DAILY_CHALLENGE_TYPES[typeIndex];
+
+        const targetIndex = Math.floor(seed / (langKeys.length * DAILY_CHALLENGE_TYPES.length)) % challengeType.targets.length;
+        const target = challengeType.targets[targetIndex];
+
+        return {
+            date: today,
+            type: challengeType.key,
+            language: language,
+            target: target,
+            progress: 0,
+            completed: false,
+        };
+    }
+
+    function ensureDailyChallenge(statsObj) {
+        const today = getTodayUTC();
+        const dc = statsObj.dailyChallenge;
+        const isValid = dc
+            && dc.date === today
+            && typeof dc.type === 'string'
+            && typeof dc.target === 'number'
+            && typeof dc.progress === 'number'
+            && getDailyChallengeType(dc);
+        if (!isValid) {
+            statsObj.dailyChallenge = generateDailyChallenge();
+        }
+    }
+
+    function getDailyChallengeType(dc) {
+        return DAILY_CHALLENGE_TYPES.find(t => t.key === dc.type);
+    }
+
+    function getDailyChallengeLabel(dc) {
+        const ct = getDailyChallengeType(dc);
+        if (!ct) return '';
+        const langName = LANGUAGE_NAMES[dc.language] || dc.language;
+        return ct.label(dc.target, langName);
+    }
+
+    function getDailyChallengeEmoji(dc) {
+        const ct = getDailyChallengeType(dc);
+        return ct ? ct.emoji : '🎯';
+    }
+
+    function showDailyChallengeToast() {
+        const toast = document.getElementById('daily-challenge-toast');
+        if (!toast) return;
+        toast.classList.add('visible');
+        setTimeout(() => toast.classList.remove('visible'), 3000);
+    }
+
+    function updateDailyChallengeProgress(sessionScore, accuracy, language) {
+        ensureDailyChallenge(stats);
+        const dc = stats.dailyChallenge;
+        if (dc.completed) return;
+
+        switch (dc.type) {
+            case 'correct_answers':
+                if (language === dc.language) {
+                    dc.progress += sessionScore;
+                }
+                break;
+            case 'play_games':
+                if (language === dc.language) {
+                    dc.progress += 1;
+                }
+                break;
+            case 'answer_streak':
+                if (language === dc.language) {
+                    dc.progress = Math.max(dc.progress, sessionScore);
+                }
+                break;
+            case 'perfect_accuracy':
+                if (accuracy === 100 && sessionScore > 0) {
+                    dc.progress = 1;
+                }
+                break;
+        }
+
+        if (dc.progress >= dc.target) {
+            dc.completed = true;
+            showDailyChallengeToast();
+        }
+    }
+
+    function renderChallengeProgress(dc, elements, opts) {
+        const { container, descEl, fillEl, statusEl, emojiEl } = elements;
+        const completedText = opts?.completedText || 'Completed!';
+        const progressText = opts?.progressText || `${dc.progress} / ${dc.target}`;
+        if (emojiEl) emojiEl.textContent = getDailyChallengeEmoji(dc);
+        if (descEl) descEl.textContent = getDailyChallengeLabel(dc);
+        if (fillEl) {
+            const pct = Math.min(100, Math.round((dc.progress / dc.target) * 100));
+            fillEl.style.width = pct + '%';
+        }
+        if (dc.completed) {
+            container.classList.add('completed');
+            statusEl.textContent = completedText;
+        } else {
+            container.classList.remove('completed');
+            statusEl.textContent = progressText;
+        }
+    }
+
+    function updateDailyChallengeCard() {
+        ensureDailyChallenge(stats);
+        const card = document.getElementById('daily-challenge-card');
+        if (!card) return;
+        card.style.display = '';
+        renderChallengeProgress(stats.dailyChallenge, {
+            container: card,
+            emojiEl: document.getElementById('daily-challenge-emoji'),
+            descEl: document.getElementById('daily-challenge-desc'),
+            fillEl: document.getElementById('daily-challenge-fill'),
+            statusEl: document.getElementById('daily-challenge-status'),
+        });
+    }
+
+    function updateEndScreenChallenge() {
+        ensureDailyChallenge(stats);
+        const dc = stats.dailyChallenge;
+        const el = document.getElementById('daily-challenge-end');
+        if (!el) return;
+
+        const ct = getDailyChallengeType(dc);
+        if (!ct) { el.style.display = 'none'; return; }
+
+        // Only show if this game is relevant to the challenge
+        const isRelevant = !ct.languageSpecific || selectedLanguage === dc.language;
+        if (!isRelevant) {
+            el.style.display = 'none';
+            return;
+        }
+
+        el.style.display = '';
+        renderChallengeProgress(dc, {
+            container: el,
+            emojiEl: document.getElementById('dc-end-emoji'),
+            statusEl: document.getElementById('dc-end-text'),
+        }, {
+            completedText: 'Daily Challenge Complete!',
+            progressText: `Daily: ${dc.progress} / ${dc.target}`,
+        });
+    }
+
+    function updateStatsDailyChallenge() {
+        ensureDailyChallenge(stats);
+        const section = document.getElementById('daily-challenge-stats');
+        if (!section) return;
+        section.style.display = '';
+        renderChallengeProgress(stats.dailyChallenge, {
+            container: section,
+            descEl: document.getElementById('dc-stats-desc'),
+            fillEl: document.getElementById('dc-stats-fill'),
+            statusEl: document.getElementById('dc-stats-status'),
+        });
+    }
+
+    // Initialize daily challenge
+    ensureDailyChallenge(stats);
+    saveStats();
 
     // Get colours available for a given cycle
     function getActiveColors(cycle) {
@@ -1350,6 +1577,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         startCycleEl.textContent = game.currentCycle;
         updateStartButtonText();
         updateStreakBadge();
+        updateDailyChallengeCard();
     }
 
     // Update start button text based on current phase
@@ -1650,6 +1878,32 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     audioToggleInput.checked = audioEnabled;
     audioToggleInput.addEventListener('change', function() {
         saveAudioSetting(this.checked);
+    });
+
+    // ========== THEME ==========
+    const savedTheme = localStorage.getItem('waffley_theme');
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    let lightMode = savedTheme ? savedTheme === 'light' : !systemPrefersDark;
+
+    function applyTheme(light) {
+        if (light) {
+            document.body.setAttribute('data-theme', 'light');
+        } else {
+            document.body.removeAttribute('data-theme');
+        }
+    }
+
+    function saveThemeSetting(light) {
+        localStorage.setItem('waffley_theme', light ? 'light' : 'dark');
+        lightMode = light;
+        applyTheme(light);
+    }
+
+    applyTheme(lightMode);
+    const themeToggleInput = document.getElementById('theme-toggle-input');
+    themeToggleInput.checked = lightMode;
+    themeToggleInput.addEventListener('change', function() {
+        saveThemeSetting(this.checked);
     });
 
     // Refresh progress from localStorage to ensure time display is current
@@ -1962,6 +2216,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             waffley_progress: JSON.parse(localStorage.getItem('waffley_progress') || 'null'),
             waffley_stats: JSON.parse(localStorage.getItem('waffley_stats') || 'null'),
             waffley_audio: localStorage.getItem('waffley_audio'),
+            waffley_theme: localStorage.getItem('waffley_theme'),
             waffley_pronoun_intro: JSON.parse(localStorage.getItem('waffley_pronoun_intro') || 'null'),
             waffley_sync_queue: JSON.parse(localStorage.getItem('waffley_sync_queue') || 'null'),
         };
@@ -2784,5 +3039,6 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             endMessage.textContent = 'Amazing! You\'re a colour word master!';
         }
 
+        updateEndScreenChallenge();
         show(endScreen);
     }
