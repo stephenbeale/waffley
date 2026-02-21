@@ -119,6 +119,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             bestDailyStreak: 0,
             lastPlayedDate: null,
             dailyChallenge: null,
+            achievements: {},
         };
     }
 
@@ -230,8 +231,14 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         const accuracy = game.totalQuestions > 0 ? Math.round((game.score / game.totalQuestions) * 100) : 0;
         updateDailyChallengeProgress(sessionScore, accuracy, language);
 
+        // Check for newly unlocked achievements
+        const newlyUnlocked = checkAchievements({ score: sessionScore, accuracy, language });
+
         saveStats();
         updateStreakBadge();
+
+        // Show achievement toasts after save (delayed if daily challenge toast is showing)
+        showNewAchievements(newlyUnlocked);
     }
 
     // Check if this is a new personal best
@@ -343,6 +350,61 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         });
 
         updateStatsDailyChallenge();
+
+        // Achievements
+        const achList = document.getElementById('achievements-list');
+        if (achList) {
+            achList.innerHTML = '';
+            const unlocked = ACHIEVEMENTS.filter(a => stats.achievements?.[a.id]);
+            const locked = ACHIEVEMENTS.filter(a => !stats.achievements?.[a.id]);
+
+            // Sort unlocked by date (most recent first)
+            unlocked.sort((a, b) => (stats.achievements[b.id].unlockedAt || 0) - (stats.achievements[a.id].unlockedAt || 0));
+
+            function buildAchievementCard(emoji, name, desc, dateText) {
+                const card = document.createElement('div');
+                card.className = dateText ? 'achievement-card unlocked' : 'achievement-card locked';
+
+                const emojiEl = document.createElement('div');
+                emojiEl.className = 'achievement-emoji';
+                emojiEl.textContent = emoji;
+
+                const info = document.createElement('div');
+                info.className = 'achievement-info';
+
+                const nameEl = document.createElement('div');
+                nameEl.className = 'achievement-name';
+                nameEl.textContent = name;
+
+                const descEl = document.createElement('div');
+                descEl.className = 'achievement-desc';
+                descEl.textContent = desc;
+
+                info.appendChild(nameEl);
+                info.appendChild(descEl);
+
+                if (dateText) {
+                    const dateEl = document.createElement('div');
+                    dateEl.className = 'achievement-date';
+                    dateEl.textContent = dateText;
+                    info.appendChild(dateEl);
+                }
+
+                card.appendChild(emojiEl);
+                card.appendChild(info);
+                return card;
+            }
+
+            unlocked.forEach(a => {
+                const date = new Date(stats.achievements[a.id].unlockedAt);
+                const dateStr = date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                achList.appendChild(buildAchievementCard(a.emoji, a.name, a.description, dateStr));
+            });
+
+            locked.forEach(a => {
+                achList.appendChild(buildAchievementCard('\uD83D\uDD12', a.name, a.description, null));
+            });
+        }
     }
 
     // Show statistics overlay
@@ -679,6 +741,142 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     // Initialize daily challenge
     ensureDailyChallenge(stats);
     saveStats();
+
+    // ========== ACHIEVEMENT SYSTEM ==========
+
+    const ACHIEVEMENTS = [
+        {
+            id: 'first_correct',
+            emoji: '\u2B50',
+            name: 'First Steps',
+            description: 'Get your first correct answer',
+            check: (s) => getTotalCorrectAllLanguages() >= 1,
+        },
+        {
+            id: 'ten_streak',
+            emoji: '\uD83D\uDD25',
+            name: 'On Fire',
+            description: 'Get 10 correct in a row',
+            check: (s) => s.bestStreak >= 10,
+        },
+        {
+            id: 'twenty_streak',
+            emoji: '\uD83D\uDCA5',
+            name: 'Unstoppable',
+            description: 'Get 20 correct in a row',
+            check: (s) => s.bestStreak >= 20,
+        },
+        {
+            id: 'perfect_game',
+            emoji: '\uD83D\uDCAF',
+            name: 'Perfectionist',
+            description: 'Score 100% accuracy in a game',
+            check: (s, session) => session.accuracy === 100 && session.score > 0,
+        },
+        {
+            id: 'five_games',
+            emoji: '\uD83C\uDFAE',
+            name: 'Getting Started',
+            description: 'Play 5 games',
+            check: (s) => s.gamesPlayed >= 5,
+        },
+        {
+            id: 'fifty_games',
+            emoji: '\uD83C\uDFC5',
+            name: 'Dedicated Learner',
+            description: 'Play 50 games',
+            check: (s) => s.gamesPlayed >= 50,
+        },
+        {
+            id: 'hundred_games',
+            emoji: '\uD83C\uDFC6',
+            name: 'Centurion',
+            description: 'Play 100 games',
+            check: (s) => s.gamesPlayed >= 100,
+        },
+        {
+            id: 'three_day_streak',
+            emoji: '\uD83D\uDCC5',
+            name: 'Three-Peat',
+            description: 'Play 3 days in a row',
+            check: (s) => (s.dailyStreak || 0) >= 3,
+        },
+        {
+            id: 'seven_day_streak',
+            emoji: '\uD83D\uDDD3\uFE0F',
+            name: 'Week Warrior',
+            description: 'Play 7 days in a row',
+            check: (s) => (s.dailyStreak || 0) >= 7,
+        },
+        {
+            id: 'thirty_day_streak',
+            emoji: '\uD83D\uDC51',
+            name: 'Monthly Master',
+            description: 'Play 30 days in a row',
+            check: (s) => (s.dailyStreak || 0) >= 30,
+        },
+        {
+            id: 'polyglot',
+            emoji: '\uD83C\uDF0D',
+            name: 'Polyglot',
+            description: 'Play games in 3+ languages',
+            check: (s) => Object.keys(s.languageStats || {}).filter(k => s.languageStats[k].games > 0).length >= 3,
+        },
+        {
+            id: 'hundred_correct',
+            emoji: '\uD83D\uDCDA',
+            name: 'Scholar',
+            description: 'Get 100 total correct answers',
+            check: () => getTotalCorrectAllLanguages() >= 100,
+        },
+        {
+            id: 'five_hundred_correct',
+            emoji: '\uD83C\uDF93',
+            name: 'Professor',
+            description: 'Get 500 total correct answers',
+            check: () => getTotalCorrectAllLanguages() >= 500,
+        },
+    ];
+
+    function checkAchievements(sessionData) {
+        if (!stats.achievements) stats.achievements = {};
+        const newlyUnlocked = [];
+        for (const achievement of ACHIEVEMENTS) {
+            if (stats.achievements[achievement.id]) continue;
+            if (achievement.check(stats, sessionData)) {
+                stats.achievements[achievement.id] = { unlockedAt: Date.now() };
+                newlyUnlocked.push(achievement);
+            }
+        }
+        return newlyUnlocked;
+    }
+
+    const ACHIEVEMENT_TOAST_DURATION = 3500;
+    const ACHIEVEMENT_TOAST_GAP = 500;
+
+    function showAchievementToast(achievement) {
+        const toast = document.getElementById('achievement-toast');
+        if (!toast) return;
+        const emojiEl = toast.querySelector('.achievement-toast-emoji');
+        const textEl = toast.querySelector('.achievement-toast-text');
+        if (emojiEl) emojiEl.textContent = achievement.emoji;
+        if (textEl) textEl.textContent = `${achievement.name} unlocked!`;
+        toast.classList.add('visible');
+        setTimeout(() => toast.classList.remove('visible'), ACHIEVEMENT_TOAST_DURATION);
+    }
+
+    function showNewAchievements(newlyUnlocked) {
+        if (newlyUnlocked.length === 0) return;
+        // Check if daily challenge toast is visible — delay to avoid overlap
+        const dcToast = document.getElementById('daily-challenge-toast');
+        const dcVisible = dcToast && dcToast.classList.contains('visible');
+        const initialDelay = dcVisible ? ACHIEVEMENT_TOAST_DURATION : 0;
+        const stagger = ACHIEVEMENT_TOAST_DURATION + ACHIEVEMENT_TOAST_GAP;
+
+        newlyUnlocked.forEach((achievement, i) => {
+            setTimeout(() => showAchievementToast(achievement), initialDelay + i * stagger);
+        });
+    }
 
     // Get colours available for a given cycle
     function getActiveColors(cycle) {
