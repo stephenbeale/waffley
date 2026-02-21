@@ -667,6 +667,9 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         // Verb mode
         currentVerb: null,
 
+        // Ordered rounds: pronouns go in canonical order for first 2 passes per level
+        pronounOrderIndex: 0,
+
         // Session timing: first level of each session always gets MAX_TIME
         levelsAtSessionStart: -1,
     };
@@ -757,19 +760,10 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         return VERB_PRONOUNS[selectedLanguage]?.[key] || '';
     }
 
-    // Get disambiguated button label for a pronoun key.
-    // Some languages have identical pronoun forms (e.g. German "Sie" for she/they).
-    // When duplicates exist, append the emoji to distinguish them.
-    function getPronounButtonText(key) {
-        const translation = getPronounTranslation(key);
-        const hasDuplicate = PRONOUN_KEYS.some(other =>
-            other !== key && getPronounTranslation(other) === translation
-        );
-        if (hasDuplicate) {
-            const emoji = PRONOUN_EMOJIS[key] || '';
-            return emoji ? `${translation} ${emoji}` : `${translation} (${PRONOUN_LABELS[key]})`;
-        }
-        return translation;
+    // Check if chosen pronoun key matches the target via translation
+    // (e.g. German "sie" covers both she and they — clicking it is correct for either)
+    function isPronounMatch(chosen, target) {
+        return getPronounTranslation(chosen) === getPronounTranslation(target);
     }
 
     function isVerbSupported() {
@@ -2087,6 +2081,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         game.mercyUsed = false;
         game.sessionStreak = {};
         game.pitchStreak = 0;
+        game.pronounOrderIndex = 0;
         currentScoreEl.textContent = '0';
 
         // Initialize speech recognition if entering speech mode
@@ -2185,11 +2180,18 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             gameScreen.classList.remove('typing-active');
         }
 
+        // For pronoun mode, skip items whose translation is already represented by another button
+        const seenTranslations = new Set();
         items.forEach(item => {
+            if (isPronounMode()) {
+                const translation = getPronounTranslation(item);
+                if (seenTranslations.has(translation)) return; // skip duplicate
+                seenTranslations.add(translation);
+            }
             const btn = document.createElement('button');
             btn.className = 'answer-btn';
             btn.dataset.color = item;
-            btn.textContent = isPronounMode() ? getPronounButtonText(item) : getFormTranslation(item, currentForm);
+            btn.textContent = isPronounMode() ? getPronounTranslation(item) : getFormTranslation(item, currentForm);
 
             // Apply styling based on current phase and category
             if (phase === 0 && isColorCategory()) {
@@ -2238,12 +2240,20 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             });
         });
 
-        // Pick randomly from unmastered pairs, avoiding same item as last round
-        const pool = unmasteredPairs.length > 0 ? unmasteredPairs : items.map(item => ({ item, form: 'base' }));
-        // Filter out previous item if possible
-        const filteredPool = pool.filter(p => p.item !== game.currentColor);
-        const pickPool = filteredPool.length > 0 ? filteredPool : pool;
-        const pick = pickPool[Math.floor(Math.random() * pickPool.length)];
+        // Verb-like modes: first 2 ordered passes through canonical PRONOUN_KEYS,
+        // then switch to random picking for remaining rounds
+        let pick;
+        if (isVerbLikeMode() && game.pronounOrderIndex < PRONOUN_KEYS.length * 2) {
+            const key = PRONOUN_KEYS[game.pronounOrderIndex % PRONOUN_KEYS.length];
+            pick = { item: key, form: 'base' };
+            game.pronounOrderIndex++;
+        } else {
+            // Pick randomly from unmastered pairs, avoiding same item as last round
+            const pool = unmasteredPairs.length > 0 ? unmasteredPairs : items.map(item => ({ item, form: 'base' }));
+            const filteredPool = pool.filter(p => p.item !== game.currentColor);
+            const pickPool = filteredPool.length > 0 ? filteredPool : pool;
+            pick = pickPool[Math.floor(Math.random() * pickPool.length)];
+        }
 
         game.currentColor = pick.item;
         game.currentForm = pick.form;
@@ -2373,7 +2383,10 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         // Highlight the correct button in Learning phase for verb-like modes
         if (isVerbLikeMode() && getPhaseFromProgress() === 0) {
             buttonsContainer.querySelectorAll('.answer-btn').forEach(btn => {
-                btn.classList.toggle('learning-highlight', btn.dataset.color === game.currentColor);
+                const match = isPronounMode()
+                    ? isPronounMatch(btn.dataset.color, game.currentColor)
+                    : btn.dataset.color === game.currentColor;
+                btn.classList.toggle('learning-highlight', match);
             });
         } else if (isVerbLikeMode()) {
             buttonsContainer.querySelectorAll('.answer-btn.learning-highlight').forEach(btn => {
@@ -2443,7 +2456,8 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         cancelAnimationFrame(game.timerRAF);
         game.totalQuestions++;
 
-        if (chosen === game.currentColor) {
+        const isCorrect = isPronounMode() ? isPronounMatch(chosen, game.currentColor) : chosen === game.currentColor;
+        if (isCorrect) {
             game.responseTimes.push(performance.now() - game.timerStart);
             game.score++;
             game.pitchStreak++;
@@ -2451,8 +2465,9 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             playCorrectSound();
 
             // Track total correct answers (for stats) and mastery
+            // For pronouns, credit the actual target (not the button key which may differ for duplicates)
             game.totalCorrectAnswers++;
-            recordMasteryAnswer(chosen);
+            recordMasteryAnswer(game.currentColor);
             saveProgress();
             updateLevelDisplay();
 
@@ -2474,6 +2489,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
                     initLevelMastery();
                     game.sessionStreak = {};
                     game.pitchStreak = 0;
+                    game.pronounOrderIndex = 0;
                     generateButtons();
                     updateLevelDisplay();
                     showLevelUp(getLevelInCycle(), previousPhase, timeChanged);
