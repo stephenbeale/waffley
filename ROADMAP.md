@@ -387,7 +387,7 @@ Planned features and improvements for Waffley.
   Challenge a friend to beat your score in a specific category. Async result comparison with bonus XP for winner.
   - Complexity: M
 
-- [ ] **Progress sharing**
+- [x] **Progress sharing**
   One-tap generation of a shareable result card for social media (round score, streak milestone, category mastered).
   - Complexity: S
 

@@ -2580,6 +2580,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             startGame();
         }
     });
+    document.getElementById('share-btn').addEventListener('click', shareResult);
     document.getElementById('restart-btn').addEventListener('click', () => {
         // Clean up speech recognition
         if (recognition) {
@@ -3504,6 +3505,194 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
         speedMercyOverlay.classList.add('active');
         document.getElementById('speed-mercy-retry').focus();
+    }
+
+    // ========== SHARE CARD ==========
+
+    function drawStatBox(ctx, x, y, w, h, value, label) {
+        const r = 12;
+        ctx.fillStyle = 'rgba(42,42,78,0.6)';
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.lineTo(x + w - r, y);
+        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+        ctx.lineTo(x + w, y + h - r);
+        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+        ctx.lineTo(x + r, y + h);
+        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+        ctx.lineTo(x, y + r);
+        ctx.quadraticCurveTo(x, y, x + r, y);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 48px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(value, x + w / 2, y + h / 2 - 4);
+
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.font = '24px sans-serif';
+        ctx.fillText(label, x + w / 2, y + h / 2 + 32);
+    }
+
+    function generateShareCard() {
+        const size = 1080;
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+
+        // Dark gradient background
+        const grad = ctx.createLinearGradient(0, 0, 0, size);
+        grad.addColorStop(0, '#1a1a2e');
+        grad.addColorStop(1, '#16213e');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, size, size);
+
+        // Red accent bar
+        ctx.fillStyle = '#e94560';
+        ctx.fillRect(0, 0, size, 6);
+
+        // Branding
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 52px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('🧇 Waffley', size / 2, 80);
+
+        // Subtitle: language flag + category or verb/pronoun label
+        let subtitle = '';
+        const flag = LANGUAGE_FLAGS[selectedLanguage] || '';
+        const langName = LANGUAGE_NAMES[selectedLanguage] || '';
+        if (isPronounMode()) {
+            subtitle = `${flag} ${langName} · Pronouns`;
+        } else if (isVerbMode() && game.currentVerb) {
+            const verbEmoji = VERB_ENGLISH[game.currentVerb]?.emoji || '';
+            const verbName = game.currentVerb.charAt(0).toUpperCase() + game.currentVerb.slice(1);
+            subtitle = `${flag} ${langName} · ${verbEmoji} ${verbName}`;
+        } else {
+            const catInfo = CATEGORIES[selectedCategory];
+            const catLabel = catInfo ? catInfo.label : selectedCategory;
+            const catIcon = catInfo ? catInfo.icon : '';
+            subtitle = `${flag} ${langName} · ${catIcon} ${catLabel}`;
+        }
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.font = '36px sans-serif';
+        ctx.fillText(subtitle, size / 2, 130);
+
+        // Phase name
+        const phaseName = PHASES[getPhaseFromProgress()] || 'Learning';
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.font = '28px sans-serif';
+        ctx.fillText(`${phaseName} Phase`, size / 2, 175);
+
+        // Divider
+        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(size * 0.2, 210);
+        ctx.lineTo(size * 0.8, 210);
+        ctx.stroke();
+
+        // Large score
+        ctx.fillStyle = '#e94560';
+        ctx.font = 'bold 160px sans-serif';
+        ctx.fillText(String(game.score), size / 2, 400);
+
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.font = '32px sans-serif';
+        ctx.fillText('CORRECT ANSWERS', size / 2, 450);
+
+        // Stat boxes
+        const accuracy = game.totalQuestions > 0 ? Math.round((game.score / game.totalQuestions) * 100) : 0;
+        const avgTime = game.responseTimes.length > 0
+            ? (game.responseTimes.reduce((a, b) => a + b, 0) / game.responseTimes.length / 1000).toFixed(1)
+            : '0.0';
+        const boxW = 240;
+        const boxH = 110;
+        const gap = 40;
+        const boxY = 500;
+        drawStatBox(ctx, size / 2 - boxW - gap / 2, boxY, boxW, boxH, accuracy + '%', 'ACCURACY');
+        drawStatBox(ctx, size / 2 + gap / 2, boxY, boxW, boxH, avgTime + 's', 'AVG TIME');
+
+        // Milestones
+        ctx.font = '32px sans-serif';
+        ctx.textAlign = 'center';
+        const milestoneColor = '#16c79a';
+        let milestoneY = 680;
+        const milestoneGap = 50;
+        let milestoneCount = 0;
+
+        // Personal best
+        const isNewBest = game.score > 0 && game.score > stats.bestStreak;
+        if (isNewBest) {
+            ctx.fillStyle = milestoneColor;
+            ctx.fillText('🏆 New Personal Best!', size / 2, milestoneY);
+            milestoneY += milestoneGap;
+            milestoneCount++;
+        }
+
+        // Daily challenge
+        const dc = stats.dailyChallenge;
+        if (dc && dc.completed && milestoneCount < 3) {
+            ctx.fillStyle = milestoneColor;
+            ctx.fillText('📅 Daily Challenge Complete!', size / 2, milestoneY);
+            milestoneY += milestoneGap;
+            milestoneCount++;
+        }
+
+        // Best streak
+        if (stats.bestStreak > 0 && !isNewBest && milestoneCount < 3) {
+            ctx.fillStyle = milestoneColor;
+            ctx.fillText(`🔥 Best streak: ${stats.bestStreak}`, size / 2, milestoneY);
+            milestoneY += milestoneGap;
+            milestoneCount++;
+        }
+
+        // Daily streak
+        if (stats.dailyStreak > 1 && milestoneCount < 3) {
+            ctx.fillStyle = milestoneColor;
+            ctx.fillText(`📅 ${stats.dailyStreak}-day streak`, size / 2, milestoneY);
+            milestoneY += milestoneGap;
+            milestoneCount++;
+        }
+
+        // Footer
+        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        ctx.font = '26px sans-serif';
+        ctx.fillText('waffley.app', size / 2, size - 40);
+
+        return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    }
+
+    async function shareResult() {
+        const btn = document.getElementById('share-btn');
+        btn.disabled = true;
+        btn.textContent = '⏳ Generating...';
+        try {
+            const blob = await generateShareCard();
+            const file = new File([blob], 'waffley-result.png', { type: 'image/png' });
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    files: [file],
+                    title: 'My Waffley Result',
+                    text: `I scored ${game.score} on Waffley! 🧇`,
+                });
+            } else {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'waffley-result.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+        } catch (err) {
+            if (err.name !== 'AbortError') console.error('Share failed:', err);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = '📤 Share';
+        }
     }
 
     function endGame() {
