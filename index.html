@@ -13,6 +13,9 @@
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧇</text></svg>">
 </head>
 <body>
+<script>
+  (function(){var t=localStorage.getItem('waffley_theme');var d=window.matchMedia('(prefers-color-scheme:dark)').matches;if(t?t==='light':!d)document.body.setAttribute('data-theme','light')})();
+</script>
 
 <div id="language-screen" class="active">
     <h1>Waffley</h1>
@@ -37,6 +40,15 @@
             <span class="audio-toggle-slider"></span>
             <span class="audio-toggle-icon">🔊</span>
             <span class="audio-toggle-label">Play pronunciation</span>
+        </label>
+    </div>
+
+    <div class="audio-toggle-container">
+        <label class="audio-toggle">
+            <input type="checkbox" id="theme-toggle-input">
+            <span class="audio-toggle-slider"></span>
+            <span class="audio-toggle-icon">☀️</span>
+            <span class="audio-toggle-label">Light mode</span>
         </label>
     </div>
 
@@ -143,6 +155,18 @@
 
     <div class="streak-badge" id="streak-badge">Start your streak today!</div>
 
+    <div class="daily-challenge-card" id="daily-challenge-card" style="display:none">
+        <div class="daily-challenge-header">
+            <span class="daily-challenge-emoji" id="daily-challenge-emoji"></span>
+            <span class="daily-challenge-title">Daily Challenge</span>
+        </div>
+        <div class="daily-challenge-desc" id="daily-challenge-desc"></div>
+        <div class="daily-challenge-progress-bar">
+            <div class="daily-challenge-progress-fill" id="daily-challenge-fill"></div>
+        </div>
+        <div class="daily-challenge-status" id="daily-challenge-status"></div>
+    </div>
+
     <div class="start-buttons">
         <button id="start-btn" class="btn btn--primary">Start Learning</button>
     </div>
@@ -180,6 +204,14 @@
     <div class="language-stats">
         <div class="language-stats-title">By Language</div>
         <div id="language-stats-list"></div>
+    </div>
+    <div class="daily-challenge-stats" id="daily-challenge-stats" style="display:none">
+        <div class="daily-challenge-stats-title">Today's Challenge</div>
+        <div class="daily-challenge-stats-desc" id="dc-stats-desc"></div>
+        <div class="daily-challenge-progress-bar">
+            <div class="daily-challenge-progress-fill" id="dc-stats-fill"></div>
+        </div>
+        <div class="daily-challenge-stats-status" id="dc-stats-status"></div>
     </div>
     <div class="stats-buttons">
         <button id="close-stats-btn">Close</button>
@@ -290,6 +322,10 @@
     <div class="prompt-label">correct answers</div>
     <div class="personal-best" id="personal-best">New Personal Best!</div>
     <div class="best-streak-display" id="best-streak-display"></div>
+    <div class="daily-challenge-end" id="daily-challenge-end" style="display:none">
+        <span class="daily-challenge-end-emoji" id="dc-end-emoji"></span>
+        <span class="daily-challenge-end-text" id="dc-end-text"></span>
+    </div>
     <div class="stats-row">
         <div class="stat-item">
             <div class="stat-value" id="accuracy-stat">0%</div>
@@ -385,6 +421,11 @@
             <p>You may delete your account at any time from the Statistics screen. We reserve the right to suspend accounts that violate these terms.</p>
         </div>
     </div>
+</div>
+
+<div id="daily-challenge-toast" class="challenge-toast" aria-live="polite">
+    <span class="challenge-toast-emoji">🏆</span>
+    <span class="challenge-toast-text">Daily Challenge Complete!</span>
 </div>
 
 <script>

@@ -289,7 +289,7 @@ Planned features and improvements for Waffley.
   Trophies for milestones: first correct answer, mastering a category, 7-day streak, 100 rounds, perfect accuracy. Displayed on a profile/stats screen.
   - Complexity: M
 
-- [ ] **Daily challenges**
+- [x] **Daily challenges**
   One optional themed daily quest per language (e.g. "20 correct answers", "finish level 3 in verbs") with bonus XP reward. Resets at midnight UTC.
   - Complexity: M
 
@@ -333,7 +333,7 @@ Planned features and improvements for Waffley.
   Full Tab/arrow key support throughout, including button grids. Currently OK but needs a targeted audit for edge cases.
   - Complexity: S
 
-- [ ] **Dark/light mode toggle**
+- [x] **Dark/light mode toggle**
   User preference for light mode (currently dark-only). Reduces eye strain and broadens accessibility.
   - Complexity: S
 
