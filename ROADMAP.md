@@ -337,7 +337,7 @@ Planned features and improvements for Waffley.
   User preference for light mode (currently dark-only). Reduces eye strain and broadens accessibility.
   - Complexity: S
 
-- [ ] **Error tracking (Sentry)**
+- [x] **Error tracking (Sentry)**
   Capture JavaScript errors, API failures, and performance issues in production. Set up alerts for error rate spikes.
   - Complexity: S
 
