@@ -251,6 +251,10 @@ Planned features and improvements for Waffley.
   Last button on an orphaned row (7th of 7 in 3-column grid) now gets `flex: 50%` via `:last-child:nth-child(3n+1)` selector.
   - Complexity: S
 
+- [x] **Ordered pronoun rounds for first 2 passes per level**
+  Pronoun challenges now go through all 7 pronouns in canonical order (I, you, he, she, we, you_pl, they) for the first 2 complete passes at each level, then switch to random picking. Duplicate translations (e.g. German "Sie") are handled by showing one button per unique translation with translation-based matching.
+  - Complexity: S
+
 ---
 
 ## Future Roadmap
