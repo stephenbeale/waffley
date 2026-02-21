@@ -186,9 +186,10 @@ export const PRONOUN_LABELS = {
     I: 'I', you: 'You', he: 'He', she: 'She', we: 'We', you_pl: 'You (all)', they: 'They'
 };
 
-// Emoji icons for gendered/group pronouns shown in the pronoun intro card.
-// I and You are omitted — they need no visual disambiguation.
+// Emoji icons for pronouns shown in the display area and intro card.
 export const PRONOUN_EMOJIS = {
+    I: '🙋',
+    you: '🫵',
     he: '👨',
     she: '👩',
     we: '👫',
