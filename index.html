@@ -181,6 +181,10 @@
         <div class="language-stats-title">By Language</div>
         <div id="language-stats-list"></div>
     </div>
+    <div class="achievements-section">
+        <div class="achievements-title">Achievements</div>
+        <div class="achievements-grid" id="achievements-grid"></div>
+    </div>
     <div class="stats-buttons">
         <button id="close-stats-btn">Close</button>
         <button id="reset-stats-btn">Reset Stats</button>
@@ -386,6 +390,8 @@
         </div>
     </div>
 </div>
+
+<div id="achievement-toast" aria-live="polite"></div>
 
 <script>
   window.SUPABASE_URL      = 'https://yqgrmpewmrmcajbdjaem.supabase.co';
