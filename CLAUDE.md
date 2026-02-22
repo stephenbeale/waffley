@@ -403,3 +403,80 @@ The following PRs from prior sessions remain open. They were NOT touched in this
 - Supabase `site_url` and redirect URL allowlist must be updated after domain goes live
 - The 6 new categories bring the total from the original set to a significantly expanded vocabulary base; seed script is the source of truth for the database state
 - Numbers category intentionally has no article/plural forms — iteration in seed.js skips word-form generation for this category
+
+### 2026-02-22 (continued) - PR Cleanup, Daily Challenges, Progress Sharing, Domain
+
+**Work Completed:**
+
+1. **PR #74 — feat(vocab): add 6 new vocabulary categories** (MERGED, from prior sub-session)
+   - 6 new categories: Body, Clothing, Home, Numbers (0-10), Family, Professions/Jobs
+   - 11 items each, full translations in all 6 languages
+   - Supabase seed run: 121 items, 726 translations, 1596 word forms
+   - ROADMAP.md marked complete
+
+2. **Repository made public** — `gh repo edit --visibility public`
+
+3. **PR #58 — fix: debounce syncStatsToDb with 400ms timer** (MERGED)
+   - Resolved merge conflicts in ROADMAP.md and app.js (debounce + Sentry error reporting)
+   - Rebased on master and force-pushed
+
+4. **PR #68 — feat: add daily challenge system** (CLOSED as superseded)
+   - Created PR #75 to address CodeRabbit review comments:
+     - Guard `statusEl` in `renderChallengeProgress`
+     - Only call `saveStats()` when daily challenge date actually changed
+     - Reuse `getTodayUTC()` instead of duplicating UTC date logic
+     - Add ARIA `role="progressbar"` attributes to progress bars
+   - PR #75 MERGED, PR #68 CLOSED
+
+5. **PR #70 — feat(share): add share card generation and Web Share API** (MERGED)
+   - Fixed phase label: `PHASES[getPhaseFromProgress()]` replacing undefined `game.currentPhase`
+   - Fixed `isNewBest`: strict `>` instead of `>=` to prevent ties triggering "new personal best"
+   - Rebased on master, amended commit, force-pushed and merged
+
+6. **Domain purchase** — `waffley.app` purchased from Namecheap
+   - Hosting: existing SiteGround account
+   - Deployment not yet completed (see Next Steps)
+
+**PRs Merged This Session:**
+- #74 — feat(vocab): add 6 new vocabulary categories
+- #58 — fix: debounce syncStatsToDb with 400ms timer
+- #75 — fix: address CodeRabbit review comments on daily challenges
+- #70 — feat(share): add share card generation and Web Share API
+
+**Current State:**
+- Branch: master, clean, fully synchronized with origin/master
+- No open PRs
+- No uncommitted changes
+- All local feature branches from this session cleaned up
+
+**Unfinished Git Workflows:**
+- None — all PRs resolved, working tree clean
+
+**Stashes (pre-existing, not from this session — candidates for deletion):**
+- `stash@{0}` — ROADMAP.md checkbox updates from `feature/sentry-error-tracking` (likely obsolete)
+- `stash@{1}` — WIP before `feature/pronouns-full-category` branch (likely obsolete)
+- `stash@{2}` — WIP word-stats spaced-repetition system (likely superseded by merged PR #73)
+- `stash@{3}` — TTS revert changes on `fix/tts-voice-quality-v2` (likely obsolete)
+- `stash@{4}`, `stash@{5}` — WIP from old feature branches (obsolete)
+- To drop all: `git stash drop stash@{5}` through `stash@{0}` (drop highest index first)
+
+**Domain and Hosting (In Progress):**
+- `waffley.app` purchased from Namecheap — nameservers not yet pointed
+- Steps remaining for next session:
+  1. Log in to SiteGround cPanel, add `waffley.app` as an addon domain
+  2. Point Namecheap nameservers to SiteGround nameservers
+  3. Obtain SFTP credentials from SiteGround
+  4. Upload all repo files to `waffley.app/public_html` via SFTP
+  5. Install Let's Encrypt SSL certificate (mandatory — `.app` is HSTS-preloaded, HTTPS required)
+  6. Update Supabase project URL allowlist to include `https://waffley.app`
+
+**Next Steps:**
+1. Complete `waffley.app` deployment (priority — domain is live but not deployed)
+2. Drop stale stashes: `git stash drop stash@{5}` through `stash@{0}`
+3. Next roadmap features: expand verb tenses (L), iOS/Android apps (M), or CI/CD pipeline (M)
+
+**Technical Notes:**
+- `.app` TLD is HSTS-preloaded — HTTPS is not optional, must be installed before the site can load
+- Supabase `site_url` and redirect URL allowlist must be updated after domain goes live
+- `PHASES[getPhaseFromProgress()]` is the correct pattern for reading current phase label (not `game.currentPhase` which is undefined after the game object refactor)
+- `isNewBest` strict `>` change means ties do not trigger the "new personal best" toast
