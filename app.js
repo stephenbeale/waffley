@@ -120,6 +120,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             lastPlayedDate: null,
             dailyChallenge: null,
             achievements: {},
+            totalXP: 0,
         };
     }
 
@@ -231,13 +232,29 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         const accuracy = game.totalQuestions > 0 ? Math.round((game.score / game.totalQuestions) * 100) : 0;
         updateDailyChallengeProgress(sessionScore, accuracy, language);
 
+        // Award XP
+        const phase = getPhaseFromProgress();
+        const xpReward = calculateXPReward(sessionScore, accuracy, phase);
+        const previousLevel = getLevelFromXP(stats.totalXP || 0);
+        stats.totalXP = (stats.totalXP || 0) + xpReward.total;
+        const newLevel = getLevelFromXP(stats.totalXP);
+
         // Check for newly unlocked achievements
         const newlyUnlocked = checkAchievements({ score: sessionScore, accuracy, language });
 
         saveStats();
         updateStreakBadge();
 
-        // Show achievement toasts after save (delayed if daily challenge toast is showing)
+        // Show XP toast, then level-up toast if levelled up
+        if (xpReward.total > 0) {
+            showXPToast(xpReward.total);
+        }
+        if (newLevel > previousLevel) {
+            const { title } = getLevelTitle(newLevel);
+            setTimeout(() => showLevelUpToast(newLevel, title), XP_TOAST_DURATION + 300);
+        }
+
+        // Show achievement toasts after save (delayed if daily challenge toast or XP toasts are showing)
         showNewAchievements(newlyUnlocked);
     }
 
@@ -350,6 +367,9 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         });
 
         updateStatsDailyChallenge();
+
+        // XP section
+        updateXPDisplay();
 
         // Achievements
         const achList = document.getElementById('achievements-list');
@@ -836,6 +856,41 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             description: 'Get 500 total correct answers',
             check: () => getTotalCorrectAllLanguages() >= 500,
         },
+        {
+            id: 'xp_1000',
+            emoji: '\u2728',
+            name: 'Rising Star',
+            description: 'Earn 1,000 XP',
+            check: (s) => (s.totalXP || 0) >= 1000,
+        },
+        {
+            id: 'xp_5000',
+            emoji: '\uD83D\uDCAB',
+            name: 'Shining Bright',
+            description: 'Earn 5,000 XP',
+            check: (s) => (s.totalXP || 0) >= 5000,
+        },
+        {
+            id: 'xp_25000',
+            emoji: '\uD83C\uDF1F',
+            name: 'Superstar',
+            description: 'Earn 25,000 XP',
+            check: (s) => (s.totalXP || 0) >= 25000,
+        },
+        {
+            id: 'level_10',
+            emoji: '\uD83D\uDD1F',
+            name: 'Double Digits',
+            description: 'Reach level 10',
+            check: (s) => getLevelFromXP(s.totalXP || 0) >= 10,
+        },
+        {
+            id: 'level_25',
+            emoji: '\u26A1',
+            name: 'Quarter Century',
+            description: 'Reach level 25',
+            check: (s) => getLevelFromXP(s.totalXP || 0) >= 25,
+        },
     ];
 
     function checkAchievements(sessionData) {
@@ -867,15 +922,113 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
     function showNewAchievements(newlyUnlocked) {
         if (newlyUnlocked.length === 0) return;
-        // Check if daily challenge toast is visible — delay to avoid overlap
+        // Check if other toasts are visible — delay to avoid overlap
         const dcToast = document.getElementById('daily-challenge-toast');
         const dcVisible = dcToast && dcToast.classList.contains('visible');
-        const initialDelay = dcVisible ? ACHIEVEMENT_TOAST_DURATION : 0;
+        const xpToast = document.getElementById('xp-toast');
+        const xpVisible = xpToast && xpToast.classList.contains('visible');
+        const lvlToast = document.getElementById('level-up-xp-toast');
+        const lvlVisible = lvlToast && lvlToast.classList.contains('visible');
+
+        let initialDelay = 0;
+        if (dcVisible) initialDelay += ACHIEVEMENT_TOAST_DURATION;
+        if (xpVisible) initialDelay += XP_TOAST_DURATION + 300;
+        if (lvlVisible) initialDelay += LEVEL_UP_TOAST_DURATION + 300;
+        // Minimum delay to let XP toast finish even if not yet visible
+        if (initialDelay === 0) initialDelay = XP_TOAST_DURATION + 500;
         const stagger = ACHIEVEMENT_TOAST_DURATION + ACHIEVEMENT_TOAST_GAP;
 
         newlyUnlocked.forEach((achievement, i) => {
             setTimeout(() => showAchievementToast(achievement), initialDelay + i * stagger);
         });
+    }
+
+    // ========== XP AND LEVELLING SYSTEM ==========
+
+    const XP_PER_CORRECT = 10;
+    const XP_PERFECT_BONUS = 25;
+    const XP_PHASE_MULTIPLIERS = [1, 2, 3, 4]; // Learning, Practice, Typing, Speech
+    const XP_TOAST_DURATION = 2000;
+    const LEVEL_UP_TOAST_DURATION = 3500;
+
+    // Cumulative XP needed to reach level n: 50 * n * (n - 1)
+    function xpForLevel(n) {
+        return 50 * n * (n - 1);
+    }
+
+    // Returns current level from total XP
+    function getLevelFromXP(xp) {
+        let level = 1;
+        while (xpForLevel(level + 1) <= xp) level++;
+        return level;
+    }
+
+    const LEVEL_TITLES = [
+        { minLevel: 50, title: 'Master',       color: '#e94560' },
+        { minLevel: 25, title: 'Expert',        color: '#f0a500' },
+        { minLevel: 15, title: 'Advanced',      color: '#6f42c1' },
+        { minLevel: 10, title: 'Intermediate',  color: '#0f3460' },
+        { minLevel: 5,  title: 'Learner',       color: '#16c79a' },
+        { minLevel: 1,  title: 'Beginner',      color: '#888'    },
+    ];
+
+    function getLevelTitle(level) {
+        for (const entry of LEVEL_TITLES) {
+            if (level >= entry.minLevel) return entry;
+        }
+        return LEVEL_TITLES[LEVEL_TITLES.length - 1];
+    }
+
+    function calculateXPReward(sessionScore, accuracy, phase) {
+        const multiplier = XP_PHASE_MULTIPLIERS[phase] || 1;
+        const base = sessionScore * XP_PER_CORRECT * multiplier;
+        const bonus = (accuracy === 100 && sessionScore > 0) ? XP_PERFECT_BONUS : 0;
+        return { base, bonus, total: base + bonus };
+    }
+
+    function showXPToast(xpEarned) {
+        const toast = document.getElementById('xp-toast');
+        if (!toast) return;
+        toast.textContent = `+${xpEarned} XP`;
+        toast.classList.add('visible');
+        setTimeout(() => toast.classList.remove('visible'), XP_TOAST_DURATION);
+    }
+
+    function showLevelUpToast(level, title) {
+        const toast = document.getElementById('level-up-xp-toast');
+        if (!toast) return;
+        const levelEl = toast.querySelector('.level-toast-level');
+        const titleEl = toast.querySelector('.level-toast-title');
+        if (levelEl) levelEl.textContent = `Level ${level}!`;
+        if (titleEl) titleEl.textContent = title;
+        toast.classList.add('visible');
+        setTimeout(() => toast.classList.remove('visible'), LEVEL_UP_TOAST_DURATION);
+    }
+
+    function updateXPDisplay() {
+        const totalXP = stats.totalXP || 0;
+        const level = getLevelFromXP(totalXP);
+        const { title, color } = getLevelTitle(level);
+        const currentLevelXP = xpForLevel(level);
+        const nextLevelXP = xpForLevel(level + 1);
+        const progressXP = totalXP - currentLevelXP;
+        const neededXP = nextLevelXP - currentLevelXP;
+        const progressPct = neededXP > 0 ? Math.min((progressXP / neededXP) * 100, 100) : 100;
+
+        const levelNumEl = document.getElementById('xp-level-num');
+        const levelTitleEl = document.getElementById('xp-level-title');
+        const progressBar = document.getElementById('xp-progress-fill');
+        const totalXPEl = document.getElementById('xp-total');
+        const progressLabel = document.getElementById('xp-progress-label');
+
+        if (levelNumEl) levelNumEl.textContent = level;
+        if (levelTitleEl) {
+            levelTitleEl.textContent = title;
+            levelTitleEl.style.color = color;
+        }
+        if (progressBar) progressBar.style.width = progressPct + '%';
+        if (totalXPEl) totalXPEl.textContent = totalXP.toLocaleString() + ' XP';
+        if (progressLabel) progressLabel.textContent = `${progressXP} / ${neededXP} XP to next level`;
     }
 
     // Get colours available for a given cycle
@@ -3217,16 +3370,33 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             ? (game.responseTimes.reduce((a, b) => a + b, 0) / game.responseTimes.length / 1000).toFixed(1)
             : '0.0';
 
+        // Calculate XP for end screen display (before stats update awards it)
+        const phase = getPhaseFromProgress();
+        const xpReward = calculateXPReward(game.score, accuracy, phase);
+
         // Check for personal best before updating stats
         const isNewBest = isNewPersonalBest(game.score);
         const previousBest = stats.bestStreak;
 
-        // Update statistics
+        // Update statistics (also awards XP)
         updateStatsAfterGame(game.score, selectedLanguage);
 
         finalScore.textContent = game.score;
         document.getElementById('accuracy-stat').textContent = accuracy + '%';
         document.getElementById('avg-time-stat').textContent = avgTime + 's';
+
+        // Show XP earned on end screen
+        const xpEarnedEl = document.getElementById('xp-earned');
+        if (xpEarnedEl) {
+            if (xpReward.total > 0) {
+                let xpText = `+${xpReward.total} XP`;
+                if (xpReward.bonus > 0) xpText += ` (includes ${xpReward.bonus} bonus)`;
+                xpEarnedEl.textContent = xpText;
+                xpEarnedEl.style.display = '';
+            } else {
+                xpEarnedEl.style.display = 'none';
+            }
+        }
 
         // Show personal best indicator
         const personalBestEl = document.getElementById('personal-best');

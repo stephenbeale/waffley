@@ -175,6 +175,19 @@
 
 <div id="stats-overlay" class="overlay" role="dialog" aria-label="Statistics">
     <div class="stats-title">Your Statistics</div>
+    <div class="xp-section">
+        <div class="xp-level-row">
+            <span class="xp-level-num-label">Level <span id="xp-level-num">1</span></span>
+            <span class="xp-level-title" id="xp-level-title">Beginner</span>
+        </div>
+        <div class="xp-progress-bar">
+            <div class="xp-progress-fill" id="xp-progress-fill"></div>
+        </div>
+        <div class="xp-progress-info">
+            <span class="xp-progress-label" id="xp-progress-label">0 / 100 XP to next level</span>
+            <span class="xp-total" id="xp-total">0 XP</span>
+        </div>
+    </div>
     <div class="stats-grid">
         <div class="stats-card">
             <div class="stats-card-value" id="stats-total-correct">0</div>
@@ -326,6 +339,7 @@
     <div class="prompt-label">correct answers</div>
     <div class="personal-best" id="personal-best">New Personal Best!</div>
     <div class="best-streak-display" id="best-streak-display"></div>
+    <div class="xp-earned" id="xp-earned" style="display:none"></div>
     <div class="daily-challenge-end" id="daily-challenge-end" style="display:none">
         <span class="daily-challenge-end-emoji" id="dc-end-emoji"></span>
         <span class="daily-challenge-end-text" id="dc-end-text"></span>
@@ -435,6 +449,13 @@
 <div id="achievement-toast" class="achievement-toast" aria-live="polite">
     <span class="achievement-toast-emoji">⭐</span>
     <span class="achievement-toast-text">Achievement unlocked!</span>
+</div>
+
+<div id="xp-toast" class="xp-toast" aria-live="polite">+0 XP</div>
+
+<div id="level-up-xp-toast" class="level-up-xp-toast" aria-live="polite">
+    <span class="level-toast-level">Level 2!</span>
+    <span class="level-toast-title">Beginner</span>
 </div>
 
 <script>
