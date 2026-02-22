@@ -127,7 +127,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     // Update daily streak — call once per game when at least one correct answer was given.
     // Increments if the last played date was yesterday, resets if a day was skipped.
     function updateDailyStreak() {
-        const today = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+        const today = getTodayUTC();
         if (stats.lastPlayedDate === today) return; // already counted today
 
         if (stats.lastPlayedDate) {
@@ -835,10 +835,10 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         }
         if (dc.completed) {
             container.classList.add('completed');
-            statusEl.textContent = completedText;
+            if (statusEl) statusEl.textContent = completedText;
         } else {
             container.classList.remove('completed');
-            statusEl.textContent = progressText;
+            if (statusEl) statusEl.textContent = progressText;
         }
     }
 
@@ -896,9 +896,10 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         });
     }
 
-    // Initialize daily challenge
+    // Initialize daily challenge (only save if date changed / challenge regenerated)
+    const dcBefore = stats.dailyChallenge;
     ensureDailyChallenge(stats);
-    saveStats();
+    if (stats.dailyChallenge !== dcBefore) saveStats();
 
     // ========== ACHIEVEMENT SYSTEM ==========
 
