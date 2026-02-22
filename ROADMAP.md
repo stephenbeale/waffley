@@ -301,7 +301,7 @@ Planned features and improvements for Waffley.
   Surface vocabulary items at scientifically optimal intervals based on performance history. Background algorithm schedules review rounds automatically.
   - Complexity: L
 
-- [ ] **Expand vocabulary categories**
+- [x] **Expand vocabulary categories**
   Add 5+ new categories: body parts, clothing, household objects, numbers 0–100, family members, professions.
   - Complexity: M
 

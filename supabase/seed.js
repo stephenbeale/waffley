@@ -72,6 +72,12 @@ const CATEGORY_DEFS = [
     { slug: 'animals',    label: 'Animals',    icon: '🐾', display_type: 'emoji', is_noun: true,  is_adjective: false, sort_order: 2 },
     { slug: 'food',       label: 'Food',       icon: '🍎', display_type: 'emoji', is_noun: true,  is_adjective: false, sort_order: 3 },
     { slug: 'weather',    label: 'Weather',    icon: '☀️', display_type: 'emoji', is_noun: true,  is_adjective: false, sort_order: 4 },
+    { slug: 'body',        label: 'Body',       icon: '🫀', display_type: 'emoji', is_noun: true,  is_adjective: false, sort_order: 5 },
+    { slug: 'clothing',    label: 'Clothing',   icon: '👕', display_type: 'emoji', is_noun: true,  is_adjective: false, sort_order: 6 },
+    { slug: 'home',        label: 'Home',       icon: '🏠', display_type: 'emoji', is_noun: true,  is_adjective: false, sort_order: 7 },
+    { slug: 'numbers',     label: 'Numbers',    icon: '🔢', display_type: 'emoji', is_noun: false, is_adjective: false, sort_order: 8 },
+    { slug: 'family',      label: 'Family',     icon: '👨‍👩‍👧', display_type: 'emoji', is_noun: true,  is_adjective: false, sort_order: 9 },
+    { slug: 'professions', label: 'Jobs',       icon: '💼', display_type: 'emoji', is_noun: true,  is_adjective: false, sort_order: 10 },
 ];
 
 const COLOUR_ITEMS = [
@@ -99,6 +105,30 @@ const EMOJI_ITEMS = {
     weather: {
         sunny: '☀️', rainy: '🌧️', snowy: '❄️', windy: '💨', cloudy: '☁️',
         stormy: '⛈️', hot: '🔥', foggy: '🌫️', rainbow: '🌈', lightning: '⚡', tornado: '🌪️',
+    },
+    body: {
+        eye: '👁️', ear: '👂', nose: '👃', mouth: '👄', hand: '✋',
+        foot: '🦶', heart: '❤️', bone: '🦴', brain: '🧠', tooth: '🦷', tongue: '👅',
+    },
+    clothing: {
+        shirt: '👕', trousers: '👖', dress: '👗', shoe: '👟', hat: '🎩',
+        sock: '🧦', glove: '🧤', scarf: '🧣', jacket: '🧥', tie: '👔', boot: '👢',
+    },
+    home: {
+        chair: '🪑', bed: '🛏️', door: '🚪', lamp: '💡', clock: '🕐',
+        key: '🔑', book: '📖', cup: '☕', phone: '📱', television: '📺', window: '🪟',
+    },
+    numbers: {
+        zero: '0️⃣', one: '1️⃣', two: '2️⃣', three: '3️⃣', four: '4️⃣',
+        five: '5️⃣', six: '6️⃣', seven: '7️⃣', eight: '8️⃣', nine: '9️⃣', ten: '🔟',
+    },
+    family: {
+        mother: '👩', father: '👨', baby: '👶', daughter: '👧', son: '👦',
+        grandmother: '👵', grandfather: '👴', aunt: '👩‍🦰', uncle: '🧔', cousin: '🧑', friend: '🤝',
+    },
+    professions: {
+        doctor: '👨‍⚕️', teacher: '👩‍🏫', chef: '👨‍🍳', firefighter: '👨‍🚒', police: '👮',
+        farmer: '👨‍🌾', pilot: '👨‍✈️', builder: '👷', singer: '🎤', dancer: '💃', scientist: '🔬',
     },
 };
 
@@ -209,7 +239,7 @@ async function seedVocabulary(langRows, catRows) {
             }
         }
         // Emoji categories
-        for (const cat of ['adjectives', 'animals', 'food', 'weather']) {
+        for (const cat of ['adjectives', 'animals', 'food', 'weather', 'body', 'clothing', 'home', 'numbers', 'family', 'professions']) {
             const catData = langData[cat];
             if (!catData?.translations) continue;
             for (const [key, text] of Object.entries(catData.translations)) {
@@ -225,7 +255,7 @@ async function seedVocabulary(langRows, catRows) {
     const forms = [];
     for (const [langCode, langData] of Object.entries(LANG_DATA)) {
         const langId = langMap[langCode];
-        for (const cat of ['adjectives', 'animals', 'food', 'weather']) {
+        for (const cat of ['adjectives', 'animals', 'food', 'weather', 'body', 'clothing', 'home', 'numbers', 'family', 'professions']) {
             const catData = langData[cat];
             if (!catData?.forms) continue;
             for (const [key, formData] of Object.entries(catData.forms)) {

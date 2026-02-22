@@ -80,6 +80,107 @@ export default {
             tornado: { article: 'O', plural: 'Tornados', pluralArticle: 'Os' }
         }
     },
+    body: {
+        translations: {
+            eye: 'Olho', ear: 'Orelha', nose: 'Nariz', mouth: 'Boca', hand: 'Mão',
+            foot: 'Pé', heart: 'Coração', bone: 'Osso', brain: 'Cérebro', tooth: 'Dente', tongue: 'Língua'
+        },
+        forms: {
+            eye: { article: 'O', plural: 'Olhos', pluralArticle: 'Os' },
+            ear: { article: 'A', plural: 'Orelhas', pluralArticle: 'As' },
+            nose: { article: 'O', plural: 'Narizes', pluralArticle: 'Os' },
+            mouth: { article: 'A', plural: 'Bocas', pluralArticle: 'As' },
+            hand: { article: 'A', plural: 'Mãos', pluralArticle: 'As' },
+            foot: { article: 'O', plural: 'Pés', pluralArticle: 'Os' },
+            heart: { article: 'O', plural: 'Corações', pluralArticle: 'Os' },
+            bone: { article: 'O', plural: 'Ossos', pluralArticle: 'Os' },
+            brain: { article: 'O', plural: 'Cérebros', pluralArticle: 'Os' },
+            tooth: { article: 'O', plural: 'Dentes', pluralArticle: 'Os' },
+            tongue: { article: 'A', plural: 'Línguas', pluralArticle: 'As' }
+        }
+    },
+    clothing: {
+        translations: {
+            shirt: 'Camisa', trousers: 'Calças', dress: 'Vestido', shoe: 'Sapato', hat: 'Chapéu',
+            sock: 'Meia', glove: 'Luva', scarf: 'Cachecol', jacket: 'Casaco', tie: 'Gravata', boot: 'Bota'
+        },
+        forms: {
+            shirt: { article: 'A', plural: 'Camisas', pluralArticle: 'As' },
+            trousers: { article: 'As', plural: 'Calças', pluralArticle: 'As' },
+            dress: { article: 'O', plural: 'Vestidos', pluralArticle: 'Os' },
+            shoe: { article: 'O', plural: 'Sapatos', pluralArticle: 'Os' },
+            hat: { article: 'O', plural: 'Chapéus', pluralArticle: 'Os' },
+            sock: { article: 'A', plural: 'Meias', pluralArticle: 'As' },
+            glove: { article: 'A', plural: 'Luvas', pluralArticle: 'As' },
+            scarf: { article: 'O', plural: 'Cachecóis', pluralArticle: 'Os' },
+            jacket: { article: 'O', plural: 'Casacos', pluralArticle: 'Os' },
+            tie: { article: 'A', plural: 'Gravatas', pluralArticle: 'As' },
+            boot: { article: 'A', plural: 'Botas', pluralArticle: 'As' }
+        }
+    },
+    home: {
+        translations: {
+            chair: 'Cadeira', bed: 'Cama', door: 'Porta', lamp: 'Lâmpada', clock: 'Relógio',
+            key: 'Chave', book: 'Livro', cup: 'Chávena', phone: 'Telefone', television: 'Televisão', window: 'Janela'
+        },
+        forms: {
+            chair: { article: 'A', plural: 'Cadeiras', pluralArticle: 'As' },
+            bed: { article: 'A', plural: 'Camas', pluralArticle: 'As' },
+            door: { article: 'A', plural: 'Portas', pluralArticle: 'As' },
+            lamp: { article: 'A', plural: 'Lâmpadas', pluralArticle: 'As' },
+            clock: { article: 'O', plural: 'Relógios', pluralArticle: 'Os' },
+            key: { article: 'A', plural: 'Chaves', pluralArticle: 'As' },
+            book: { article: 'O', plural: 'Livros', pluralArticle: 'Os' },
+            cup: { article: 'A', plural: 'Chávenas', pluralArticle: 'As' },
+            phone: { article: 'O', plural: 'Telefones', pluralArticle: 'Os' },
+            television: { article: 'A', plural: 'Televisões', pluralArticle: 'As' },
+            window: { article: 'A', plural: 'Janelas', pluralArticle: 'As' }
+        }
+    },
+    numbers: {
+        translations: {
+            zero: 'Zero', one: 'Um', two: 'Dois', three: 'Três', four: 'Quatro',
+            five: 'Cinco', six: 'Seis', seven: 'Sete', eight: 'Oito', nine: 'Nove', ten: 'Dez'
+        }
+    },
+    family: {
+        translations: {
+            mother: 'Mãe', father: 'Pai', baby: 'Bebé', daughter: 'Filha', son: 'Filho',
+            grandmother: 'Avó', grandfather: 'Avô', aunt: 'Tia', uncle: 'Tio', cousin: 'Primo', friend: 'Amigo'
+        },
+        forms: {
+            mother: { article: 'A', plural: 'Mães', pluralArticle: 'As' },
+            father: { article: 'O', plural: 'Pais', pluralArticle: 'Os' },
+            baby: { article: 'O', plural: 'Bebés', pluralArticle: 'Os' },
+            daughter: { article: 'A', plural: 'Filhas', pluralArticle: 'As' },
+            son: { article: 'O', plural: 'Filhos', pluralArticle: 'Os' },
+            grandmother: { article: 'A', plural: 'Avós', pluralArticle: 'As' },
+            grandfather: { article: 'O', plural: 'Avôs', pluralArticle: 'Os' },
+            aunt: { article: 'A', plural: 'Tias', pluralArticle: 'As' },
+            uncle: { article: 'O', plural: 'Tios', pluralArticle: 'Os' },
+            cousin: { article: 'O', plural: 'Primos', pluralArticle: 'Os' },
+            friend: { article: 'O', plural: 'Amigos', pluralArticle: 'Os' }
+        }
+    },
+    professions: {
+        translations: {
+            doctor: 'Médico', teacher: 'Professor', chef: 'Cozinheiro', firefighter: 'Bombeiro', police: 'Polícia',
+            farmer: 'Agricultor', pilot: 'Piloto', builder: 'Pedreiro', singer: 'Cantor', dancer: 'Dançarino', scientist: 'Cientista'
+        },
+        forms: {
+            doctor: { article: 'O', plural: 'Médicos', pluralArticle: 'Os' },
+            teacher: { article: 'O', plural: 'Professores', pluralArticle: 'Os' },
+            chef: { article: 'O', plural: 'Cozinheiros', pluralArticle: 'Os' },
+            firefighter: { article: 'O', plural: 'Bombeiros', pluralArticle: 'Os' },
+            police: { article: 'O', plural: 'Polícias', pluralArticle: 'Os' },
+            farmer: { article: 'O', plural: 'Agricultores', pluralArticle: 'Os' },
+            pilot: { article: 'O', plural: 'Pilotos', pluralArticle: 'Os' },
+            builder: { article: 'O', plural: 'Pedreiros', pluralArticle: 'Os' },
+            singer: { article: 'O', plural: 'Cantores', pluralArticle: 'Os' },
+            dancer: { article: 'O', plural: 'Dançarinos', pluralArticle: 'Os' },
+            scientist: { article: 'O', plural: 'Cientistas', pluralArticle: 'Os' }
+        }
+    },
     verbs: {
         pronouns: {
             I: 'Eu', you: 'Tu', he: 'Ele', she: 'Ela', we: 'Nós', you_pl: 'Vós', they: 'Eles/Elas'

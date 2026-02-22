@@ -273,7 +273,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
     // ========== BACKGROUND DB SYNC (OFFLINE-FIRST) ==========
 
-    const DB_CATEGORIES = ['colours', 'adjectives', 'animals', 'food', 'weather'];
+    const DB_CATEGORIES = ['colours', 'adjectives', 'animals', 'food', 'weather', 'body', 'clothing', 'home', 'numbers', 'family', 'professions'];
 
     // Debounce timers keyed by "lang:category" — collapses rapid back-to-back saves
     // (e.g. saveProgress() fires twice within ms at level-up) into a single DB write.
@@ -403,7 +403,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         const allProgress = loadAllProgress();
         if (allProgress.languages) {
             // Remove all keys for the selected language (words and verbs)
-            const categories = ['colours', 'adjectives', 'animals', 'food', 'weather', 'verbs_present', 'verbs_pronouns'];
+            const categories = ['colours', 'adjectives', 'animals', 'food', 'weather', 'body', 'clothing', 'home', 'numbers', 'family', 'professions', 'verbs_present', 'verbs_pronouns'];
             categories.forEach(cat => {
                 const key = getProgressKey(selectedLanguage, cat);
                 delete allProgress.languages[key];

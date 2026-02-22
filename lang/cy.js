@@ -71,6 +71,107 @@ export default {
             tornado: { article: 'Y', plural: 'Corwyntoedd', pluralArticle: 'Y' }
         }
     },
+    body: {
+        translations: {
+            eye: 'Llygad', ear: 'Clust', nose: 'Trwyn', mouth: 'Ceg', hand: 'Llaw',
+            foot: 'Troed', heart: 'Calon', bone: 'Asgwrn', brain: 'Ymennydd', tooth: 'Dant', tongue: 'Tafod'
+        },
+        forms: {
+            eye: { article: 'Y', plural: 'Llygaid', pluralArticle: 'Y' },
+            ear: { article: 'Y', plural: 'Clustiau', pluralArticle: 'Y' },
+            nose: { article: 'Y', plural: 'Trwynau', pluralArticle: 'Y' },
+            mouth: { article: 'Y', plural: 'Cegau', pluralArticle: 'Y' },
+            hand: { article: 'Y', plural: 'Dwylo', pluralArticle: 'Y' },
+            foot: { article: 'Y', plural: 'Traed', pluralArticle: 'Y' },
+            heart: { article: 'Y', plural: 'Calonnau', pluralArticle: 'Y' },
+            bone: { article: 'Yr', plural: 'Esgyrn', pluralArticle: 'Yr' },
+            brain: { article: 'Yr', plural: 'Ymennyddiau', pluralArticle: 'Yr' },
+            tooth: { article: 'Y', plural: 'Dannedd', pluralArticle: 'Y' },
+            tongue: { article: 'Y', plural: 'Tafodau', pluralArticle: 'Y' }
+        }
+    },
+    clothing: {
+        translations: {
+            shirt: 'Crys', trousers: 'Trowsus', dress: 'Ffrog', shoe: 'Esgid', hat: 'Het',
+            sock: 'Hosan', glove: 'Maneg', scarf: 'Sgarff', jacket: 'Siaced', tie: 'Tei', boot: 'Esgid'
+        },
+        forms: {
+            shirt: { article: 'Y', plural: 'Crysau', pluralArticle: 'Y' },
+            trousers: { article: 'Y', plural: 'Trowsusau', pluralArticle: 'Y' },
+            dress: { article: 'Y', plural: 'Ffrogiau', pluralArticle: 'Y' },
+            shoe: { article: 'Yr', plural: 'Esgidiau', pluralArticle: 'Yr' },
+            hat: { article: 'Yr', plural: 'Hetiau', pluralArticle: 'Yr' },
+            sock: { article: 'Yr', plural: 'Hosanau', pluralArticle: 'Yr' },
+            glove: { article: 'Y', plural: 'Menig', pluralArticle: 'Y' },
+            scarf: { article: 'Y', plural: 'Sgarffiau', pluralArticle: 'Y' },
+            jacket: { article: 'Y', plural: 'Siacedi', pluralArticle: 'Y' },
+            tie: { article: 'Y', plural: 'Teis', pluralArticle: 'Y' },
+            boot: { article: 'Yr', plural: 'Esgidiau', pluralArticle: 'Yr' }
+        }
+    },
+    home: {
+        translations: {
+            chair: 'Cadair', bed: 'Gwely', door: 'Drws', lamp: 'Lamp', clock: 'Cloc',
+            key: 'Allwedd', book: 'Llyfr', cup: 'Cwpan', phone: 'Ffôn', television: 'Teledu', window: 'Ffenest'
+        },
+        forms: {
+            chair: { article: 'Y', plural: 'Cadeiriau', pluralArticle: 'Y' },
+            bed: { article: 'Y', plural: 'Gwelyau', pluralArticle: 'Y' },
+            door: { article: 'Y', plural: 'Drysau', pluralArticle: 'Y' },
+            lamp: { article: 'Y', plural: 'Lampau', pluralArticle: 'Y' },
+            clock: { article: 'Y', plural: 'Clociau', pluralArticle: 'Y' },
+            key: { article: 'Yr', plural: 'Allweddi', pluralArticle: 'Yr' },
+            book: { article: 'Y', plural: 'Llyfrau', pluralArticle: 'Y' },
+            cup: { article: 'Y', plural: 'Cwpanau', pluralArticle: 'Y' },
+            phone: { article: 'Y', plural: 'Ffonau', pluralArticle: 'Y' },
+            television: { article: 'Y', plural: 'Teledus', pluralArticle: 'Y' },
+            window: { article: 'Y', plural: 'Ffenestri', pluralArticle: 'Y' }
+        }
+    },
+    numbers: {
+        translations: {
+            zero: 'Dim', one: 'Un', two: 'Dau', three: 'Tri', four: 'Pedwar',
+            five: 'Pump', six: 'Chwech', seven: 'Saith', eight: 'Wyth', nine: 'Naw', ten: 'Deg'
+        }
+    },
+    family: {
+        translations: {
+            mother: 'Mam', father: 'Tad', baby: 'Babi', daughter: 'Merch', son: 'Mab',
+            grandmother: 'Nain', grandfather: 'Taid', aunt: 'Modryb', uncle: 'Ewythr', cousin: 'Cefnder', friend: 'Ffrind'
+        },
+        forms: {
+            mother: { article: 'Y', plural: 'Mamau', pluralArticle: 'Y' },
+            father: { article: 'Y', plural: 'Tadau', pluralArticle: 'Y' },
+            baby: { article: 'Y', plural: 'Babis', pluralArticle: 'Y' },
+            daughter: { article: 'Y', plural: 'Merched', pluralArticle: 'Y' },
+            son: { article: 'Y', plural: 'Meibion', pluralArticle: 'Y' },
+            grandmother: { article: 'Y', plural: 'Neiniau', pluralArticle: 'Y' },
+            grandfather: { article: 'Y', plural: 'Teidiau', pluralArticle: 'Y' },
+            aunt: { article: 'Y', plural: 'Modrybedd', pluralArticle: 'Y' },
+            uncle: { article: 'Yr', plural: 'Ewythrod', pluralArticle: 'Yr' },
+            cousin: { article: 'Y', plural: 'Cefndryd', pluralArticle: 'Y' },
+            friend: { article: 'Y', plural: 'Ffrindiau', pluralArticle: 'Y' }
+        }
+    },
+    professions: {
+        translations: {
+            doctor: 'Meddyg', teacher: 'Athro', chef: 'Cogydd', firefighter: 'Diffoddwr', police: 'Plismon',
+            farmer: 'Ffermwr', pilot: 'Peilot', builder: 'Adeiladwr', singer: 'Canwr', dancer: 'Dawnsiwr', scientist: 'Gwyddonydd'
+        },
+        forms: {
+            doctor: { article: 'Y', plural: 'Meddygon', pluralArticle: 'Y' },
+            teacher: { article: 'Yr', plural: 'Athrawon', pluralArticle: 'Yr' },
+            chef: { article: 'Y', plural: 'Cogyddion', pluralArticle: 'Y' },
+            firefighter: { article: 'Y', plural: 'Diffoddwyr', pluralArticle: 'Y' },
+            police: { article: 'Y', plural: 'Plismyn', pluralArticle: 'Y' },
+            farmer: { article: 'Y', plural: 'Ffermwyr', pluralArticle: 'Y' },
+            pilot: { article: 'Y', plural: 'Peilotiaid', pluralArticle: 'Y' },
+            builder: { article: 'Yr', plural: 'Adeiladwyr', pluralArticle: 'Yr' },
+            singer: { article: 'Y', plural: 'Cantorion', pluralArticle: 'Y' },
+            dancer: { article: 'Y', plural: 'Dawnswyr', pluralArticle: 'Y' },
+            scientist: { article: 'Y', plural: 'Gwyddonwyr', pluralArticle: 'Y' }
+        }
+    },
     aliases: {
         red: ['coch', 'goch'], green: ['gwyrdd', 'wyrdd'], blue: ['glas', 'las'], yellow: ['melyn', 'felyn'],
         orange: ['oren'], pink: ['pinc'], purple: ['porffor'],

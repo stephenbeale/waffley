@@ -80,6 +80,107 @@ export default {
             tornado: { article: 'Il', plural: 'Tornado', pluralArticle: 'I' }
         }
     },
+    body: {
+        translations: {
+            eye: 'Occhio', ear: 'Orecchio', nose: 'Naso', mouth: 'Bocca', hand: 'Mano',
+            foot: 'Piede', heart: 'Cuore', bone: 'Osso', brain: 'Cervello', tooth: 'Dente', tongue: 'Lingua'
+        },
+        forms: {
+            eye: { article: "L'", plural: 'Occhi', pluralArticle: 'Gli' },
+            ear: { article: "L'", plural: 'Orecchie', pluralArticle: 'Le' },
+            nose: { article: 'Il', plural: 'Nasi', pluralArticle: 'I' },
+            mouth: { article: 'La', plural: 'Bocche', pluralArticle: 'Le' },
+            hand: { article: 'La', plural: 'Mani', pluralArticle: 'Le' },
+            foot: { article: 'Il', plural: 'Piedi', pluralArticle: 'I' },
+            heart: { article: 'Il', plural: 'Cuori', pluralArticle: 'I' },
+            bone: { article: "L'", plural: 'Ossa', pluralArticle: 'Le' },
+            brain: { article: 'Il', plural: 'Cervelli', pluralArticle: 'I' },
+            tooth: { article: 'Il', plural: 'Denti', pluralArticle: 'I' },
+            tongue: { article: 'La', plural: 'Lingue', pluralArticle: 'Le' }
+        }
+    },
+    clothing: {
+        translations: {
+            shirt: 'Camicia', trousers: 'Pantaloni', dress: 'Vestito', shoe: 'Scarpa', hat: 'Cappello',
+            sock: 'Calzino', glove: 'Guanto', scarf: 'Sciarpa', jacket: 'Giacca', tie: 'Cravatta', boot: 'Stivale'
+        },
+        forms: {
+            shirt: { article: 'La', plural: 'Camicie', pluralArticle: 'Le' },
+            trousers: { article: 'I', plural: 'Pantaloni', pluralArticle: 'I' },
+            dress: { article: 'Il', plural: 'Vestiti', pluralArticle: 'I' },
+            shoe: { article: 'La', plural: 'Scarpe', pluralArticle: 'Le' },
+            hat: { article: 'Il', plural: 'Cappelli', pluralArticle: 'I' },
+            sock: { article: 'Il', plural: 'Calzini', pluralArticle: 'I' },
+            glove: { article: 'Il', plural: 'Guanti', pluralArticle: 'I' },
+            scarf: { article: 'La', plural: 'Sciarpe', pluralArticle: 'Le' },
+            jacket: { article: 'La', plural: 'Giacche', pluralArticle: 'Le' },
+            tie: { article: 'La', plural: 'Cravatte', pluralArticle: 'Le' },
+            boot: { article: 'Lo', plural: 'Stivali', pluralArticle: 'Gli' }
+        }
+    },
+    home: {
+        translations: {
+            chair: 'Sedia', bed: 'Letto', door: 'Porta', lamp: 'Lampada', clock: 'Orologio',
+            key: 'Chiave', book: 'Libro', cup: 'Tazza', phone: 'Telefono', television: 'Televisione', window: 'Finestra'
+        },
+        forms: {
+            chair: { article: 'La', plural: 'Sedie', pluralArticle: 'Le' },
+            bed: { article: 'Il', plural: 'Letti', pluralArticle: 'I' },
+            door: { article: 'La', plural: 'Porte', pluralArticle: 'Le' },
+            lamp: { article: 'La', plural: 'Lampade', pluralArticle: 'Le' },
+            clock: { article: "L'", plural: 'Orologi', pluralArticle: 'Gli' },
+            key: { article: 'La', plural: 'Chiavi', pluralArticle: 'Le' },
+            book: { article: 'Il', plural: 'Libri', pluralArticle: 'I' },
+            cup: { article: 'La', plural: 'Tazze', pluralArticle: 'Le' },
+            phone: { article: 'Il', plural: 'Telefoni', pluralArticle: 'I' },
+            television: { article: 'La', plural: 'Televisioni', pluralArticle: 'Le' },
+            window: { article: 'La', plural: 'Finestre', pluralArticle: 'Le' }
+        }
+    },
+    numbers: {
+        translations: {
+            zero: 'Zero', one: 'Uno', two: 'Due', three: 'Tre', four: 'Quattro',
+            five: 'Cinque', six: 'Sei', seven: 'Sette', eight: 'Otto', nine: 'Nove', ten: 'Dieci'
+        }
+    },
+    family: {
+        translations: {
+            mother: 'Madre', father: 'Padre', baby: 'Bambino', daughter: 'Figlia', son: 'Figlio',
+            grandmother: 'Nonna', grandfather: 'Nonno', aunt: 'Zia', uncle: 'Zio', cousin: 'Cugino', friend: 'Amico'
+        },
+        forms: {
+            mother: { article: 'La', plural: 'Madri', pluralArticle: 'Le' },
+            father: { article: 'Il', plural: 'Padri', pluralArticle: 'I' },
+            baby: { article: 'Il', plural: 'Bambini', pluralArticle: 'I' },
+            daughter: { article: 'La', plural: 'Figlie', pluralArticle: 'Le' },
+            son: { article: 'Il', plural: 'Figli', pluralArticle: 'I' },
+            grandmother: { article: 'La', plural: 'Nonne', pluralArticle: 'Le' },
+            grandfather: { article: 'Il', plural: 'Nonni', pluralArticle: 'I' },
+            aunt: { article: 'La', plural: 'Zie', pluralArticle: 'Le' },
+            uncle: { article: 'Lo', plural: 'Zii', pluralArticle: 'Gli' },
+            cousin: { article: 'Il', plural: 'Cugini', pluralArticle: 'I' },
+            friend: { article: "L'", plural: 'Amici', pluralArticle: 'Gli' }
+        }
+    },
+    professions: {
+        translations: {
+            doctor: 'Medico', teacher: 'Insegnante', chef: 'Cuoco', firefighter: 'Pompiere', police: 'Poliziotto',
+            farmer: 'Contadino', pilot: 'Pilota', builder: 'Muratore', singer: 'Cantante', dancer: 'Ballerino', scientist: 'Scienziato'
+        },
+        forms: {
+            doctor: { article: 'Il', plural: 'Medici', pluralArticle: 'I' },
+            teacher: { article: "L'", plural: 'Insegnanti', pluralArticle: 'Gli' },
+            chef: { article: 'Il', plural: 'Cuochi', pluralArticle: 'I' },
+            firefighter: { article: 'Il', plural: 'Pompieri', pluralArticle: 'I' },
+            police: { article: 'Il', plural: 'Poliziotti', pluralArticle: 'I' },
+            farmer: { article: 'Il', plural: 'Contadini', pluralArticle: 'I' },
+            pilot: { article: 'Il', plural: 'Piloti', pluralArticle: 'I' },
+            builder: { article: 'Il', plural: 'Muratori', pluralArticle: 'I' },
+            singer: { article: 'Il', plural: 'Cantanti', pluralArticle: 'I' },
+            dancer: { article: 'Il', plural: 'Ballerini', pluralArticle: 'I' },
+            scientist: { article: 'Lo', plural: 'Scienziati', pluralArticle: 'Gli' }
+        }
+    },
     verbs: {
         pronouns: {
             I: 'Io', you: 'Tu', he: 'Lui', she: 'Lei', we: 'Noi', you_pl: 'Voi', they: 'Loro'
