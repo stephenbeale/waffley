@@ -211,9 +211,14 @@ CREATE TABLE IF NOT EXISTS user_item_mastery (
     total_correct  INTEGER  NOT NULL DEFAULT 0,
     total_attempts INTEGER  NOT NULL DEFAULT 0,
     last_seen_at   TIMESTAMPTZ,
+    interval_days   REAL    NOT NULL DEFAULT 0,
+    easiness_factor REAL    NOT NULL DEFAULT 2.5,
+    next_review_at  TIMESTAMPTZ,
     UNIQUE (user_id, item_id, language_id, form_type)
 );
 CREATE INDEX IF NOT EXISTS idx_uim_user_lang ON user_item_mastery(user_id, language_id);
+CREATE INDEX IF NOT EXISTS idx_uim_next_review
+    ON user_item_mastery(user_id, next_review_at) WHERE next_review_at IS NOT NULL;
 
 CREATE TABLE IF NOT EXISTS game_sessions (
     id              UUID     PRIMARY KEY DEFAULT gen_random_uuid(),

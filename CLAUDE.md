@@ -288,3 +288,40 @@ All user-facing features are complete. Only technical debt remains:
 - `isPronounMode()` is the narrower check for pronoun-specific logic (display layout, button text via `getPronounButtonText()`, intro text)
 - `getPronounButtonText()` detects duplicates by checking if any other active key shares the same foreign translation — only appends emoji when a clash exists
 - Stash `stash@{0}` ("WIP: stash before creating feature/pronouns-full-category branch") is likely obsolete; safe to drop after confirming it contains no unique work
+
+### 2026-02-21 - XP and Levelling System
+
+**Work Completed:**
+
+1. **XP and Levelling System** (Feature from roadmap, Complexity: M)
+   - Added XP constants: base 10 XP per correct, phase multipliers (1x/2x/3x/4x for Learning/Practice/Typing/Speech), +25 perfect accuracy bonus
+   - Quadratic level formula: `50 * n * (n - 1)` cumulative XP per level
+   - 6 cosmetic level titles: Beginner (1-4), Learner (5-9), Intermediate (10-14), Advanced (15-24), Expert (25-49), Master (50+)
+   - XP awarded in `updateStatsAfterGame()` with level-up detection
+   - Two toast types: XP earned (green, 2s) and level-up (purple-red gradient, 3.5s)
+   - Stats overlay XP section: level number, title, progress bar, total XP
+   - End screen shows XP earned per game
+   - 5 new achievements: Rising Star (1K XP), Shining Bright (5K XP), Superstar (25K XP), Double Digits (Level 10), Quarter Century (Level 25)
+   - `totalXP: 0` added to `getDefaultStats()` — no migration needed
+   - Achievement toast timing updated to avoid overlap with XP toasts
+   - ROADMAP.md marked complete
+
+2. **End screen simplification** (external user edit)
+   - Share button and end-screen-actions wrapper removed
+   - Simpler layout with direct Continue button
+   - Progress sharing unchecked in ROADMAP.md
+
+**Files Modified:**
+- `app.js` — XP system (constants, formulas, calculation, toasts, stats display, achievements, hook into updateStatsAfterGame)
+- `index.html` — XP section in stats overlay, XP earned on end screen, toast containers, end screen simplified
+- `styles.css` — XP progress bar, level title, XP/level-up toasts, end screen XP badge
+- `ROADMAP.md` — XP and levelling marked complete, Progress sharing unchecked
+
+**Current State:**
+- Branch `feature/xp-and-levelling` — PR being created (push + PR in parallel)
+- All changes committed
+
+**Next Steps:**
+- Merge PR after review
+- Consider spaced repetition scheduling (next P2 roadmap item)
+- Remaining P2 items: expand vocabulary categories, expand verb tenses, iOS/Android native apps, push notifications, user profiles, etc.

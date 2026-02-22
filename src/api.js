@@ -88,6 +88,10 @@ function enqueue(fn, args) {
     } else if (fn === 'upsertUserStats') {
         const idx = queue.findIndex(e => e.fn === fn);
         if (idx !== -1) queue.splice(idx, 1);
+    } else if (fn === 'upsertItemMastery') {
+        const dedupeKey = `${args[0]}:${args[1]}:${args[3]}`;
+        const idx = queue.findIndex(e => e.fn === fn && `${e.args[0]}:${e.args[1]}:${e.args[3]}` === dedupeKey);
+        if (idx !== -1) queue.splice(idx, 1);
     }
 
     queue.push({ fn, args, ts: Date.now() });
@@ -119,6 +123,8 @@ async function flushSyncQueue() {
                 await _doUpsertUserStats(...entry.args);
             } else if (entry.fn === 'recordSession') {
                 await _doRecordSession(...entry.args);
+            } else if (entry.fn === 'upsertItemMastery') {
+                await _doUpsertItemMastery(...entry.args);
             }
         } catch (e) {
             window.Sentry?.captureException(e);
@@ -468,6 +474,103 @@ export async function upsertUserStats(stats) {
     } catch {
         enqueue('upsertUserStats', [stats]);
     }
+}
+
+// ---------------------------------------------------------------------------
+// Item mastery — SRS data (spaced repetition)
+// ---------------------------------------------------------------------------
+
+const _itemIdCache = new Map();
+
+async function getItemId(itemKey, categorySlug) {
+    const cacheKey = `${categorySlug}:${itemKey}`;
+    if (_itemIdCache.has(cacheKey)) return _itemIdCache.get(cacheKey);
+    const cl = await getClient();
+    if (!cl) return null;
+    const { data, error } = await cl
+        .from('vocabulary_items')
+        .select('id')
+        .eq('item_key', itemKey)
+        .eq('category_id', (await getCatMap()).toId[categorySlug])
+        .single();
+    if (error || !data) return null;
+    _itemIdCache.set(cacheKey, data.id);
+    return data.id;
+}
+
+async function _doUpsertItemMastery(langCode, itemKey, categorySlug, formType, srsData) {
+    const cl = await getClient();
+    if (!cl) throw new Error('offline');
+    const user = await ensureSession();
+    if (!user) throw new Error('no session');
+    const [langMap, itemId] = await Promise.all([getLangMap(), getItemId(itemKey, categorySlug)]);
+    if (!itemId || !langMap) throw new Error('missing id');
+
+    const { error } = await cl
+        .from('user_item_mastery')
+        .upsert({
+            user_id:         user.id,
+            item_id:         itemId,
+            language_id:     langMap.toId[langCode],
+            form_type:       formType,
+            correct_streak:  srsData.cs,
+            total_correct:   srsData.tc,
+            total_attempts:  srsData.ta,
+            last_seen_at:    srsData.ls ? new Date(srsData.ls).toISOString() : null,
+            interval_days:   srsData.iv,
+            easiness_factor: srsData.ef,
+            next_review_at:  srsData.nr ? new Date(srsData.nr).toISOString() : null,
+        }, { onConflict: 'user_id,item_id,language_id,form_type' });
+
+    if (error) throw error;
+}
+
+export async function upsertItemMastery(langCode, itemKey, categorySlug, formType, srsData) {
+    try {
+        await _doUpsertItemMastery(langCode, itemKey, categorySlug, formType, srsData);
+    } catch {
+        enqueue('upsertItemMastery', [langCode, itemKey, categorySlug, formType, srsData]);
+    }
+}
+
+export async function getItemMasteryMap() {
+    const cl = await getClient();
+    if (!cl) return {};
+    const user = await ensureSession();
+    if (!user) return {};
+    const [langMap, catMap] = await Promise.all([getLangMap(), getCatMap()]);
+    if (!langMap || !catMap) return {};
+
+    const { data, error } = await cl
+        .from('user_item_mastery')
+        .select(`
+            language_id, form_type,
+            correct_streak, total_correct, total_attempts,
+            last_seen_at, interval_days, easiness_factor, next_review_at,
+            item_id,
+            vocabulary_items!inner ( item_key, category_id )
+        `)
+        .eq('user_id', user.id);
+
+    if (error) throw error;
+
+    const result = {};
+    for (const row of data) {
+        const langCode = langMap.toCode[row.language_id];
+        const catSlug  = catMap.toSlug[row.vocabulary_items.category_id];
+        if (!langCode || !catSlug) continue;
+        const srsKey = `${langCode}:${catSlug}:${row.vocabulary_items.item_key}:${row.form_type}`;
+        result[srsKey] = {
+            cs: row.correct_streak,
+            tc: row.total_correct,
+            ta: row.total_attempts,
+            iv: row.interval_days,
+            ef: row.easiness_factor,
+            ls: row.last_seen_at ? new Date(row.last_seen_at).getTime() : 0,
+            nr: row.next_review_at ? new Date(row.next_review_at).getTime() : 0,
+        };
+    }
+    return result;
 }
 
 // ---------------------------------------------------------------------------
