@@ -1978,6 +1978,14 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     font-size: 1rem;
 }
 
+.end-screen-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
 /* Stats overlay — daily challenge section */
 .daily-challenge-stats {
     max-width: 400px;
