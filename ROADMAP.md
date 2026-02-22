@@ -280,7 +280,7 @@ Planned features and improvements for Waffley.
   - Complexity: M
 
 - [x] **Debounce API saves**
-  Collapse rapid back-to-back `saveProgress()` calls (e.g. answer → level-up within ms) into a single DB write per 400ms window. Prevents double-writes and race conditions.
+  Both `syncProgressToDb()` and `syncStatsToDb()` use 400ms debounce timers to collapse rapid back-to-back saves into single DB writes. Progress debounce is keyed per `lang:category`; stats uses a single global timer.
   - Complexity: S
 
 ### P2 — Should Have
