@@ -12,7 +12,7 @@ import {
     VERB_LIST, VERB_ORDER, PRONOUN_KEYS, VERB_ENGLISH, PRONOUN_LABELS, PRONOUN_EMOJIS,
     VERB_CONJUGATIONS, VERB_PRONOUNS, VERB_LANGUAGES
 } from './data.js';
-import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, recordSession, signInWithGoogle, signInWithApple, signOut, getUser, onAuthChange, exportUserData, deleteAccount } from './src/api.js';
+import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, recordSession, signInWithGoogle, signInWithApple, signOut, getUser, onAuthChange, exportUserData, deleteAccount, upsertItemMastery, getItemMasteryMap } from './src/api.js';
 
     // ========== LEVEL SYSTEM FUNCTIONS ==========
 
@@ -153,6 +153,124 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         syncStatsToDb();
     }
 
+    // ========== SPACED REPETITION (SRS) ==========
+
+    let _srsStore = null;
+
+    function newSRSEntry() {
+        return { cs: 0, tc: 0, ta: 0, iv: 0, ef: 2.5, ls: 0, nr: 0 };
+    }
+
+    function computeSRS(prev, correct) {
+        const now = Date.now();
+        const entry = { ...prev, ls: now, ta: prev.ta + 1 };
+        if (correct) {
+            entry.tc = prev.tc + 1;
+            entry.cs = prev.cs + 1;
+            entry.iv = prev.iv === 0 ? 1 : prev.iv === 1 ? 3 : Math.round(prev.iv * prev.ef);
+            entry.ef = Math.min(2.5, prev.ef + 0.1);
+        } else {
+            entry.cs = 0;
+            entry.iv = 1;
+            entry.ef = Math.max(1.3, prev.ef - 0.2);
+        }
+        entry.nr = now + entry.iv * 86400000;
+        return entry;
+    }
+
+    function loadSRSStore() {
+        if (_srsStore) return _srsStore;
+        try {
+            _srsStore = JSON.parse(localStorage.getItem('waffley_srs') || '{}');
+        } catch { _srsStore = {}; }
+        return _srsStore;
+    }
+
+    function saveSRSStore() {
+        localStorage.setItem('waffley_srs', JSON.stringify(_srsStore || {}));
+    }
+
+    function getSRSEntry(key) {
+        const store = loadSRSStore();
+        return store[key] || newSRSEntry();
+    }
+
+    function setSRSEntry(key, entry) {
+        const store = loadSRSStore();
+        store[key] = entry;
+        saveSRSStore();
+    }
+
+    function getSRSKey(lang, category, item, form) {
+        return `${lang}:${category}:${item}:${form}`;
+    }
+
+    const _srsDbTimers = {};
+
+    function syncSRSToDb(srsKey, srsData) {
+        // Skip verb/pronoun keys — no item_id mapping in DB for those
+        if (isVerbLikeMode()) return;
+        if (!isConfigured()) return;
+        clearTimeout(_srsDbTimers[srsKey]);
+        _srsDbTimers[srsKey] = setTimeout(() => {
+            const parts = srsKey.split(':');
+            upsertItemMastery(parts[0], parts[2], parts[1], parts[3], srsData);
+        }, 2000);
+    }
+
+    function updateSRSAfterAnswer(item, form, correct) {
+        const cat = isVerbMode() ? 'verbs' : isPronounMode() ? 'pronouns' : selectedCategory;
+        const srsKey = getSRSKey(selectedLanguage, cat, item, form);
+        const prev = getSRSEntry(srsKey);
+        const updated = computeSRS(prev, correct);
+        setSRSEntry(srsKey, updated);
+        syncSRSToDb(srsKey, updated);
+    }
+
+    function getSRSWeight(srsEntry) {
+        const now = Date.now();
+        if (srsEntry.nr === 0) return 1; // never reviewed — neutral
+        if (now >= srsEntry.nr) {
+            // Overdue: weight 2–7 proportional to how overdue
+            const overdueDays = (now - srsEntry.nr) / 86400000;
+            return Math.min(7, 2 + overdueDays);
+        }
+        return 0.3; // not yet due
+    }
+
+    function selectActiveItems(allItems, count) {
+        const now = Date.now();
+        const cat = selectedCategory;
+        const due = [];
+        const notDue = [];
+
+        for (const item of allItems) {
+            const srsKey = getSRSKey(selectedLanguage, cat, item, 'base');
+            const entry = getSRSEntry(srsKey);
+            if (entry.nr > 0 && now >= entry.nr) {
+                due.push(item);
+            } else {
+                notDue.push(item);
+            }
+        }
+
+        // Prioritize due items, fill remainder with shuffled not-due
+        const result = [];
+        const shuffledDue = shuffle(due);
+        const shuffledNotDue = shuffle(notDue);
+
+        for (const item of shuffledDue) {
+            if (result.length >= count) break;
+            result.push(item);
+        }
+        for (const item of shuffledNotDue) {
+            if (result.length >= count) break;
+            result.push(item);
+        }
+
+        return result;
+    }
+
     // ========== BACKGROUND DB SYNC (OFFLINE-FIRST) ==========
 
     const DB_CATEGORIES = ['colours', 'adjectives', 'animals', 'food', 'weather'];
@@ -268,9 +386,11 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         stats = getDefaultStats();
         ensureDailyChallenge(stats);
         saveStats();
-        // Also clear all progress and pronoun intro flags for all languages
+        // Also clear all progress, pronoun intro flags, and SRS data for all languages
         localStorage.removeItem('waffley_progress');
         localStorage.removeItem(PRONOUN_INTRO_KEY);
+        localStorage.removeItem('waffley_srs');
+        _srsStore = null;
         game.totalCorrectAnswers = 0;
         game.currentCycle = 1;
         game.levelsCompleted = 0;
@@ -463,6 +583,20 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
                 updateStartScreenProgress();
             }
         }).catch(e => { console.debug('[waffley] DB progress merge failed:', e.message); window.Sentry?.captureException(e); });
+
+        // SRS hydration: merge DB item mastery into localStorage SRS store (DB wins if more attempts)
+        getItemMasteryMap().then(dbSRS => {
+            const store = loadSRSStore();
+            let changed = false;
+            for (const [key, dbEntry] of Object.entries(dbSRS)) {
+                const local = store[key];
+                if (!local || dbEntry.ta > local.ta) {
+                    store[key] = dbEntry;
+                    changed = true;
+                }
+            }
+            if (changed) saveSRSStore();
+        }).catch(e => { console.debug('[waffley] SRS merge failed:', e.message); window.Sentry?.captureException(e); });
     }
 
     // ========== AUTH ==========
@@ -1070,9 +1204,9 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         }
         const count = getButtonCount();
         if (isColorCategory()) {
-            game.activeItems = shuffle(ALL_COLORS).slice(0, count);
+            game.activeItems = selectActiveItems(ALL_COLORS, count);
         } else {
-            game.activeItems = shuffle(getCategoryData().items).slice(0, count);
+            game.activeItems = selectActiveItems(getCategoryData().items, count);
         }
     }
 
@@ -2884,9 +3018,9 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             game.activeColors = getActiveColors(game.currentCycle);
             const count = getButtonCount();
             if (isColorCategory()) {
-                game.activeItems = shuffle(game.activeColors).slice(0, count);
+                game.activeItems = selectActiveItems(game.activeColors, count);
             } else {
-                game.activeItems = shuffle(getCategoryData().items).slice(0, count);
+                game.activeItems = selectActiveItems(getCategoryData().items, count);
             }
         }
         initLevelMastery();
@@ -3071,11 +3205,24 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             pick = { item: key, form: 'base' };
             game.pronounOrderIndex++;
         } else {
-            // Pick randomly from unmastered pairs, avoiding same item as last round
+            // SRS-weighted pick from unmastered pairs, avoiding same item as last round
             const pool = unmasteredPairs.length > 0 ? unmasteredPairs : items.map(item => ({ item, form: 'base' }));
             const filteredPool = pool.filter(p => p.item !== game.currentColor);
             const pickPool = filteredPool.length > 0 ? filteredPool : pool;
-            pick = pickPool[Math.floor(Math.random() * pickPool.length)];
+
+            const cat = isVerbMode() ? 'verbs' : isPronounMode() ? 'pronouns' : selectedCategory;
+            const weights = pickPool.map(p => {
+                const srsKey = getSRSKey(selectedLanguage, cat, p.item, p.form);
+                return getSRSWeight(getSRSEntry(srsKey));
+            });
+            const totalWeight = weights.reduce((a, b) => a + b, 0);
+            let r = Math.random() * totalWeight;
+            let idx = 0;
+            for (; idx < weights.length - 1; idx++) {
+                r -= weights[idx];
+                if (r <= 0) break;
+            }
+            pick = pickPool[idx];
         }
 
         game.currentColor = pick.item;
@@ -3246,6 +3393,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             if (!game.roundActive) return;
             game.roundActive = false;
             game.totalQuestions++;
+            updateSRSAfterAnswer(game.currentColor, game.currentForm || 'base', false);
             if (isAtMinTime() && !game.mercyUsed) {
                 showSpeedMercy();
             } else {
@@ -3288,6 +3436,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             // For pronouns, credit the actual target (not the button key which may differ for duplicates)
             game.totalCorrectAnswers++;
             recordMasteryAnswer(game.currentColor);
+            updateSRSAfterAnswer(game.currentColor, game.currentForm || 'base', true);
             updateLevelDisplay();
 
             // Check if all items in this level are mastered
@@ -3322,6 +3471,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             }
         } else {
             resetSessionStreak();
+            updateSRSAfterAnswer(game.currentColor, game.currentForm || 'base', false);
             // Show mercy overlay at min time if not already used this session
             if (isAtMinTime() && !game.mercyUsed) {
                 showSpeedMercy();

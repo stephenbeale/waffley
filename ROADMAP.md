@@ -297,7 +297,7 @@ Planned features and improvements for Waffley.
   Award XP per correct answer scaled by phase difficulty. Visual level bar on profile. Unlocks cosmetic rewards at thresholds. Feeds into streaks and achievements.
   - Complexity: M
 
-- [ ] **Spaced repetition scheduling**
+- [x] **Spaced repetition scheduling**
   Surface vocabulary items at scientifically optimal intervals based on performance history. Background algorithm schedules review rounds automatically.
   - Complexity: L
 
