@@ -325,3 +325,81 @@ All user-facing features are complete. Only technical debt remains:
 - Merge PR after review
 - Consider spaced repetition scheduling (next P2 roadmap item)
 - Remaining P2 items: expand vocabulary categories, expand verb tenses, iOS/Android native apps, push notifications, user profiles, etc.
+
+### 2026-02-22 - Expand Vocabulary Categories + Domain Purchase
+
+**Work Completed:**
+
+1. **Expand Vocabulary Categories** (PR #74 — MERGED to master, commit `66149f2`)
+   - Added 6 new vocabulary categories: Body, Clothing, Home, Numbers (0-10), Family, Professions/Jobs
+   - Each category has 11 items with full translations in all 6 languages: Spanish, French, German, Italian, Welsh, Portuguese
+   - Noun categories (Body, Clothing, Home, Family, Professions) include article and plural forms
+   - Numbers category excluded from noun/article forms (non-applicable)
+   - Supabase seed script updated and run successfully: 121 items, 726 translations, 1596 word forms
+   - Repository made public: `gh repo edit --visibility public`
+
+2. **Spaced Repetition Scheduling** (PR #73 — MERGED, commit `07153c9`, completed in immediately prior session)
+   - Simplified SM-2 algorithm tracking per-item ease, interval, and due date
+   - Items scheduled according to recall difficulty
+
+**Files Modified in This Session:**
+- `data.js` — Added to CATEGORIES, NOUN_CATEGORIES, and CATEGORY_DATA
+- `lang/es.js`, `lang/fr.js`, `lang/de.js`, `lang/it.js`, `lang/cy.js`, `lang/pt.js` — Added 6 category sections with translations and word forms
+- `index.html` — Added 6 category buttons
+- `app.js` — Updated DB_CATEGORIES and resetProgress() arrays
+- `supabase/seed.js` — Added CATEGORY_DEFS and EMOJI_ITEMS entries, updated iteration loops
+- `ROADMAP.md` — Marked "Expand vocabulary categories" as complete
+
+**PRs Merged This Session:**
+- #74 - feat(vocab): add 6 new vocabulary categories
+
+**Current State:**
+- Branch: master, clean, fully synchronized with origin/master (commit `9273757`)
+- No unpushed commits, no uncommitted changes
+- No stale local branches from this session
+
+**Unfinished Git Workflows:**
+The following PRs from prior sessions remain open. They were NOT touched in this session. All have CodeRabbit review comments only (no blocking approvals required). All CI checks pass.
+
+- **PR #70** (`feature/progress-sharing`) — "Add shareable result card with Web Share API"
+  - CodeRabbit flagged 2 actionable issues in `app.js`: phase label reading `PHASES[game.currentPhase]` (often undefined), and `isNewBest` treating ties as new bests
+  - Status: checks pass, not merged, awaiting decision
+
+- **PR #68** (`feature/daily-challenges`) — "feat: add daily challenge system"
+  - CodeRabbit flagged several nitpicks: missing `waffley_theme` removal on data delete, unguarded `statusEl` in `renderChallengeProgress`, unconditional `saveStats()` on page load, duplicated UTC date logic in `updateDailyStreak`, hardcoded dark-mode colors in daily challenge components
+  - Status: checks pass, not merged, awaiting decision
+
+- **PR #58** (`fix/debounce-api-saves`) — "fix: debounce syncStatsToDb with 400ms timer"
+  - No CodeRabbit actionable issues. Clean PR.
+  - Status: checks pass, no reviews, oldest open PR — likely safe to merge
+
+**Stashes (pre-existing, not from this session):**
+- `stash@{0}` — ROADMAP.md checkbox updates from `feature/sentry-error-tracking` (likely obsolete)
+- `stash@{1}` — WIP before `feature/pronouns-full-category` branch (likely obsolete)
+- `stash@{2}` — WIP word-stats spaced-repetition system (may have been superseded by PR #73)
+- `stash@{3}` — TTS revert changes on `fix/tts-voice-quality-v2` (likely obsolete)
+- `stash@{4}`, `stash@{5}` — WIP from old feature branches (obsolete)
+
+**Domain and Hosting (In Progress):**
+- User purchased `waffley.app` domain from Namecheap
+- Existing SiteGround hosting will be used
+- Steps remaining:
+  1. Log in to SiteGround cPanel, add `waffley.app` as an addon domain
+  2. Point Namecheap nameservers to SiteGround nameservers
+  3. Get SFTP credentials from SiteGround
+  4. Upload all repo files to the `waffley.app/public_html` directory via SFTP
+  5. Install Let's Encrypt SSL certificate (mandatory — `.app` is HSTS-preloaded, requires HTTPS)
+  6. Update Supabase project URL allowlist to include `https://waffley.app`
+
+**Next Steps:**
+1. Decide whether to merge PR #58 (`fix/debounce-api-saves`) — clean PR, no issues flagged
+2. Review and address CodeRabbit comments on PR #68 and PR #70 before merging
+3. Complete domain hosting setup (see steps above)
+4. Drop stale stashes after confirming none contain unique work: `git stash drop stash@{0}` through `stash@{5}`
+5. Next roadmap features to consider: verb tense expansion, user profiles, push notifications
+
+**Technical Notes:**
+- `waffley.app` requires HTTPS — Let's Encrypt via SiteGround cPanel is the expected path
+- Supabase `site_url` and redirect URL allowlist must be updated after domain goes live
+- The 6 new categories bring the total from the original set to a significantly expanded vocabulary base; seed script is the source of truth for the database state
+- Numbers category intentionally has no article/plural forms — iteration in seed.js skips word-form generation for this category
