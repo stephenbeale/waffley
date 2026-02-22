@@ -46,7 +46,7 @@ export const NEW_COLORS_PER_CYCLE = {
 };
 
 // Noun categories that support articles and plurals
-export const NOUN_CATEGORIES = ['animals', 'food', 'weather'];
+export const NOUN_CATEGORIES = ['animals', 'food', 'weather', 'body', 'clothing', 'home', 'family', 'professions'];
 // Adjective category supports feminine forms
 export const ADJECTIVE_CATEGORY = 'adjectives';
 export const ARTICLE_CYCLE = 2;
@@ -83,7 +83,13 @@ export const CATEGORIES = {
     adjectives: { label: 'Adjectives', icon: '😊' },
     animals: { label: 'Animals', icon: '🐾' },
     food: { label: 'Food', icon: '🍎' },
-    weather: { label: 'Weather', icon: '☀️' }
+    weather: { label: 'Weather', icon: '☀️' },
+    body: { label: 'Body', icon: '🫀' },
+    clothing: { label: 'Clothing', icon: '👕' },
+    home: { label: 'Home', icon: '🏠' },
+    numbers: { label: 'Numbers', icon: '🔢' },
+    family: { label: 'Family', icon: '👨‍👩‍👧' },
+    professions: { label: 'Jobs', icon: '💼' },
 };
 
 // Helper: build translations object for a category from all language files
@@ -154,7 +160,67 @@ export const CATEGORY_DATA = {
         },
         translations: buildTranslations('weather'),
         forms: buildForms('weather')
-    }
+    },
+    body: {
+        displayType: 'emoji',
+        items: ['eye', 'ear', 'nose', 'mouth', 'hand', 'foot', 'heart', 'bone', 'brain', 'tooth', 'tongue'],
+        display: {
+            eye: '👁️', ear: '👂', nose: '👃', mouth: '👄', hand: '✋',
+            foot: '🦶', heart: '❤️', bone: '🦴', brain: '🧠', tooth: '🦷', tongue: '👅'
+        },
+        translations: buildTranslations('body'),
+        forms: buildForms('body')
+    },
+    clothing: {
+        displayType: 'emoji',
+        items: ['shirt', 'trousers', 'dress', 'shoe', 'hat', 'sock', 'glove', 'scarf', 'jacket', 'tie', 'boot'],
+        display: {
+            shirt: '👕', trousers: '👖', dress: '👗', shoe: '👟', hat: '🎩',
+            sock: '🧦', glove: '🧤', scarf: '🧣', jacket: '🧥', tie: '👔', boot: '👢'
+        },
+        translations: buildTranslations('clothing'),
+        forms: buildForms('clothing')
+    },
+    home: {
+        displayType: 'emoji',
+        items: ['chair', 'bed', 'door', 'lamp', 'clock', 'key', 'book', 'cup', 'phone', 'television', 'window'],
+        display: {
+            chair: '🪑', bed: '🛏️', door: '🚪', lamp: '💡', clock: '🕐',
+            key: '🔑', book: '📖', cup: '☕', phone: '📱', television: '📺', window: '🪟'
+        },
+        translations: buildTranslations('home'),
+        forms: buildForms('home')
+    },
+    numbers: {
+        displayType: 'emoji',
+        items: ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'],
+        display: {
+            zero: '0️⃣', one: '1️⃣', two: '2️⃣', three: '3️⃣', four: '4️⃣',
+            five: '5️⃣', six: '6️⃣', seven: '7️⃣', eight: '8️⃣', nine: '9️⃣', ten: '🔟'
+        },
+        translations: buildTranslations('numbers'),
+        forms: buildForms('numbers')
+    },
+    family: {
+        displayType: 'emoji',
+        items: ['mother', 'father', 'baby', 'daughter', 'son', 'grandmother', 'grandfather', 'aunt', 'uncle', 'cousin', 'friend'],
+        display: {
+            mother: '👩', father: '👨', baby: '👶', daughter: '👧', son: '👦',
+            grandmother: '👵', grandfather: '👴', aunt: '👩‍🦰', uncle: '🧔', cousin: '🧑', friend: '🤝'
+        },
+        translations: buildTranslations('family'),
+        forms: buildForms('family')
+    },
+    professions: {
+        displayType: 'emoji',
+        items: ['doctor', 'teacher', 'chef', 'firefighter', 'police', 'farmer', 'pilot', 'builder', 'singer', 'dancer', 'scientist'],
+        display: {
+            doctor: '👨‍⚕️', teacher: '👩‍🏫', chef: '👨‍🍳', firefighter: '👨‍🚒', police: '👮',
+            farmer: '👨‍🌾', pilot: '👨‍✈️', builder: '👷', singer: '🎤', dancer: '💃', scientist: '🔬'
+        },
+        translations: buildTranslations('professions'),
+        forms: buildForms('professions')
+    },
 };
 
 // ========== VERB DATA ==========
