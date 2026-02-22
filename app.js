@@ -1303,16 +1303,22 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             btn.textContent         = pronouns[key] || '';
             setTimeout(() => btn.focus(), 50);
 
-            // Speak the target-language pronoun; mark engine warmed-up on end
+            // Speak the target-language pronoun via neural audio, fallback to browser TTS
             const word = pronouns[key];
-            if (word && audioEnabled && ttsSupported) {
-                const langCode = SPEECH_LANG_CODES[selectedLanguage] || 'es-ES';
-                speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(word);
-                utterance.lang  = langCode;
-                utterance.rate  = TTS_SPEECH_RATE;
-                utterance.onend = () => { speechWarmedUp = true; };
-                speechSynthesis.speak(utterance);
+            if (word && audioEnabled) {
+                playNeuralAudio(selectedLanguage, 'pronouns-' + key).then(() => {
+                    speechWarmedUp = true;
+                }).catch(() => {
+                    if (ttsSupported) {
+                        const langCode = SPEECH_LANG_CODES[selectedLanguage] || 'es-ES';
+                        speechSynthesis.cancel();
+                        const utterance = new SpeechSynthesisUtterance(word);
+                        utterance.lang  = langCode;
+                        utterance.rate  = TTS_SPEECH_RATE;
+                        utterance.onend = () => { speechWarmedUp = true; };
+                        speechSynthesis.speak(utterance);
+                    }
+                });
             }
         }
 
@@ -1355,46 +1361,74 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         audioEnabled = enabled;
     }
 
+    // ── Neural TTS (pre-generated MP3 files) ──────────────────
+    function playNeuralAudio(lang, key) {
+        const path = `audio/${lang}/${key}.mp3`;
+        const audio = new Audio(path);
+        return new Promise((resolve, reject) => {
+            audio.addEventListener('ended', resolve);
+            audio.addEventListener('error', reject);
+            audio.play().catch(reject);
+        });
+    }
+
+    function getAudioKey(item) {
+        if (isPronounMode()) {
+            return `pronouns-${item}`;
+        }
+        if (isVerbMode()) {
+            const verb = game.currentVerb;
+            // Learning: full phrase (pronoun + conjugation)
+            // Practice+: conjugation only
+            return getPhaseFromProgress() === 0
+                ? `verbs-${verb}-${item}-phrase`
+                : `verbs-${verb}-${item}`;
+        }
+        // Vocabulary categories
+        const category = selectedCategory;
+        const form = game.currentForm || 'base';
+        if (form === 'feminine') return `${category}-${item}-feminine`;
+        if (form === 'article')  return `${category}-${item}-article`;
+        if (form === 'plural')   return `${category}-${item}-plural`;
+        return `${category}-${item}`;
+    }
+
+    function speakWithBrowserTTS(word, language) {
+        if (!ttsSupported) return;
+        const langCode = SPEECH_LANG_CODES[language] || 'es-ES';
+        speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(word);
+        utterance.lang = langCode;
+        utterance.rate = TTS_SPEECH_RATE;
+        speechSynthesis.speak(utterance);
+    }
+
+    function getBrowserTTSWord(color) {
+        if (isPronounMode()) return getPronounTranslation(color);
+        if (isVerbMode()) {
+            const conjugations = VERB_CONJUGATIONS[selectedLanguage]?.[game.currentVerb];
+            const pronoun = VERB_PRONOUNS[selectedLanguage]?.[color] || '';
+            const conjugation = conjugations?.[color] || '';
+            return getPhaseFromProgress() === 0
+                ? pronoun + ' ' + conjugation
+                : conjugation;
+        }
+        return getFormTranslation(color, game.currentForm || 'base');
+    }
+
     function speakColor(color, language) {
-        if (!audioEnabled || !ttsSupported) return;
+        if (!audioEnabled) return;
         // Don't speak in Typing or Speech mode (would give away the answer)
         if (getPhaseFromProgress() >= 2) return;
         // Silent visual-only rounds: last levels of Learning phase
         if (getPhaseFromProgress() === 0 && getLevelInPhase() >= SILENT_LEVEL_THRESHOLD) return;
 
-        let word;
-        if (isPronounMode()) {
-            word = getPronounTranslation(color);
-        } else if (isVerbMode()) {
-            const conjugations = VERB_CONJUGATIONS[selectedLanguage]?.[game.currentVerb];
-            const pronoun = VERB_PRONOUNS[selectedLanguage]?.[color] || '';
-            const conjugation = conjugations?.[color] || '';
-            // Learning: speak full phrase so user hears the pronoun too
-            // Practice: pronoun is on screen already — speak only the conjugation (faster)
-            word = getPhaseFromProgress() === 0
-                ? pronoun + ' ' + conjugation
-                : conjugation;
-        } else {
-            word = getFormTranslation(color, game.currentForm || 'base');
-        }
-        if (!word) return;
-
-        const langCode = SPEECH_LANG_CODES[language] || 'es-ES';
-
-        const doSpeak = () => {
-            speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(word);
-            utterance.lang = langCode;
-            utterance.rate = TTS_SPEECH_RATE;
-            speechSynthesis.speak(utterance);
-        };
-
-        // If TTS hasn't warmed up yet, wait briefly for the engine to be ready
-        if (!speechWarmedUp) {
-            setTimeout(doSpeak, 150);
-        } else {
-            doSpeak();
-        }
+        // Try neural audio first, fall back to browser TTS
+        const key = getAudioKey(color);
+        playNeuralAudio(language, key).catch(() => {
+            const word = getBrowserTTSWord(color);
+            if (word) speakWithBrowserTTS(word, language);
+        });
     }
 
     let speechWarmedUp = false;
