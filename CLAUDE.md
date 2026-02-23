@@ -480,3 +480,95 @@ The following PRs from prior sessions remain open. They were NOT touched in this
 - Supabase `site_url` and redirect URL allowlist must be updated after domain goes live
 - `PHASES[getPhaseFromProgress()]` is the correct pattern for reading current phase label (not `game.currentPhase` which is undefined after the game object refactor)
 - `isNewBest` strict `>` change means ties do not trigger the "new personal best" toast
+
+### 2026-02-23 - PR Cleanup Sprint + Domain Purchase
+
+**Work Completed:**
+
+1. **PR #76 — fix: pronoun highlight, verb layout, speed mercy complete, verb button dedup** (MERGED)
+   - Removed green highlight from verbs/pronouns in the Learning phase (was inappropriate for guided recognition rounds)
+   - Fixed verb Practice+ layout to use pronoun emoji consistently across all phases
+   - Added "Mark Level Complete" option when speed round timer hits 2 seconds (mercy mechanic)
+   - Deduplicated identical verb conjugation answer buttons using translation-based matching
+
+2. **PR #75 — fix: address CodeRabbit review comments on daily challenges** (MERGED, from prior sub-session)
+   - Guard `statusEl` in `renderChallengeProgress`
+   - Only call `saveStats()` when daily challenge date actually changed
+   - Reuse `getTodayUTC()` instead of duplicating UTC date logic
+   - Add ARIA `role="progressbar"` attributes to progress bars
+
+3. **PR #70 — feat(share): add share card generation and Web Share API** (MERGED, from prior sub-session)
+   - Fixed phase label: `PHASES[getPhaseFromProgress()]` replacing undefined `game.currentPhase`
+   - Fixed `isNewBest`: strict `>` instead of `>=` to prevent ties triggering "new personal best"
+
+4. **PR #58 — fix: debounce syncStatsToDb with 400ms timer** (MERGED, from prior sub-session)
+   - Resolved merge conflicts, kept Sentry error reporting alongside debounce logic
+
+5. **PR #74 — feat(vocab): add 6 new vocabulary categories** (MERGED, from prior sub-session)
+   - Added 6 new categories: Body, Clothing, Home, Numbers (0-10), Family, Professions/Jobs
+   - 11 items each, full translations in all 6 languages
+   - Supabase seed run: 121 items, 726 translations, 1596 word forms
+
+6. **Repository made public** — `gh repo edit --visibility public`
+   - Remote: https://github.com/stephenbeale/waffley (now public)
+
+7. **Domain purchase** — `waffley.app` purchased from Namecheap
+   - Hosting: existing SiteGround account
+   - Deployment not yet started (awaiting SFTP credentials)
+
+**PRs Merged This Session:**
+- #74 — feat(vocab): add 6 new vocabulary categories
+- #58 — fix: debounce syncStatsToDb with 400ms timer
+- #75 — fix: address CodeRabbit review comments on daily challenges
+- #70 — feat(share): add share card generation and Web Share API
+- #76 — fix: pronoun highlight, verb layout, speed mercy complete, verb button dedup
+
+**Current State:**
+- Branch: master, clean, fully synchronized with origin/master
+- No open PRs
+- No uncommitted changes
+- PR #68 (`feature/daily-challenges`) was closed as superseded — its work landed via PR #75
+
+**Stale Local Branches (not yet deleted — candidates for cleanup):**
+- `feature/db-migration`
+- `feature/sentence-building-mode`
+- `feature/xp-and-levelling`
+- `fix/button-two-columns`
+- `fix/pronoun-reinforcement-label`
+- `fix/stats-button-pronoun-access`
+- `refactor/consolidate-language-data`
+- `refactor/es-modules`
+- `refactor/extract-utilities`
+- `refactor/per-language-files`
+- To verify all are merged before deleting: `git branch --merged master`
+- To delete all merged branches in one pass: `git branch --merged master | grep -v '^\* ' | xargs git branch -d`
+
+**Stashes (pre-existing — candidates for deletion):**
+- `stash@{0}` — ROADMAP.md checkbox updates from `feature/sentry-error-tracking` (likely obsolete)
+- `stash@{1}` — WIP before `feature/pronouns-full-category` branch (likely obsolete)
+- `stash@{2}` — WIP word-stats spaced-repetition system (likely superseded by merged PR #73)
+- `stash@{3}` — TTS revert changes on `fix/tts-voice-quality-v2` (likely obsolete)
+- `stash@{4}`, `stash@{5}` — WIP from old feature branches (obsolete)
+- To drop all: `git stash drop stash@{5}` through `stash@{0}` (drop highest index first)
+
+**Domain and Hosting (In Progress):**
+- `waffley.app` purchased from Namecheap — nameservers not yet pointed to SiteGround
+- Steps remaining for next session:
+  1. Log in to SiteGround cPanel, add `waffley.app` as an addon domain
+  2. Point Namecheap nameservers to SiteGround nameservers
+  3. Obtain SFTP credentials from SiteGround
+  4. Upload all repo files to `waffley.app/public_html` via SFTP
+  5. Install Let's Encrypt SSL certificate (mandatory — `.app` is HSTS-preloaded, HTTPS required)
+  6. Update Supabase project URL allowlist to include `https://waffley.app`
+
+**Next Steps:**
+1. Deploy `waffley.app` on SiteGround — highest priority, domain is live but nothing is served
+2. Drop stale stashes: `git stash drop stash@{5}` through `stash@{0}`
+3. Delete stale local branches (verify merged first, then batch delete)
+4. Next roadmap features: expand verb tenses (L), iOS/Android apps (M), CI/CD pipeline (M)
+
+**Technical Notes:**
+- `.app` TLD is HSTS-preloaded — HTTPS is mandatory before the site can load in any browser
+- Supabase `site_url` and redirect URL allowlist must be updated after domain goes live
+- PR #76 dedup logic uses translation-based matching: two buttons with identical foreign-language text are collapsed into one, preventing confusing duplicate answer options for verb conjugations
+- `PHASES[getPhaseFromProgress()]` is the correct pattern for reading the current phase label
