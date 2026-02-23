@@ -2954,6 +2954,16 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         endGame();
     });
 
+    document.getElementById('speed-mercy-complete').addEventListener('click', function() {
+        speedMercyOverlay.classList.remove('active');
+        // Advance the level as if mastered
+        const previousPhase = getPhaseFromProgress();
+        const timeChanged = willTimeChange();
+        game.levelsCompleted++;
+        saveProgress();
+        showLevelUp(previousPhase, timeChanged);
+    });
+
     // ========== TYPING MODE HANDLERS ==========
 
     function populateAccentButtons() {
@@ -3143,11 +3153,12 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             gameScreen.classList.remove('typing-active');
         }
 
-        // For pronoun mode, skip items whose translation is already represented by another button
+        // For verb-like modes, skip items whose button text is already represented by another button
+        // (e.g. German "Sie" for she/they, or Spanish "Es" for he/she conjugations)
         const seenTranslations = new Set();
         items.forEach(item => {
-            if (isPronounMode()) {
-                const translation = getPronounTranslation(item);
+            if (isVerbLikeMode()) {
+                const translation = isPronounMode() ? getPronounTranslation(item) : getFormTranslation(item, currentForm);
                 if (seenTranslations.has(translation)) return; // skip duplicate
                 seenTranslations.add(translation);
             }
@@ -3258,19 +3269,22 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             const pronoun = game.currentColor; // pronoun key
             const phase = getPhaseFromProgress();
             colorDisplay.style.backgroundColor = 'transparent';
-            colorDisplay.classList.remove('plural-display', 'pronoun-display');
-            colorDisplay.classList.add('emoji-display');
+            colorDisplay.classList.remove('plural-display');
 
             if (phase === 0) {
                 // Learning: show English phrase e.g. "I go"
                 const englishPhrase = VERB_ENGLISH[verb]?.[pronoun] || '';
+                colorDisplay.classList.remove('pronoun-display');
+                colorDisplay.classList.add('emoji-display');
                 colorDisplay.innerHTML = `<div class="verb-display">${englishPhrase}</div>`;
             } else {
-                // Practice+: show target-language pronoun + verb context
-                const targetPronoun = VERB_PRONOUNS[selectedLanguage]?.[pronoun] || '';
+                // Practice+: show pronoun emoji + label (consistent with pronoun mode), plus verb context
+                const emoji = PRONOUN_EMOJIS[pronoun] || '';
+                const label = PRONOUN_LABELS[pronoun] || pronoun;
                 const infinitive = VERB_CONJUGATIONS[selectedLanguage]?.[verb]?.infinitive || '';
                 const englishVerb = VERB_ENGLISH[verb]?.I?.replace('I ', '') || '';
-                colorDisplay.innerHTML = `<div class="verb-display">${targetPronoun}</div><div class="verb-context">${infinitive} (to ${englishVerb})</div>`;
+                colorDisplay.classList.add('emoji-display', 'pronoun-display');
+                colorDisplay.innerHTML = `<span class="pronoun-emoji">${emoji}</span><div class="pronoun-english-label">${label}</div><div class="verb-context">${infinitive} (to ${englishVerb})</div>`;
             }
         } else if (game.isReverseRound) {
             // Reverse mode: show the foreign word as the question
@@ -3356,12 +3370,8 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             reinforcementLabel.textContent = '';
         }
 
-        // Highlight the correct button in Learning phase for verbs (not pronouns)
-        if (isVerbLikeMode() && !isPronounMode() && getPhaseFromProgress() === 0) {
-            buttonsContainer.querySelectorAll('.answer-btn').forEach(btn => {
-                btn.classList.toggle('learning-highlight', btn.dataset.color === game.currentColor);
-            });
-        } else if (isVerbLikeMode()) {
+        // Remove any stale learning-highlight from verb-like mode buttons
+        if (isVerbLikeMode()) {
             buttonsContainer.querySelectorAll('.answer-btn.learning-highlight').forEach(btn => {
                 btn.classList.remove('learning-highlight');
             });
@@ -3430,7 +3440,9 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         cancelAnimationFrame(game.timerRAF);
         game.totalQuestions++;
 
-        const isCorrect = isPronounMode() ? isPronounMatch(chosen, game.currentColor) : chosen === game.currentColor;
+        const isCorrect = isPronounMode() ? isPronounMatch(chosen, game.currentColor)
+            : isVerbMode() ? getVerbTranslation(chosen) === getVerbTranslation(game.currentColor)
+            : chosen === game.currentColor;
         if (isCorrect) {
             game.responseTimes.push(performance.now() - game.timerStart);
             game.score++;
@@ -3498,10 +3510,15 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         typingUI.classList.remove('active');
 
         const timeSeconds = getTimeLimitSeconds();
-        speedMercyMessage.textContent = timeSeconds <= MIN_TIME
+        const atMinTime = isAtMinTime();
+        speedMercyMessage.textContent = atMinTime
             ? "That 2-second timer is no joke!"
             : `Tricky at ${timeSeconds} seconds!`;
         speedMercyStreak.textContent = `Current streak: ${game.score}`;
+
+        // Show "Mark Level Complete" option when at minimum time
+        document.getElementById('speed-mercy-complete-hint').style.display = atMinTime ? '' : 'none';
+        document.getElementById('speed-mercy-complete').style.display = atMinTime ? '' : 'none';
 
         speedMercyOverlay.classList.add('active');
         document.getElementById('speed-mercy-retry').focus();
