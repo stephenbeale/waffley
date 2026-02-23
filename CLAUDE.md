@@ -572,3 +572,64 @@ The following PRs from prior sessions remain open. They were NOT touched in this
 - Supabase `site_url` and redirect URL allowlist must be updated after domain goes live
 - PR #76 dedup logic uses translation-based matching: two buttons with identical foreign-language text are collapsed into one, preventing confusing duplicate answer options for verb conjugations
 - `PHASES[getPhaseFromProgress()]` is the correct pattern for reading the current phase label
+
+### 2026-02-23 (continued) - Buy Me a Coffee Nudge + Roadmap Cleanup
+
+**Work Completed:**
+
+1. **PR #77 — feat: add Buy Me a Coffee nudge at key touchpoints** (MERGED to master, commit `eb1f090`)
+   - Added a non-intrusive coffee nudge link at 4 locations: home screen footer, end screen, stats overlay, cycle-complete overlay
+   - URL: https://buymeacoffee.com/stephenbeale
+   - Styled at 0.75rem, 60% opacity, gold accent link color (#f0a500)
+   - Overlay instances (stats overlay, cycle-complete overlay) include a subtle top border separator for visual separation
+   - Commit: `a0fca89` - feat: add Buy Me a Coffee nudge at key touchpoints
+
+2. **Roadmap cleanup** — Marked 4 bugs as complete (all fixed in PR #76):
+   - Pronouns round green highlight removed
+   - Level 6 pronoun-verb layout fixed
+   - 2-second speed round mark-as-complete added
+   - Duplicate pronoun answer buttons deduplicated
+   - Commit: `f17ee69` - docs: mark 4 bug fixes as complete in roadmap
+
+**PRs Merged This Session:**
+- #77 — feat: add Buy Me a Coffee nudge at key touchpoints
+
+**Current State:**
+- Branch: master, clean, fully synchronized with origin/master (commit `f17ee69`)
+- No open PRs
+- No uncommitted changes
+- No unpushed commits
+
+**Unfinished Git Workflows:**
+- None — working tree clean, all PRs resolved
+
+**Pending Cleanup (carried over from earlier today):**
+- Stale git stashes (`stash@{0}` through `stash@{5}`) — all likely obsolete, see descriptions in prior session notes
+  - To drop all: `git stash drop stash@{5}` through `stash@{0}` (drop highest index first)
+- Stale local branches not yet deleted:
+  - `feature/db-migration`, `feature/sentence-building-mode`, `feature/xp-and-levelling`
+  - `fix/button-two-columns`, `fix/pronoun-reinforcement-label`, `fix/stats-button-pronoun-access`
+  - `refactor/consolidate-language-data`, `refactor/es-modules`, `refactor/extract-utilities`, `refactor/per-language-files`
+  - To delete all merged: `git branch --merged master | grep -v '^\* ' | xargs git branch -d`
+
+**Domain and Hosting (In Progress):**
+- `waffley.app` purchased from Namecheap — nameservers not yet pointed to SiteGround
+- Steps remaining:
+  1. Log in to SiteGround cPanel, add `waffley.app` as an addon domain
+  2. Point Namecheap nameservers to SiteGround nameservers
+  3. Obtain SFTP credentials from SiteGround
+  4. Upload all repo files to `waffley.app/public_html` via SFTP
+  5. Install Let's Encrypt SSL certificate (mandatory — `.app` is HSTS-preloaded, HTTPS required)
+  6. Update Supabase project URL allowlist to include `https://waffley.app`
+
+**Next Steps:**
+1. Deploy `waffley.app` on SiteGround — highest priority, domain is purchased but nothing is served
+2. Drop stale stashes: `git stash drop stash@{5}` through `stash@{0}`
+3. Delete stale local branches: `git branch --merged master | grep -v '^\* ' | xargs git branch -d`
+4. Next roadmap features: expand verb tenses (L), iOS/Android apps (M), CI/CD pipeline (M)
+
+**Technical Notes:**
+- Buy Me a Coffee nudge is intentionally low-visibility — small text, muted opacity, no button or banner
+- Overlay instances use a `border-top: 1px solid rgba(255,255,255,0.1)` separator to visually detach the nudge from game content
+- `.app` TLD is HSTS-preloaded — HTTPS is mandatory before the site will load in any browser
+- Supabase `site_url` and redirect URL allowlist must be updated after the domain goes live
