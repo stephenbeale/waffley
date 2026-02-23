@@ -159,19 +159,19 @@ Planned features and improvements for Waffley.
 - [x] **Consider single-column layout for first pronoun round**
   The first pronoun round (Learning phase, early levels) may benefit from a single-column button layout instead of the 3-column verb grid, since pronoun buttons contain short text and a stacked layout could be clearer for initial learning.
 
-- [ ] **Pronouns round should not highlight correct answer in green**
+- [x] **Pronouns round should not highlight correct answer in green**
   The correct answer button is highlighted green during pronouns rounds, but it should not be — the user should work it out themselves without visual hints.
   - Complexity: S
 
-- [ ] **Fix pronoun-verb layout inconsistency at Level 6**
+- [x] **Fix pronoun-verb layout inconsistency at Level 6**
   When showing the pronoun with the user guessing the verb conjugation (e.g. "to be"), the layout is awkwardly different from other views. Should use the same consistent layout as other verb/pronoun rounds.
   - Complexity: S
 
-- [ ] **Add "mark as complete" option for 2-second speed rounds**
+- [x] **Add "mark as complete" option for 2-second speed rounds**
   At the fastest timer levels (2 seconds), give the user the option to mark the category as complete when they fail, e.g. "This is an extreme level for fun — if you think you know it, press here to move on." Prevents frustration at the hardest speed tier.
   - Complexity: S
 
-- [ ] **Deduplicate identical pronoun answer buttons**
+- [x] **Deduplicate identical pronoun answer buttons**
   In German, higher pronoun levels show two buttons for "Sie" (she vs. they) but only one is marked correct. Audit all languages for duplicate translations across different pronouns (e.g. Spanish "Él es"/"Ella es") and ensure only one button is shown that accepts both matching options.
   - Complexity: M
 
