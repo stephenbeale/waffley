@@ -196,6 +196,42 @@ export default {
             eat:   { infinitive: 'Mangiare',  I: 'Mangio',  you: 'Mangi',    he: 'Mangia',   she: 'Mangia',   we: 'Mangiamo',  you_pl: 'Mangiate', they: 'Mangiano' },
             speak: { infinitive: 'Parlare',   I: 'Parlo',   you: 'Parli',    he: 'Parla',    she: 'Parla',    we: 'Parliamo',  you_pl: 'Parlate',  they: 'Parlano' },
             live:  { infinitive: 'Vivere',    I: 'Vivo',    you: 'Vivi',     he: 'Vive',     she: 'Vive',     we: 'Viviamo',   you_pl: 'Vivete',   they: 'Vivono' }
+        },
+        past: {
+            be:    { I: 'Fui',       you: 'Fosti',      he: 'Fu',        she: 'Fu',        we: 'Fummo',      you_pl: 'Foste',      they: 'Furono' },
+            have:  { I: 'Ebbi',      you: 'Avesti',     he: 'Ebbe',      she: 'Ebbe',      we: 'Avemmo',     you_pl: 'Aveste',     they: 'Ebbero' },
+            go:    { I: 'Andai',     you: 'Andasti',    he: 'Andò',      she: 'Andò',      we: 'Andammo',    you_pl: 'Andaste',    they: 'Andarono' },
+            do:    { I: 'Feci',      you: 'Facesti',    he: 'Fece',      she: 'Fece',      we: 'Facemmo',    you_pl: 'Faceste',    they: 'Fecero' },
+            want:  { I: 'Volli',     you: 'Volesti',    he: 'Volle',     she: 'Volle',     we: 'Volemmo',    you_pl: 'Voleste',    they: 'Vollero' },
+            can:   { I: 'Potei',     you: 'Potesti',    he: 'Poté',      she: 'Poté',      we: 'Potemmo',    you_pl: 'Poteste',    they: 'Poterono' },
+            know:  { I: 'Seppi',     you: 'Sapesti',    he: 'Seppe',     she: 'Seppe',     we: 'Sapemmo',    you_pl: 'Sapeste',    they: 'Seppero' },
+            eat:   { I: 'Mangiai',   you: 'Mangiasti',  he: 'Mangiò',    she: 'Mangiò',    we: 'Mangiammo',  you_pl: 'Mangiaste',  they: 'Mangiarono' },
+            speak: { I: 'Parlai',    you: 'Parlasti',   he: 'Parlò',     she: 'Parlò',     we: 'Parlammo',   you_pl: 'Parlaste',   they: 'Parlarono' },
+            live:  { I: 'Vissi',     you: 'Vivesti',    he: 'Visse',     she: 'Visse',     we: 'Vivemmo',    you_pl: 'Viveste',    they: 'Vissero' }
+        },
+        perfect: {
+            be:    { I: 'Sono stato',    you: 'Sei stato',    he: 'È stato',     she: 'È stata',     we: 'Siamo stati',   you_pl: 'Siete stati',   they: 'Sono stati' },
+            have:  { I: 'Ho avuto',      you: 'Hai avuto',    he: 'Ha avuto',    she: 'Ha avuto',    we: 'Abbiamo avuto', you_pl: 'Avete avuto',   they: 'Hanno avuto' },
+            go:    { I: 'Sono andato',   you: 'Sei andato',   he: 'È andato',    she: 'È andata',    we: 'Siamo andati',  you_pl: 'Siete andati',  they: 'Sono andati' },
+            do:    { I: 'Ho fatto',      you: 'Hai fatto',    he: 'Ha fatto',    she: 'Ha fatto',    we: 'Abbiamo fatto', you_pl: 'Avete fatto',   they: 'Hanno fatto' },
+            want:  { I: 'Ho voluto',     you: 'Hai voluto',   he: 'Ha voluto',   she: 'Ha voluto',   we: 'Abbiamo voluto', you_pl: 'Avete voluto', they: 'Hanno voluto' },
+            can:   { I: 'Ho potuto',     you: 'Hai potuto',   he: 'Ha potuto',   she: 'Ha potuto',   we: 'Abbiamo potuto', you_pl: 'Avete potuto', they: 'Hanno potuto' },
+            know:  { I: 'Ho saputo',     you: 'Hai saputo',   he: 'Ha saputo',   she: 'Ha saputo',   we: 'Abbiamo saputo', you_pl: 'Avete saputo', they: 'Hanno saputo' },
+            eat:   { I: 'Ho mangiato',   you: 'Hai mangiato', he: 'Ha mangiato', she: 'Ha mangiato', we: 'Abbiamo mangiato', you_pl: 'Avete mangiato', they: 'Hanno mangiato' },
+            speak: { I: 'Ho parlato',    you: 'Hai parlato',  he: 'Ha parlato',  she: 'Ha parlato',  we: 'Abbiamo parlato', you_pl: 'Avete parlato', they: 'Hanno parlato' },
+            live:  { I: 'Ho vissuto',    you: 'Hai vissuto',  he: 'Ha vissuto',  she: 'Ha vissuto',  we: 'Abbiamo vissuto', you_pl: 'Avete vissuto', they: 'Hanno vissuto' }
+        },
+        conditional: {
+            be:    { I: 'Sarei',      you: 'Saresti',     he: 'Sarebbe',    she: 'Sarebbe',    we: 'Saremmo',     you_pl: 'Sareste',     they: 'Sarebbero' },
+            have:  { I: 'Avrei',      you: 'Avresti',     he: 'Avrebbe',    she: 'Avrebbe',    we: 'Avremmo',     you_pl: 'Avreste',     they: 'Avrebbero' },
+            go:    { I: 'Andrei',     you: 'Andresti',    he: 'Andrebbe',   she: 'Andrebbe',   we: 'Andremmo',    you_pl: 'Andreste',    they: 'Andrebbero' },
+            do:    { I: 'Farei',      you: 'Faresti',     he: 'Farebbe',    she: 'Farebbe',    we: 'Faremmo',     you_pl: 'Fareste',     they: 'Farebbero' },
+            want:  { I: 'Vorrei',     you: 'Vorresti',    he: 'Vorrebbe',   she: 'Vorrebbe',   we: 'Vorremmo',    you_pl: 'Vorreste',    they: 'Vorrebbero' },
+            can:   { I: 'Potrei',     you: 'Potresti',    he: 'Potrebbe',   she: 'Potrebbe',   we: 'Potremmo',    you_pl: 'Potreste',    they: 'Potrebbero' },
+            know:  { I: 'Saprei',     you: 'Sapresti',    he: 'Saprebbe',   she: 'Saprebbe',   we: 'Sapremmo',    you_pl: 'Sapreste',    they: 'Saprebbero' },
+            eat:   { I: 'Mangerei',   you: 'Mangeresti',  he: 'Mangerebbe', she: 'Mangerebbe', we: 'Mangeremmo',  you_pl: 'Mangereste',  they: 'Mangerebbero' },
+            speak: { I: 'Parlerei',   you: 'Parleresti',  he: 'Parlerebbe', she: 'Parlerebbe', we: 'Parleremmo',  you_pl: 'Parlereste',  they: 'Parlerebbero' },
+            live:  { I: 'Vivrei',     you: 'Vivresti',    he: 'Vivrebbe',   she: 'Vivrebbe',   we: 'Vivremmo',    you_pl: 'Vivreste',    they: 'Vivrebbero' }
         }
     },
     aliases: {

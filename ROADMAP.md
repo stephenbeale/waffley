@@ -321,7 +321,7 @@ Planned features and improvements for Waffley.
   Add 5+ new categories: body parts, clothing, household objects, numbers 0–100, family members, professions.
   - Complexity: M
 
-- [ ] **Expand verb tenses**
+- [x] **Expand verb tenses**
   Add past tense, present perfect, and conditional for Spanish and Italian. Requires updated schema and per-tense conjugation data.
   - Complexity: L
 

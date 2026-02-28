@@ -197,6 +197,42 @@ export default {
             eat:   { infinitive: 'Comer',   I: 'Como',    you: 'Comes',   he: 'Come',    she: 'Come',    we: 'Comemos',  you_pl: 'Coméis',   they: 'Comen' },
             speak: { infinitive: 'Hablar',  I: 'Hablo',   you: 'Hablas',  he: 'Habla',   she: 'Habla',   we: 'Hablamos', you_pl: 'Habláis',  they: 'Hablan' },
             live:  { infinitive: 'Vivir',   I: 'Vivo',    you: 'Vives',   he: 'Vive',    she: 'Vive',    we: 'Vivimos',  you_pl: 'Vivís',    they: 'Viven' }
+        },
+        past: {
+            be:    { I: 'Fui',      you: 'Fuiste',    he: 'Fue',      she: 'Fue',      we: 'Fuimos',    you_pl: 'Fuisteis',   they: 'Fueron' },
+            have:  { I: 'Tuve',     you: 'Tuviste',   he: 'Tuvo',     she: 'Tuvo',     we: 'Tuvimos',   you_pl: 'Tuvisteis',  they: 'Tuvieron' },
+            go:    { I: 'Fui',      you: 'Fuiste',    he: 'Fue',      she: 'Fue',      we: 'Fuimos',    you_pl: 'Fuisteis',   they: 'Fueron' },
+            do:    { I: 'Hice',     you: 'Hiciste',   he: 'Hizo',     she: 'Hizo',     we: 'Hicimos',   you_pl: 'Hicisteis',  they: 'Hicieron' },
+            want:  { I: 'Quise',    you: 'Quisiste',  he: 'Quiso',    she: 'Quiso',    we: 'Quisimos',  you_pl: 'Quisisteis', they: 'Quisieron' },
+            can:   { I: 'Pude',     you: 'Pudiste',   he: 'Pudo',     she: 'Pudo',     we: 'Pudimos',   you_pl: 'Pudisteis',  they: 'Pudieron' },
+            know:  { I: 'Supe',     you: 'Supiste',   he: 'Supo',     she: 'Supo',     we: 'Supimos',   you_pl: 'Supisteis',  they: 'Supieron' },
+            eat:   { I: 'Comí',     you: 'Comiste',   he: 'Comió',    she: 'Comió',    we: 'Comimos',   you_pl: 'Comisteis',  they: 'Comieron' },
+            speak: { I: 'Hablé',    you: 'Hablaste',  he: 'Habló',    she: 'Habló',    we: 'Hablamos',  you_pl: 'Hablasteis', they: 'Hablaron' },
+            live:  { I: 'Viví',     you: 'Viviste',   he: 'Vivió',    she: 'Vivió',    we: 'Vivimos',   you_pl: 'Vivisteis',  they: 'Vivieron' }
+        },
+        perfect: {
+            be:    { I: 'He sido',      you: 'Has sido',      he: 'Ha sido',      she: 'Ha sido',      we: 'Hemos sido',      you_pl: 'Habéis sido',      they: 'Han sido' },
+            have:  { I: 'He tenido',    you: 'Has tenido',    he: 'Ha tenido',    she: 'Ha tenido',    we: 'Hemos tenido',    you_pl: 'Habéis tenido',    they: 'Han tenido' },
+            go:    { I: 'He ido',       you: 'Has ido',       he: 'Ha ido',       she: 'Ha ido',       we: 'Hemos ido',       you_pl: 'Habéis ido',       they: 'Han ido' },
+            do:    { I: 'He hecho',     you: 'Has hecho',     he: 'Ha hecho',     she: 'Ha hecho',     we: 'Hemos hecho',     you_pl: 'Habéis hecho',     they: 'Han hecho' },
+            want:  { I: 'He querido',   you: 'Has querido',   he: 'Ha querido',   she: 'Ha querido',   we: 'Hemos querido',   you_pl: 'Habéis querido',   they: 'Han querido' },
+            can:   { I: 'He podido',    you: 'Has podido',    he: 'Ha podido',    she: 'Ha podido',    we: 'Hemos podido',    you_pl: 'Habéis podido',    they: 'Han podido' },
+            know:  { I: 'He sabido',    you: 'Has sabido',    he: 'Ha sabido',    she: 'Ha sabido',    we: 'Hemos sabido',    you_pl: 'Habéis sabido',    they: 'Han sabido' },
+            eat:   { I: 'He comido',    you: 'Has comido',    he: 'Ha comido',    she: 'Ha comido',    we: 'Hemos comido',    you_pl: 'Habéis comido',    they: 'Han comido' },
+            speak: { I: 'He hablado',   you: 'Has hablado',   he: 'Ha hablado',   she: 'Ha hablado',   we: 'Hemos hablado',   you_pl: 'Habéis hablado',   they: 'Han hablado' },
+            live:  { I: 'He vivido',    you: 'Has vivido',    he: 'Ha vivido',    she: 'Ha vivido',    we: 'Hemos vivido',    you_pl: 'Habéis vivido',    they: 'Han vivido' }
+        },
+        conditional: {
+            be:    { I: 'Sería',     you: 'Serías',     he: 'Sería',     she: 'Sería',     we: 'Seríamos',    you_pl: 'Seríais',     they: 'Serían' },
+            have:  { I: 'Tendría',   you: 'Tendrías',   he: 'Tendría',   she: 'Tendría',   we: 'Tendríamos',  you_pl: 'Tendríais',   they: 'Tendrían' },
+            go:    { I: 'Iría',      you: 'Irías',      he: 'Iría',      she: 'Iría',      we: 'Iríamos',     you_pl: 'Iríais',      they: 'Irían' },
+            do:    { I: 'Haría',     you: 'Harías',     he: 'Haría',     she: 'Haría',     we: 'Haríamos',    you_pl: 'Haríais',     they: 'Harían' },
+            want:  { I: 'Querría',   you: 'Querrías',   he: 'Querría',   she: 'Querría',   we: 'Querríamos',  you_pl: 'Querríais',   they: 'Querrían' },
+            can:   { I: 'Podría',    you: 'Podrías',    he: 'Podría',    she: 'Podría',    we: 'Podríamos',   you_pl: 'Podríais',    they: 'Podrían' },
+            know:  { I: 'Sabría',    you: 'Sabrías',    he: 'Sabría',    she: 'Sabría',    we: 'Sabríamos',   you_pl: 'Sabríais',    they: 'Sabrían' },
+            eat:   { I: 'Comería',   you: 'Comerías',   he: 'Comería',   she: 'Comería',   we: 'Comeríamos',  you_pl: 'Comeríais',   they: 'Comerían' },
+            speak: { I: 'Hablaría',  you: 'Hablarías',  he: 'Hablaría',  she: 'Hablaría',  we: 'Hablaríamos', you_pl: 'Hablaríais',  they: 'Hablarían' },
+            live:  { I: 'Viviría',   you: 'Vivirías',   he: 'Viviría',   she: 'Viviría',   we: 'Viviríamos',  you_pl: 'Viviríais',   they: 'Vivirían' }
         }
     },
     aliases: {
