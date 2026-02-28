@@ -236,16 +236,54 @@ export const VERB_ORDER = {
 export const PRONOUN_KEYS = ['I', 'you', 'he', 'she', 'we', 'you_pl', 'they'];
 
 export const VERB_ENGLISH = {
-    be:    { emoji: '🌟', I: 'I am',    you: 'You are',   he: 'He is',      she: 'She is',      we: 'We are',   you_pl: 'You (all) are',   they: 'They are' },
-    have:  { emoji: '🤲', I: 'I have',  you: 'You have',  he: 'He has',     she: 'She has',     we: 'We have',  you_pl: 'You (all) have',  they: 'They have' },
-    go:    { emoji: '🚶', I: 'I go',    you: 'You go',    he: 'He goes',    she: 'She goes',    we: 'We go',    you_pl: 'You (all) go',    they: 'They go' },
-    do:    { emoji: '⚡', I: 'I do',    you: 'You do',    he: 'He does',    she: 'She does',    we: 'We do',    you_pl: 'You (all) do',    they: 'They do' },
-    want:  { emoji: '💭', I: 'I want',  you: 'You want',  he: 'He wants',   she: 'She wants',   we: 'We want',  you_pl: 'You (all) want',  they: 'They want' },
-    can:   { emoji: '💪', I: 'I can',   you: 'You can',   he: 'He can',     she: 'She can',     we: 'We can',   you_pl: 'You (all) can',   they: 'They can' },
-    know:  { emoji: '🧠', I: 'I know',  you: 'You know',  he: 'He knows',   she: 'She knows',   we: 'We know',  you_pl: 'You (all) know',  they: 'They know' },
-    eat:   { emoji: '🍴', I: 'I eat',   you: 'You eat',   he: 'He eats',    she: 'She eats',    we: 'We eat',   you_pl: 'You (all) eat',   they: 'They eat' },
-    speak: { emoji: '💬', I: 'I speak', you: 'You speak', he: 'He speaks',  she: 'She speaks',  we: 'We speak', you_pl: 'You (all) speak', they: 'They speak' },
-    live:  { emoji: '🏠', I: 'I live',  you: 'You live',  he: 'He lives',   she: 'She lives',   we: 'We live',  you_pl: 'You (all) live',  they: 'They live' },
+    present: {
+        be:    { emoji: '🌟', I: 'I am',    you: 'You are',   he: 'He is',      she: 'She is',      we: 'We are',   you_pl: 'You (all) are',   they: 'They are' },
+        have:  { emoji: '🤲', I: 'I have',  you: 'You have',  he: 'He has',     she: 'She has',     we: 'We have',  you_pl: 'You (all) have',  they: 'They have' },
+        go:    { emoji: '🚶', I: 'I go',    you: 'You go',    he: 'He goes',    she: 'She goes',    we: 'We go',    you_pl: 'You (all) go',    they: 'They go' },
+        do:    { emoji: '⚡', I: 'I do',    you: 'You do',    he: 'He does',    she: 'She does',    we: 'We do',    you_pl: 'You (all) do',    they: 'They do' },
+        want:  { emoji: '💭', I: 'I want',  you: 'You want',  he: 'He wants',   she: 'She wants',   we: 'We want',  you_pl: 'You (all) want',  they: 'They want' },
+        can:   { emoji: '💪', I: 'I can',   you: 'You can',   he: 'He can',     she: 'She can',     we: 'We can',   you_pl: 'You (all) can',   they: 'They can' },
+        know:  { emoji: '🧠', I: 'I know',  you: 'You know',  he: 'He knows',   she: 'She knows',   we: 'We know',  you_pl: 'You (all) know',  they: 'They know' },
+        eat:   { emoji: '🍴', I: 'I eat',   you: 'You eat',   he: 'He eats',    she: 'She eats',    we: 'We eat',   you_pl: 'You (all) eat',   they: 'They eat' },
+        speak: { emoji: '💬', I: 'I speak', you: 'You speak', he: 'He speaks',  she: 'She speaks',  we: 'We speak', you_pl: 'You (all) speak', they: 'They speak' },
+        live:  { emoji: '🏠', I: 'I live',  you: 'You live',  he: 'He lives',   she: 'She lives',   we: 'We live',  you_pl: 'You (all) live',  they: 'They live' },
+    },
+    past: {
+        be:    { I: 'I was',      you: 'You were',    he: 'He was',      she: 'She was',      we: 'We were',    you_pl: 'You (all) were',    they: 'They were' },
+        have:  { I: 'I had',      you: 'You had',     he: 'He had',      she: 'She had',      we: 'We had',     you_pl: 'You (all) had',     they: 'They had' },
+        go:    { I: 'I went',     you: 'You went',    he: 'He went',     she: 'She went',     we: 'We went',    you_pl: 'You (all) went',    they: 'They went' },
+        do:    { I: 'I did',      you: 'You did',     he: 'He did',      she: 'She did',      we: 'We did',     you_pl: 'You (all) did',     they: 'They did' },
+        want:  { I: 'I wanted',   you: 'You wanted',  he: 'He wanted',   she: 'She wanted',   we: 'We wanted',  you_pl: 'You (all) wanted',  they: 'They wanted' },
+        can:   { I: 'I could',    you: 'You could',   he: 'He could',    she: 'She could',    we: 'We could',   you_pl: 'You (all) could',   they: 'They could' },
+        know:  { I: 'I knew',     you: 'You knew',    he: 'He knew',     she: 'She knew',     we: 'We knew',    you_pl: 'You (all) knew',    they: 'They knew' },
+        eat:   { I: 'I ate',      you: 'You ate',     he: 'He ate',      she: 'She ate',      we: 'We ate',     you_pl: 'You (all) ate',     they: 'They ate' },
+        speak: { I: 'I spoke',    you: 'You spoke',   he: 'He spoke',    she: 'She spoke',    we: 'We spoke',   you_pl: 'You (all) spoke',   they: 'They spoke' },
+        live:  { I: 'I lived',    you: 'You lived',   he: 'He lived',    she: 'She lived',    we: 'We lived',   you_pl: 'You (all) lived',   they: 'They lived' },
+    },
+    perfect: {
+        be:    { I: 'I have been',    you: 'You have been',    he: 'He has been',    she: 'She has been',    we: 'We have been',    you_pl: 'You (all) have been',    they: 'They have been' },
+        have:  { I: 'I have had',     you: 'You have had',     he: 'He has had',     she: 'She has had',     we: 'We have had',     you_pl: 'You (all) have had',     they: 'They have had' },
+        go:    { I: 'I have gone',    you: 'You have gone',    he: 'He has gone',    she: 'She has gone',    we: 'We have gone',    you_pl: 'You (all) have gone',    they: 'They have gone' },
+        do:    { I: 'I have done',    you: 'You have done',    he: 'He has done',    she: 'She has done',    we: 'We have done',    you_pl: 'You (all) have done',    they: 'They have done' },
+        want:  { I: 'I have wanted',  you: 'You have wanted',  he: 'He has wanted',  she: 'She has wanted',  we: 'We have wanted',  you_pl: 'You (all) have wanted',  they: 'They have wanted' },
+        can:   { I: 'I have been able', you: 'You have been able', he: 'He has been able', she: 'She has been able', we: 'We have been able', you_pl: 'You (all) have been able', they: 'They have been able' },
+        know:  { I: 'I have known',   you: 'You have known',   he: 'He has known',   she: 'She has known',   we: 'We have known',   you_pl: 'You (all) have known',   they: 'They have known' },
+        eat:   { I: 'I have eaten',   you: 'You have eaten',   he: 'He has eaten',   she: 'She has eaten',   we: 'We have eaten',   you_pl: 'You (all) have eaten',   they: 'They have eaten' },
+        speak: { I: 'I have spoken',  you: 'You have spoken',  he: 'He has spoken',  she: 'She has spoken',  we: 'We have spoken',  you_pl: 'You (all) have spoken',  they: 'They have spoken' },
+        live:  { I: 'I have lived',   you: 'You have lived',   he: 'He has lived',   she: 'She has lived',   we: 'We have lived',   you_pl: 'You (all) have lived',   they: 'They have lived' },
+    },
+    conditional: {
+        be:    { I: 'I would be',     you: 'You would be',     he: 'He would be',     she: 'She would be',     we: 'We would be',     you_pl: 'You (all) would be',     they: 'They would be' },
+        have:  { I: 'I would have',   you: 'You would have',   he: 'He would have',   she: 'She would have',   we: 'We would have',   you_pl: 'You (all) would have',   they: 'They would have' },
+        go:    { I: 'I would go',     you: 'You would go',     he: 'He would go',     she: 'She would go',     we: 'We would go',     you_pl: 'You (all) would go',     they: 'They would go' },
+        do:    { I: 'I would do',     you: 'You would do',     he: 'He would do',     she: 'She would do',     we: 'We would do',     you_pl: 'You (all) would do',     they: 'They would do' },
+        want:  { I: 'I would want',   you: 'You would want',   he: 'He would want',   she: 'She would want',   we: 'We would want',   you_pl: 'You (all) would want',   they: 'They would want' },
+        can:   { I: 'I could',        you: 'You could',        he: 'He could',        she: 'She could',        we: 'We could',        you_pl: 'You (all) could',        they: 'They could' },
+        know:  { I: 'I would know',   you: 'You would know',   he: 'He would know',   she: 'She would know',   we: 'We would know',   you_pl: 'You (all) would know',   they: 'They would know' },
+        eat:   { I: 'I would eat',    you: 'You would eat',    he: 'He would eat',    she: 'She would eat',    we: 'We would eat',    you_pl: 'You (all) would eat',    they: 'They would eat' },
+        speak: { I: 'I would speak',  you: 'You would speak',  he: 'He would speak',  she: 'She would speak',  we: 'We would speak',  you_pl: 'You (all) would speak',  they: 'They would speak' },
+        live:  { I: 'I would live',   you: 'You would live',   he: 'He would live',   she: 'She would live',   we: 'We would live',   you_pl: 'You (all) would live',   they: 'They would live' },
+    },
 };
 
 export const PRONOUN_LABELS = {
@@ -263,13 +301,31 @@ export const PRONOUN_EMOJIS = {
     they: '👥',
 };
 
-// Assemble verb conjugations from language files
+// Tense labels for UI
+export const TENSE_LABELS = {
+    present:     { label: 'Present',         icon: '🕐' },
+    past:        { label: 'Past',            icon: '⏪' },
+    perfect:     { label: 'Present Perfect', icon: '✅' },
+    conditional: { label: 'Conditional',     icon: '🤔' },
+};
+
+// Assemble verb conjugations from language files (nested by tense)
 export const VERB_CONJUGATIONS = {};
 export const VERB_PRONOUNS = {};
+export const VERB_TENSES = {};
+const ALL_TENSE_KEYS = ['present', 'past', 'perfect', 'conditional'];
 for (const [code, lang] of Object.entries(LANG_DATA)) {
     if (lang.verbs) {
-        VERB_CONJUGATIONS[code] = lang.verbs.present;
+        VERB_CONJUGATIONS[code] = {};
+        const tenses = [];
+        for (const tense of ALL_TENSE_KEYS) {
+            if (lang.verbs[tense]) {
+                VERB_CONJUGATIONS[code][tense] = lang.verbs[tense];
+                tenses.push(tense);
+            }
+        }
         VERB_PRONOUNS[code] = lang.verbs.pronouns;
+        VERB_TENSES[code] = tenses;
     }
 }
 

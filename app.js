@@ -10,7 +10,7 @@ import {
     CATEGORIES, CATEGORY_DATA,
     SPEECH_LANG_CODES, COLOR_ALIASES,
     VERB_LIST, VERB_ORDER, PRONOUN_KEYS, VERB_ENGLISH, PRONOUN_LABELS, PRONOUN_EMOJIS,
-    VERB_CONJUGATIONS, VERB_PRONOUNS, VERB_LANGUAGES
+    VERB_CONJUGATIONS, VERB_PRONOUNS, VERB_LANGUAGES, VERB_TENSES, TENSE_LABELS
 } from './data.js';
 import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, recordSession, signInWithGoogle, signInWithApple, signOut, getUser, onAuthChange, exportUserData, deleteAccount, upsertItemMastery, getItemMasteryMap } from './src/api.js';
 
@@ -407,7 +407,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         const allProgress = loadAllProgress();
         if (allProgress.languages) {
             // Remove all keys for the selected language (words and verbs)
-            const categories = ['colours', 'adjectives', 'animals', 'food', 'weather', 'body', 'clothing', 'home', 'numbers', 'family', 'professions', 'verbs_present', 'verbs_pronouns'];
+            const categories = ['colours', 'adjectives', 'animals', 'food', 'weather', 'body', 'clothing', 'home', 'numbers', 'family', 'professions', 'verbs_present', 'verbs_past', 'verbs_perfect', 'verbs_conditional', 'verbs_pronouns'];
             categories.forEach(cat => {
                 const key = getProgressKey(selectedLanguage, cat);
                 delete allProgress.languages[key];
@@ -1470,6 +1470,11 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         return selectedMode === 'verbs' && !isPronounMode();
     }
 
+    function getActiveTense() {
+        if (selectedCategory === 'verbs_pronouns') return null;
+        return selectedCategory.startsWith('verbs_') ? selectedCategory.replace('verbs_', '') : 'present';
+    }
+
     // Returns true for both verbs and pronouns — they share infrastructure
     // (7 buttons, PRONOUN_KEYS as items, no reverse rounds, base form only)
     function isVerbLikeMode() {
@@ -1503,7 +1508,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     function getVerbTranslation(pronounKey) {
         const verb = game.currentVerb;
         const phase = getPhaseFromProgress();
-        const conjugations = VERB_CONJUGATIONS[selectedLanguage]?.[verb];
+        const conjugations = VERB_CONJUGATIONS[selectedLanguage]?.[getActiveTense()]?.[verb];
         if (!conjugations) return '';
         const conjugation = conjugations[pronounKey] || '';
 
@@ -1698,7 +1703,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     function getBrowserTTSWord(color) {
         if (isPronounMode()) return getPronounTranslation(color);
         if (isVerbMode()) {
-            const conjugations = VERB_CONJUGATIONS[selectedLanguage]?.[game.currentVerb];
+            const conjugations = VERB_CONJUGATIONS[selectedLanguage]?.[getActiveTense()]?.[game.currentVerb];
             const pronoun = VERB_PRONOUNS[selectedLanguage]?.[color] || '';
             const conjugation = conjugations?.[color] || '';
             return getPhaseFromProgress() === 0
@@ -2210,9 +2215,8 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         if (isPronounMode()) {
             levelUpInfo.textContent = 'New pronouns selected!';
         } else if (isVerbMode() && game.currentVerb) {
-            const verbData = VERB_CONJUGATIONS[selectedLanguage]?.[game.currentVerb];
-            const infinitive = verbData?.infinitive || '';
-            const englishVerb = VERB_ENGLISH[game.currentVerb]?.I?.replace('I ', '') || '';
+            const infinitive = VERB_CONJUGATIONS[selectedLanguage]?.present?.[game.currentVerb]?.infinitive || '';
+            const englishVerb = VERB_ENGLISH.present[game.currentVerb]?.I?.replace('I ', '') || '';
             levelUpInfo.textContent = `Next verb: ${infinitive} (to ${englishVerb})`;
         } else {
             const forms = getAvailableForms();
@@ -2507,6 +2511,26 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             }
         } else {
             modeSelector.style.display = '';
+        }
+        // Show/hide tense buttons based on language support
+        const tenses = VERB_TENSES[selectedLanguage] || ['present'];
+        verbSelector.querySelectorAll('.tense-btn').forEach(btn => {
+            const tense = btn.dataset.category.replace('verbs_', '');
+            btn.style.display = tenses.includes(tense) ? '' : 'none';
+        });
+        // If current tense not supported by this language, fall back to present
+        if (selectedMode === 'verbs' && selectedCategory !== 'verbs_pronouns') {
+            const currentTense = getActiveTense();
+            if (!tenses.includes(currentTense)) {
+                selectedCategory = 'verbs_present';
+                verbSelector.querySelectorAll('.category-btn').forEach(b => {
+                    b.classList.toggle('selected', b.dataset.category === selectedCategory);
+                });
+                const newProgress = getLanguageProgress(selectedLanguage, selectedCategory);
+                game.totalCorrectAnswers = newProgress.totalAnswers;
+                game.currentCycle = newProgress.currentCycle;
+                game.levelsCompleted = newProgress.levelsCompleted || 0;
+            }
         }
     }
 
@@ -3273,7 +3297,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
             if (phase === 0) {
                 // Learning: show English phrase e.g. "I go"
-                const englishPhrase = VERB_ENGLISH[verb]?.[pronoun] || '';
+                const englishPhrase = VERB_ENGLISH[getActiveTense() || 'present'][verb]?.[pronoun] || '';
                 colorDisplay.classList.remove('pronoun-display');
                 colorDisplay.classList.add('emoji-display');
                 colorDisplay.innerHTML = `<div class="verb-display">${englishPhrase}</div>`;
@@ -3281,8 +3305,8 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
                 // Practice+: show pronoun emoji + label (consistent with pronoun mode), plus verb context
                 const emoji = PRONOUN_EMOJIS[pronoun] || '';
                 const label = PRONOUN_LABELS[pronoun] || pronoun;
-                const infinitive = VERB_CONJUGATIONS[selectedLanguage]?.[verb]?.infinitive || '';
-                const englishVerb = VERB_ENGLISH[verb]?.I?.replace('I ', '') || '';
+                const infinitive = VERB_CONJUGATIONS[selectedLanguage]?.present?.[verb]?.infinitive || '';
+                const englishVerb = VERB_ENGLISH.present[verb]?.I?.replace('I ', '') || '';
                 colorDisplay.classList.add('emoji-display', 'pronoun-display');
                 colorDisplay.innerHTML = `<span class="pronoun-emoji">${emoji}</span><div class="pronoun-english-label">${label}</div><div class="verb-context">${infinitive} (to ${englishVerb})</div>`;
             }
@@ -3583,7 +3607,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         if (isPronounMode()) {
             subtitle = `${flag} ${langName} · Pronouns`;
         } else if (isVerbMode() && game.currentVerb) {
-            const verbEmoji = VERB_ENGLISH[game.currentVerb]?.emoji || '';
+            const verbEmoji = VERB_ENGLISH.present[game.currentVerb]?.emoji || '';
             const verbName = game.currentVerb.charAt(0).toUpperCase() + game.currentVerb.slice(1);
             subtitle = `${flag} ${langName} · ${verbEmoji} ${verbName}`;
         } else {

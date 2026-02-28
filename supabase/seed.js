@@ -310,9 +310,12 @@ async function seedVerbs(langRows) {
 
     console.log('\n📍 Tenses');
     const tenseRows = await upsert('tenses', [
-        { tense_key: 'present', label: 'Present', sort_order: 0 },
+        { tense_key: 'present',     label: 'Present',         sort_order: 0 },
+        { tense_key: 'past',        label: 'Past',            sort_order: 1 },
+        { tense_key: 'perfect',     label: 'Present Perfect', sort_order: 2 },
+        { tense_key: 'conditional', label: 'Conditional',     sort_order: 3 },
     ], 'tense_key');
-    const presentTenseId = tenseRows[0].id;
+    const tenseMap = Object.fromEntries(tenseRows.map(t => [t.tense_key, t.id]));
 
     console.log('\n📍 Verbs');
     const verbRows = await upsert('verbs', VERB_SORT.map((key, i) => ({
@@ -350,27 +353,33 @@ async function seedVerbs(langRows) {
             if (pronounId) pronounTranslations.push({ pronoun_id: pronounId, language_id: langId, text });
         }
 
-        // Infinitives + conjugations
+        // Infinitives (from present tense only)
         for (const [verbKey, conjugationData] of Object.entries(langData.verbs.present)) {
             const verbId = verbMap[verbKey];
             if (!verbId) continue;
-
-            // Infinitive
             if (conjugationData.infinitive) {
                 verbInfinitives.push({ verb_id: verbId, language_id: langId, infinitive: conjugationData.infinitive });
             }
+        }
 
-            // Conjugations for each pronoun
-            for (const pronoun of PRONOUN_DEFS) {
-                const conjugation = conjugationData[pronoun.key];
-                if (conjugation) {
-                    verbConjugations.push({
-                        verb_id: verbId,
-                        language_id: langId,
-                        tense_id: presentTenseId,
-                        pronoun_id: pronounMap[pronoun.key],
-                        conjugation,
-                    });
+        // Conjugations for all tenses
+        for (const tenseKey of ['present', 'past', 'perfect', 'conditional']) {
+            const tenseData = langData.verbs[tenseKey];
+            if (!tenseData) continue;
+            for (const [verbKey, conjugationData] of Object.entries(tenseData)) {
+                const verbId = verbMap[verbKey];
+                if (!verbId) continue;
+                for (const pronoun of PRONOUN_DEFS) {
+                    const conjugation = conjugationData[pronoun.key];
+                    if (conjugation) {
+                        verbConjugations.push({
+                            verb_id: verbId,
+                            language_id: langId,
+                            tense_id: tenseMap[tenseKey],
+                            pronoun_id: pronounMap[pronoun.key],
+                            conjugation,
+                        });
+                    }
                 }
             }
         }
