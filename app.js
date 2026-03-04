@@ -238,6 +238,136 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         return 0.3; // not yet due
     }
 
+    // ========== WEAKNESS REPORT ==========
+
+    const FORM_LABELS = { base: 'base', plural: 'plural', article: 'article', article_plural: 'article+plural' };
+
+    function generateWeaknessReport() {
+        const store = loadSRSStore();
+        const items = [];
+        let globalTC = 0, globalTA = 0;
+
+        for (const [key, entry] of Object.entries(store)) {
+            if (!entry.ta || entry.ta < 3) continue;
+            const parts = key.split(':');
+            if (parts.length < 4) continue;
+            const [lang, category, item, form] = parts;
+            const accuracy = Math.round((entry.tc / entry.ta) * 100);
+            globalTC += entry.tc;
+            globalTA += entry.ta;
+            items.push({ lang, category, item, form, accuracy, attempts: entry.ta, errors: entry.ta - entry.tc, ef: entry.ef });
+        }
+
+        if (items.length < 5) return null;
+
+        // Weakest items: sort by accuracy ascending, take top 10
+        const weakItems = [...items].sort((a, b) => a.accuracy - b.accuracy || b.attempts - a.attempts).slice(0, 10);
+
+        // Strongest items: sort by accuracy descending, take top 5
+        const strongItems = [...items].sort((a, b) => b.accuracy - a.accuracy || b.attempts - a.attempts).slice(0, 5);
+
+        // Category aggregation
+        const catMap = {};
+        for (const it of items) {
+            const catKey = `${it.lang}:${it.category}`;
+            if (!catMap[catKey]) catMap[catKey] = { lang: it.lang, category: it.category, totalAcc: 0, count: 0, weakCount: 0 };
+            catMap[catKey].totalAcc += it.accuracy;
+            catMap[catKey].count++;
+            if (it.accuracy < 70) catMap[catKey].weakCount++;
+        }
+        const weakCategories = Object.values(catMap)
+            .map(c => ({ ...c, avgAccuracy: Math.round(c.totalAcc / c.count) }))
+            .sort((a, b) => a.avgAccuracy - b.avgAccuracy);
+
+        return {
+            weakItems,
+            weakCategories,
+            strongItems,
+            overallAccuracy: globalTA > 0 ? Math.round((globalTC / globalTA) * 100) : 0,
+            totalItemsPracticed: items.length
+        };
+    }
+
+    function getItemDisplayLabel(lang, category, item, form) {
+        const flag = LANGUAGE_FLAGS[lang] || lang;
+        const catData = CATEGORY_DATA[category];
+        const emoji = catData?.display?.[item] || item;
+        const formLabel = form !== 'base' ? ` (${FORM_LABELS[form] || form})` : '';
+        return `${flag} ${emoji}${formLabel}`;
+    }
+
+    function getCategoryDisplayLabel(lang, category) {
+        const flag = LANGUAGE_FLAGS[lang] || lang;
+        // Find the matching button label from CATEGORIES or use raw name
+        const catBtn = document.querySelector(`.category-btn[data-category="${category}"]`);
+        const catLabel = catBtn ? catBtn.textContent.trim() : category;
+        return `${flag} ${catLabel}`;
+    }
+
+    function renderWeaknessReport() {
+        const report = generateWeaknessReport();
+        const noData = document.getElementById('weakness-no-data');
+        const overall = document.getElementById('weakness-overall');
+        const weakSec = document.getElementById('weakness-weak-items');
+        const catSec = document.getElementById('weakness-weak-cats');
+        const strongSec = document.getElementById('weakness-strong-items');
+
+        if (!report) {
+            noData.style.display = '';
+            overall.style.display = 'none';
+            weakSec.style.display = 'none';
+            catSec.style.display = 'none';
+            strongSec.style.display = 'none';
+            return;
+        }
+
+        noData.style.display = 'none';
+
+        // Overall accuracy
+        overall.style.display = '';
+        overall.innerHTML = `<div class="weakness-overall-pct">${report.overallAccuracy}%</div>` +
+            `<div class="weakness-overall-label">Overall accuracy (${report.totalItemsPracticed} items)</div>`;
+
+        // Build item row helper
+        function itemRow(it, showAccuracy) {
+            const pct = showAccuracy !== undefined ? showAccuracy : it.accuracy;
+            const colorClass = pct < 50 ? 'red' : pct <= 75 ? 'amber' : 'green';
+            const label = getItemDisplayLabel(it.lang, it.category, it.item, it.form);
+            return `<div class="weakness-item">` +
+                `<span class="weakness-item-label">${label}</span>` +
+                `<span class="weakness-item-stats">${pct}% (${it.errors !== undefined ? it.attempts - it.errors : it.attempts}/${it.attempts})</span>` +
+                `<div class="accuracy-bar-bg"><div class="accuracy-bar-fill accuracy-bar-fill--${colorClass}" style="width:${pct}%"></div></div>` +
+                `</div>`;
+        }
+
+        // Weak items
+        weakSec.style.display = '';
+        document.getElementById('weakness-weak-list').innerHTML = report.weakItems.map(it => itemRow(it)).join('');
+
+        // Weak categories
+        catSec.style.display = '';
+        document.getElementById('weakness-cat-list').innerHTML = report.weakCategories.map(c => {
+            const colorClass = c.avgAccuracy < 50 ? 'red' : c.avgAccuracy <= 75 ? 'amber' : 'green';
+            const label = getCategoryDisplayLabel(c.lang, c.category);
+            return `<div class="weakness-item">` +
+                `<span class="weakness-item-label">${label}</span>` +
+                `<span class="weakness-item-stats">${c.avgAccuracy}% avg (${c.count} items)</span>` +
+                `<div class="accuracy-bar-bg"><div class="accuracy-bar-fill accuracy-bar-fill--${colorClass}" style="width:${c.avgAccuracy}%"></div></div>` +
+                `</div>`;
+        }).join('');
+
+        // Strong items
+        strongSec.style.display = '';
+        document.getElementById('weakness-strong-list').innerHTML = report.strongItems.map(it => {
+            const label = getItemDisplayLabel(it.lang, it.category, it.item, it.form);
+            return `<div class="weakness-item">` +
+                `<span class="weakness-item-label">${label}</span>` +
+                `<span class="weakness-item-stats">${it.accuracy}% (${it.accuracy === 100 ? it.attempts : it.attempts - it.errors}/${it.attempts})</span>` +
+                `<div class="accuracy-bar-bg"><div class="accuracy-bar-fill accuracy-bar-fill--green" style="width:${it.accuracy}%"></div></div>` +
+                `</div>`;
+        }).join('');
+    }
+
     function selectActiveItems(allItems, count) {
         const now = Date.now();
         const cat = selectedCategory;
@@ -494,6 +624,9 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
         // XP section
         updateXPDisplay();
+
+        // Weakness report
+        renderWeaknessReport();
 
         // Achievements
         const achList = document.getElementById('achievements-list');
@@ -2619,6 +2752,13 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     // Statistics button handlers
     document.getElementById('stats-btn').addEventListener('click', showStats);
     document.getElementById('close-stats-btn').addEventListener('click', hideStats);
+    document.getElementById('weakness-toggle').addEventListener('click', () => {
+        const btn = document.getElementById('weakness-toggle');
+        const content = document.getElementById('weakness-content');
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', !expanded);
+        content.style.display = expanded ? 'none' : '';
+    });
     document.getElementById('reset-stats-btn').addEventListener('click', () => {
         if (confirm('Are you sure you want to reset all statistics? This cannot be undone.')) {
             resetStats();

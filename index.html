@@ -259,6 +259,30 @@
         <div class="achievements-title">Achievements</div>
         <div class="achievements-list" id="achievements-list"></div>
     </div>
+    <div class="weakness-report" id="weakness-report">
+        <button class="weakness-section-header" id="weakness-toggle" aria-expanded="false">
+            <span>Weakness Report</span>
+            <span class="weakness-chevron">▸</span>
+        </button>
+        <div class="weakness-content" id="weakness-content" style="display:none">
+            <div id="weakness-no-data" class="weakness-no-data" style="display:none">
+                Not enough data yet — keep practising! Items need at least 3 attempts to appear here.
+            </div>
+            <div id="weakness-overall" class="weakness-overall" style="display:none"></div>
+            <div id="weakness-weak-items" style="display:none">
+                <div class="weakness-subtitle">Weakest Items</div>
+                <div id="weakness-weak-list" class="weakness-list"></div>
+            </div>
+            <div id="weakness-weak-cats" style="display:none">
+                <div class="weakness-subtitle">Weakest Categories</div>
+                <div id="weakness-cat-list" class="weakness-list"></div>
+            </div>
+            <div id="weakness-strong-items" style="display:none">
+                <div class="weakness-subtitle">Strongest Items</div>
+                <div id="weakness-strong-list" class="weakness-list"></div>
+            </div>
+        </div>
+    </div>
     <div class="stats-buttons">
         <button id="close-stats-btn">Close</button>
         <button id="reset-stats-btn">Reset Stats</button>
