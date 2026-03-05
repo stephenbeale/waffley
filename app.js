@@ -325,47 +325,73 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
         // Overall accuracy
         overall.style.display = '';
-        overall.innerHTML = `<div class="weakness-overall-pct">${report.overallAccuracy}%</div>` +
-            `<div class="weakness-overall-label">Overall accuracy (${report.totalItemsPracticed} items)</div>`;
+        overall.textContent = '';
+        const pctDiv = document.createElement('div');
+        pctDiv.className = 'weakness-overall-pct';
+        pctDiv.textContent = report.overallAccuracy + '%';
+        const labelDiv = document.createElement('div');
+        labelDiv.className = 'weakness-overall-label';
+        labelDiv.textContent = 'Overall accuracy (' + report.totalItemsPracticed + ' items)';
+        overall.appendChild(pctDiv);
+        overall.appendChild(labelDiv);
 
-        // Build item row helper
-        function itemRow(it, showAccuracy) {
-            const pct = showAccuracy !== undefined ? showAccuracy : it.accuracy;
-            const colorClass = pct < 50 ? 'red' : pct <= 75 ? 'amber' : 'green';
-            const label = getItemDisplayLabel(it.lang, it.category, it.item, it.form);
-            return `<div class="weakness-item">` +
-                `<span class="weakness-item-label">${label}</span>` +
-                `<span class="weakness-item-stats">${pct}% (${it.errors !== undefined ? it.attempts - it.errors : it.attempts}/${it.attempts})</span>` +
-                `<div class="accuracy-bar-bg"><div class="accuracy-bar-fill accuracy-bar-fill--${colorClass}" style="width:${pct}%"></div></div>` +
-                `</div>`;
+        // Build item row helper — uses DOM creation to avoid innerHTML XSS
+        function createItemRow(labelText, statsText, pct, colorClass) {
+            const row = document.createElement('div');
+            row.className = 'weakness-item';
+
+            const labelSpan = document.createElement('span');
+            labelSpan.className = 'weakness-item-label';
+            labelSpan.textContent = labelText;
+
+            const statsSpan = document.createElement('span');
+            statsSpan.className = 'weakness-item-stats';
+            statsSpan.textContent = statsText;
+
+            const barBg = document.createElement('div');
+            barBg.className = 'accuracy-bar-bg';
+            const barFill = document.createElement('div');
+            barFill.className = 'accuracy-bar-fill accuracy-bar-fill--' + colorClass;
+            barFill.style.width = pct + '%';
+            barBg.appendChild(barFill);
+
+            row.appendChild(labelSpan);
+            row.appendChild(statsSpan);
+            row.appendChild(barBg);
+            return row;
         }
 
         // Weak items
         weakSec.style.display = '';
-        document.getElementById('weakness-weak-list').innerHTML = report.weakItems.map(it => itemRow(it)).join('');
+        const weakList = document.getElementById('weakness-weak-list');
+        weakList.innerHTML = '';
+        report.weakItems.forEach(function(it) {
+            const pct = it.accuracy;
+            const colorClass = pct < 50 ? 'red' : pct <= 75 ? 'amber' : 'green';
+            const label = getItemDisplayLabel(it.lang, it.category, it.item, it.form);
+            const correct = it.errors !== undefined ? it.attempts - it.errors : it.attempts;
+            weakList.appendChild(createItemRow(label, pct + '% (' + correct + '/' + it.attempts + ')', pct, colorClass));
+        });
 
         // Weak categories
         catSec.style.display = '';
-        document.getElementById('weakness-cat-list').innerHTML = report.weakCategories.map(c => {
+        const catList = document.getElementById('weakness-cat-list');
+        catList.innerHTML = '';
+        report.weakCategories.forEach(function(c) {
             const colorClass = c.avgAccuracy < 50 ? 'red' : c.avgAccuracy <= 75 ? 'amber' : 'green';
             const label = getCategoryDisplayLabel(c.lang, c.category);
-            return `<div class="weakness-item">` +
-                `<span class="weakness-item-label">${label}</span>` +
-                `<span class="weakness-item-stats">${c.avgAccuracy}% avg (${c.count} items)</span>` +
-                `<div class="accuracy-bar-bg"><div class="accuracy-bar-fill accuracy-bar-fill--${colorClass}" style="width:${c.avgAccuracy}%"></div></div>` +
-                `</div>`;
-        }).join('');
+            catList.appendChild(createItemRow(label, c.avgAccuracy + '% avg (' + c.count + ' items)', c.avgAccuracy, colorClass));
+        });
 
         // Strong items
         strongSec.style.display = '';
-        document.getElementById('weakness-strong-list').innerHTML = report.strongItems.map(it => {
+        const strongList = document.getElementById('weakness-strong-list');
+        strongList.innerHTML = '';
+        report.strongItems.forEach(function(it) {
             const label = getItemDisplayLabel(it.lang, it.category, it.item, it.form);
-            return `<div class="weakness-item">` +
-                `<span class="weakness-item-label">${label}</span>` +
-                `<span class="weakness-item-stats">${it.accuracy}% (${it.accuracy === 100 ? it.attempts : it.attempts - it.errors}/${it.attempts})</span>` +
-                `<div class="accuracy-bar-bg"><div class="accuracy-bar-fill accuracy-bar-fill--green" style="width:${it.accuracy}%"></div></div>` +
-                `</div>`;
-        }).join('');
+            const correct = it.errors === 0 ? it.attempts : it.attempts - it.errors;
+            strongList.appendChild(createItemRow(label, it.accuracy + '% (' + correct + '/' + it.attempts + ')', it.accuracy, 'green'));
+        });
     }
 
     function selectActiveItems(allItems, count) {
