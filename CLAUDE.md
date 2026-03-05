@@ -676,3 +676,62 @@ The following PRs from prior sessions remain open. They were NOT touched in this
 - Accuracy is stored as a decimal (0–1) in `wordStats`; multiply by 100 for display
 - The toggle wiring uses a `click` listener on `#weakness-toggle` that toggles `aria-expanded` and CSS class on `#weakness-content`
 - If CodeRabbit XSS fix is applied, replace the `itemRow` template literal with DOM element creation and set text via `textContent`, width via `style.width`
+
+### 2026-03-05 - uTalk Affiliate Nudge + PR #82 CodeRabbit Fixes
+
+**Work Completed:**
+
+1. **fix: replace innerHTML with DOM-safe element creation in weakness report** (commit `0d5fe26`, on `feature/weakness-report`)
+   - Addressed CodeRabbit XSS actionable comment: `itemRow` builder in `generateWeaknessReport()` now uses `createElement`/`textContent`/`appendChild` instead of template-literal innerHTML for `weakness-weak-list`, `weakness-cat-list`, and `weakness-strong-list`
+
+2. **fix: add aria-controls to weakness report toggle button** (commit `1951e80`, on `feature/weakness-report`)
+   - Addressed CodeRabbit nitpick: `<button id="weakness-toggle">` in `index.html` now carries `aria-controls="weakness-content"` for correct screen-reader linkage
+
+3. **feat: add uTalk affiliate nudge to home screen footer** (PR #83 — OPEN, awaiting review)
+   - Branch: `feature/utalk-nudge`
+   - Adds a second affiliate nudge line below the existing italki line on the home screen footer
+   - Copy: "Prefer to learn at your own pace? Try uTalk for self-paced vocabulary"
+   - Links via Awin affiliate ID 1971095 to the uTalk merchant profile (`awinmid=59791`)
+   - PR: https://github.com/stephenbeale/waffley/pull/83
+
+4. **uTalk affiliate research** (via site-promoter agent)
+   - Confirmed uTalk is available through the existing Awin account (merchant ID 59791)
+   - Join link: https://ui.awin.com/awin/affiliate/1971095/merchant-profile/59791
+   - uTalk nudge also planned for verbio (Home.jsx + VerbDetail.jsx) once the Awin application is approved
+   - Memory updated: uTalk row in affiliate tracking table marked as "Yes" for waffley
+
+**Open PRs at End of Session:**
+- PR #82: `feature/weakness-report` — https://github.com/stephenbeale/waffley/pull/82
+  - CodeRabbit: PASSING (all actionable comments addressed in commits `0d5fe26` and `1951e80`)
+  - Mergeability: MERGEABLE
+  - Blocked: REVIEW_REQUIRED (branch protection — needs human approval)
+  - Remaining CodeRabbit nitpick: attempt-weighted category accuracy in `app.js` lines 269-280 (optional improvement)
+- PR #83: `feature/utalk-nudge` — https://github.com/stephenbeale/waffley/pull/83
+  - CodeRabbit: PASSING
+  - Mergeability: MERGEABLE
+  - Blocked: REVIEW_REQUIRED (branch protection — needs human approval)
+  - No actionable review comments
+
+**Git State at Session End:**
+- Current branch: `feature/weakness-report` — clean, up to date with origin
+- All commits pushed — no unpushed local work
+- Stashes: `stash@{0}` (master: WIP CLAUDE.md+ROADMAP), `stash@{1}` (master: word-stats spaced-repetition WIP) — both intentionally retained from prior sessions
+- Local-only unmerged branch: `feature/sentence-building-mode` — intentionally kept
+
+**Unfinished Git Workflows:**
+- PR #82 needs human approval before merge — cannot be merged via `--admin` without explicit authorisation
+- PR #83 needs human approval before merge — same constraint
+
+**Next Steps:**
+1. Approve and merge PR #82 via GitHub UI (weakness report — all CodeRabbit fixes shipped)
+2. Approve and merge PR #83 via GitHub UI (uTalk affiliate nudge)
+3. After both merges: switch to master, pull, delete `feature/weakness-report` and `feature/utalk-nudge` locally
+4. Sign up for uTalk via Awin: https://ui.awin.com/awin/affiliate/1971095/merchant-profile/59791 — once approved, replace generic nudge link with a deep link to the relevant language page
+5. Add uTalk affiliate nudge to verbio (`Home.jsx` and `VerbDetail.jsx`) — same pattern as waffley footer
+6. Deploy `waffley.app` on SiteGround — domain purchased, not yet served (see deployment checklist in 2026-02-27 session notes)
+7. Remaining affiliate sign-ups: Preply (https://preply.com/en/affiliate), Babbel (via Awin), eBay Partner Network (https://partnernetwork.ebay.co.uk), CV-Library
+
+**Technical Notes:**
+- uTalk Awin merchant ID: 59791; publisher ID: 1971095
+- uTalk nudge copy: "Prefer to learn at your own pace? Try uTalk for self-paced vocabulary"
+- PR #82 CodeRabbit nitpick (attempt-weighted category accuracy) is optional — current implementation averages per-item rounded accuracy, which may skew category ranking when attempt counts differ significantly; the fix aggregates totalCorrect/totalAttempts per category and rounds once
