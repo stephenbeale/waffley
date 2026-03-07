@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Waffley - Learn Colour Words</title>
+    <title>Waffley - Learn Languages Through Play</title>
+    <meta name="description" content="Free language learning game. Master vocabulary and verb conjugations in Spanish, French, German, Italian, Welsh and Portuguese through interactive exercises.">
+    <link rel="canonical" href="https://waffley.app/">
+    <meta property="og:title" content="Waffley - Learn Languages Through Play">
+    <meta property="og:description" content="Free language learning game. Master vocabulary and verb conjugations in 6 languages through interactive exercises.">
+    <meta property="og:url" content="https://waffley.app/">
+    <meta property="og:type" content="website">
     <link rel="stylesheet" href="styles.css">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#e94560">
@@ -514,16 +520,6 @@
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js');
   }
-</script>
-<script
-  src="https://browser.sentry-cdn.com/8.53.0/bundle.min.js"
-  crossorigin="anonymous"
-></script>
-<script>
-  Sentry.init({
-    dsn: '__DSN__',
-    tracesSampleRate: 0.1,
-  });
 </script>
 <script type="module" src="app.js"></script>
 
