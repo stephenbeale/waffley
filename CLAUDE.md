@@ -633,3 +633,105 @@ The following PRs from prior sessions remain open. They were NOT touched in this
 - Overlay instances use a `border-top: 1px solid rgba(255,255,255,0.1)` separator to visually detach the nudge from game content
 - `.app` TLD is HSTS-preloaded — HTTPS is mandatory before the site will load in any browser
 - Supabase `site_url` and redirect URL allowlist must be updated after the domain goes live
+
+### 2026-03-04 - Personalised Weakness Report for Stats Overlay
+
+**Work Completed:**
+
+1. **feat: add personalised weakness report to stats overlay** (PR #82 — OPEN, awaiting merge)
+   - Branch: `feature/weakness-report` (commit `89a68b1`)
+   - Adds a collapsible "Weakness Report" section to the stats overlay
+   - `generateWeaknessReport()` in `app.js` analyses `game.stats.wordStats` to compute per-item accuracy, then groups items into weak (bottom 3 by accuracy, min 5 attempts), strong (top 3 by accuracy, min 5 attempts), and weak categories
+   - Stats overlay in `index.html` gains a collapsible `<section id="weakness-content">` with `<ul>` lists for weak items, weak categories, and strong items — toggle button `#weakness-toggle` controls `aria-expanded`
+   - `styles.css` gains accuracy bar styles (`.accuracy-bar-bg`, `.accuracy-bar-fill`, `.weakness-item`, `.weakness-item-label`, `.weakness-item-stats`), collapsible header (`.weakness-section-header`), and item row layout
+
+**Files Modified:**
+- `app.js` — `generateWeaknessReport()` function, rendering logic for the three lists, toggle button wiring in `showStats()`
+- `index.html` — collapsible weakness report section inside stats overlay
+- `styles.css` — accuracy bar components, item rows, collapsible header
+
+**PR Status:**
+- PR #82: https://github.com/stephenbeale/waffley/pull/82
+- CodeRabbit check: PASSING (review completed)
+- Mergeability: MERGEABLE but BLOCKED by branch protection (requires human review/approval)
+- CodeRabbit actionable comments (2):
+  1. `app.js` line 365: accuracy rounding edge case — numerator shows 200/200 for 199/200; fix by checking actual error count rather than rounded accuracy in the ternary
+  2. `app.js` lines 336-368: innerHTML XSS surface — `itemRow` builds HTML strings for `weakness-weak-list`, `weakness-cat-list`, `weakness-strong-list`; CodeRabbit recommends DOM-safe construction via `createElement`/`textContent`/`appendChild`
+  - Nitpick: `index.html` toggle button missing `aria-controls="weakness-content"` attribute (add to `<button id="weakness-toggle">`)
+
+**Unfinished Git Workflows:**
+- PR #82 needs to be merged — branch protection blocks `--merge` without human approval
+- Options: (a) approve and merge via GitHub UI, (b) address CodeRabbit actionable comments first then merge, (c) use `gh pr merge 82 --admin` if admin override is acceptable
+
+**Next Steps:**
+1. Review and merge PR #82 — optionally address the 2 CodeRabbit actionable comments first (XSS fix and accuracy rounding are worthwhile improvements)
+2. After merge: delete `feature/weakness-report` branch locally (`git branch -d feature/weakness-report`) and pull master
+3. Deploy `waffley.app` on SiteGround — domain purchased but not yet served; see deployment steps in prior session notes
+4. Drop stale stashes if not yet done: `git stash list` to confirm, then `git stash drop stash@{N}` for each obsolete entry
+5. Italki affiliate programme: already signed up (Awin account) — use link builder at https://ui.awin.com/link-builder/en/awin/publisher/1971095 to generate deep links for waffley.app content
+6. Remaining affiliate sign-ups blocking Tier 3 monetisation: Preply and Babbel (via Awin)
+
+**Technical Notes:**
+- `generateWeaknessReport()` requires at least 5 attempts per item before including it in weak/strong lists — prevents noise from items seen only once or twice
+- Accuracy is stored as a decimal (0–1) in `wordStats`; multiply by 100 for display
+- The toggle wiring uses a `click` listener on `#weakness-toggle` that toggles `aria-expanded` and CSS class on `#weakness-content`
+- If CodeRabbit XSS fix is applied, replace the `itemRow` template literal with DOM element creation and set text via `textContent`, width via `style.width`
+
+### 2026-03-05 - uTalk Affiliate Nudge + PR #82 CodeRabbit Fixes
+
+**Work Completed:**
+
+1. **fix: replace innerHTML with DOM-safe element creation in weakness report** (commit `0d5fe26`, on `feature/weakness-report`)
+   - Addressed CodeRabbit XSS actionable comment: `itemRow` builder in `generateWeaknessReport()` now uses `createElement`/`textContent`/`appendChild` instead of template-literal innerHTML for `weakness-weak-list`, `weakness-cat-list`, and `weakness-strong-list`
+
+2. **fix: add aria-controls to weakness report toggle button** (commit `1951e80`, on `feature/weakness-report`)
+   - Addressed CodeRabbit nitpick: `<button id="weakness-toggle">` in `index.html` now carries `aria-controls="weakness-content"` for correct screen-reader linkage
+
+3. **feat: add uTalk affiliate nudge to home screen footer** (PR #83 — OPEN, awaiting review)
+   - Branch: `feature/utalk-nudge`
+   - Adds a second affiliate nudge line below the existing italki line on the home screen footer
+   - Copy: "Prefer to learn at your own pace? Try uTalk for self-paced vocabulary"
+   - Links via Awin affiliate ID 1971095 to the uTalk merchant profile (`awinmid=59791`)
+   - PR: https://github.com/stephenbeale/waffley/pull/83
+
+4. **uTalk affiliate research** (via site-promoter agent)
+   - Confirmed uTalk is available through the existing Awin account (merchant ID 59791)
+   - Join link: https://ui.awin.com/awin/affiliate/1971095/merchant-profile/59791
+   - uTalk nudge also planned for verbio (Home.jsx + VerbDetail.jsx) once the Awin application is approved
+   - Memory updated: uTalk row in affiliate tracking table marked as "Yes" for waffley
+
+**Open PRs at End of Session:**
+- PR #82: `feature/weakness-report` — https://github.com/stephenbeale/waffley/pull/82
+  - CodeRabbit: PASSING (all actionable comments addressed in commits `0d5fe26` and `1951e80`)
+  - Mergeability: MERGEABLE
+  - Blocked: REVIEW_REQUIRED (branch protection — needs human approval)
+  - Remaining CodeRabbit nitpick: attempt-weighted category accuracy in `app.js` lines 269-280 (optional improvement)
+- PR #83: `feature/utalk-nudge` — https://github.com/stephenbeale/waffley/pull/83
+  - CodeRabbit: PASSING
+  - Mergeability: MERGEABLE
+  - Blocked: REVIEW_REQUIRED (branch protection — needs human approval)
+  - No actionable review comments
+
+**Git State at Session End:**
+- Current branch: `feature/weakness-report` — clean, up to date with origin
+- All commits pushed — no unpushed local work
+- Stashes: `stash@{0}` (master: WIP CLAUDE.md+ROADMAP), `stash@{1}` (master: word-stats spaced-repetition WIP) — both intentionally retained from prior sessions
+- Local-only unmerged branch: `feature/sentence-building-mode` — intentionally kept
+
+**Unfinished Git Workflows:**
+- PR #82 needs human approval before merge — cannot be merged via `--admin` without explicit authorisation
+- PR #83 needs human approval before merge — same constraint
+
+**Next Steps:**
+1. Approve and merge PR #82 via GitHub UI (weakness report — all CodeRabbit fixes shipped)
+2. Approve and merge PR #83 via GitHub UI (uTalk affiliate nudge)
+3. After both merges: switch to master, pull, delete `feature/weakness-report` and `feature/utalk-nudge` locally
+4. Sign up for uTalk via Awin: https://ui.awin.com/awin/affiliate/1971095/merchant-profile/59791 — once approved, replace generic nudge link with a deep link to the relevant language page
+5. Add uTalk affiliate nudge to verbio (`Home.jsx` and `VerbDetail.jsx`) — same pattern as waffley footer
+6. Deploy `waffley.app` on SiteGround — domain purchased, not yet served (see deployment checklist in 2026-02-27 session notes)
+7. Remaining affiliate sign-ups: Preply (https://preply.com/en/affiliate), Babbel (via Awin), eBay Partner Network (https://partnernetwork.ebay.co.uk), CV-Library
+
+**Technical Notes:**
+- uTalk Awin merchant ID: 59791; publisher ID: 1971095
+- uTalk nudge copy: "Prefer to learn at your own pace? Try uTalk for self-paced vocabulary"
+- PR #82 CodeRabbit nitpick (attempt-weighted category accuracy) is optional — current implementation averages per-item rounded accuracy, which may skew category ranking when attempt counts differ significantly; the fix aggregates totalCorrect/totalAttempts per category and rounds once
