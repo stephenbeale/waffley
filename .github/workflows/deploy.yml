@@ -1,0 +1,29 @@
+name: Deploy to SiteGround (waffley.app)
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    name: SFTP deploy to public_html
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # needed for FTP-Deploy-Action diff
+
+      - name: Deploy changed files via SFTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.SFTP_HOST }}
+          username: ${{ secrets.SFTP_USER }}
+          password: ${{ secrets.SFTP_PASSWORD }}
+          protocol: ftps
+          server-dir: /public_html/
+          local-dir: ./public/
+          state-name: .ftp-deploy-sync-state.json
+          dry-run: false
