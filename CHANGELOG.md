@@ -5,6 +5,50 @@ All notable changes to Waffley are documented here. Format follows [Keep a Chang
 ## [Unreleased]
 
 ### Added
+- Japanese language (romaji) — 7th language, words only (no verb conjugation)
+
+## 2026-03-09
+
+### Added
+- Deployed to https://waffley.app on SiteGround
+- Pre-deploy SEO: meta description, Open Graph tags, canonical URL
+- `robots.txt` and `sitemap.xml`
+- Personalised weakness report in stats overlay (PR #82) — collapsible section showing weak/strong items by accuracy
+- uTalk affiliate nudge in home screen footer (PR #83)
+- Buy Me a Coffee, italki, SiteGround, and cross-promotion links in footer
+
+### Changed
+- Title updated from "Learn Colour Words" to "Learn Languages Through Play"
+- Manifest name updated to match
+
+### Removed
+- Broken Sentry integration (placeholder DSN)
+
+## 2026-03-05
+
+### Added
+- Verb tense expansion — past, present perfect, and conditional tenses for ES, FR, DE, IT, PT
+- Pronouns as full game category with 4 learning phases
+- XP and levelling system with 6 cosmetic titles (Beginner to Master)
+- Daily challenge system with progress tracking
+- Day streaks and 5 new achievements
+- Spaced repetition scheduling (simplified SM-2 algorithm)
+- 6 new vocabulary categories: Body, Clothing, Home, Numbers (0-10), Family, Professions
+- Supabase cloud sync with Google/Apple sign-in (optional)
+- Privacy Policy and Terms of Service overlays
+- Data export and account deletion from stats screen
+- Shareable result card with Web Share API
+- Speed round "Mark Level Complete" option at 2-second timer
+- Duplicate verb conjugation button dedup
+
+### Fixed
+- Pronoun highlight removed from Learning phase verbs/pronouns
+- Verb Practice+ layout uses pronoun emoji consistently
+- Debounced Supabase sync to prevent rapid duplicate writes
+
+## 2026-02-16
+
+### Added
 - Verb conjugation learning path — parallel "Verbs" mode alongside existing "Words" mode
 - Present tense matching exercises for 10 common irregular verbs (ES, FR, DE, IT, PT)
 - Mode toggle (Words/Verbs) and verb tense selector in UI
@@ -17,12 +61,12 @@ All notable changes to Waffley are documented here. Format follows [Keep a Chang
 - Speech wrong attempts history — scrolling list of failed speech recognition attempts with cross marks
 - Session mastery removal — items excluded from questions after 3 consecutive correct, restored at next level
 - Speed round mercy — when failing at 2-second speed, choose to retry, add 2 seconds, or end game
-- Feminine adjective forms from Cycle 2 — gendered prompts with 👨/👩 indicators (ES, FR, IT, PT)
+- Feminine adjective forms from Cycle 2 — gendered prompts with indicators (ES, FR, IT, PT)
 - Expanded vocabulary: 2 new items per category (sick/strong, cow/pig, tomato/carrot, lightning/tornado)
 - Typing mode mobile UX — smaller display, accent shortcut buttons, timer repositioned, keyboard hint
 - Phase selection on topic screen — click any journey phase to start from that point
 - Typing phase between Practice and Speech (4-phase, 40-level cycle)
-- Accent-tolerant typing input (e.g. "Marron" accepted for "Marrón")
+- Accent-tolerant typing input (e.g. "Marron" accepted for "Marron")
 - Form-aware typing prompts for articles and plurals
 - Article forms for noun categories (animals, food, weather) from Cycle 2 onwards
 - Plural forms with repeated emoji display from Cycle 3 onwards
