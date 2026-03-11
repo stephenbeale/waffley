@@ -1364,7 +1364,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         }
         const count = getButtonCount();
         if (isColorCategory()) {
-            game.activeItems = selectActiveItems(ALL_COLORS, count);
+            game.activeItems = selectActiveItems(game.activeColors, count);
         } else {
             game.activeItems = selectActiveItems(getCategoryData().items, count);
         }
@@ -1472,10 +1472,13 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     }
 
     // Get mastery progress for UI display
+    // Returns both item-level mastery and gradual fill (individual correct answers)
     function getMasteryProgress() {
         const values = Object.values(game.levelMastery);
         const mastered = values.filter(c => c >= MASTERY_THRESHOLD).length;
-        return { mastered, total: values.length };
+        const totalNeeded = values.length * MASTERY_THRESHOLD;
+        const correctSoFar = values.reduce((sum, c) => sum + Math.min(c, MASTERY_THRESHOLD), 0);
+        return { mastered, total: values.length, correctSoFar, totalNeeded };
     }
 
     // Check if levelling up would change the time limit
@@ -2298,12 +2301,12 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     // Update game screen level display
     function updateLevelDisplay() {
         const phase = getPhaseFromProgress();
-        const { mastered, total } = getMasteryProgress();
+        const { mastered, total, correctSoFar, totalNeeded } = getMasteryProgress();
 
         currentLevelEl.textContent = getLevelInCycle();
 
-        // Update vertical progress bar with mastery progress
-        const pct = total > 0 ? Math.min(100, mastered / total * 100) : 0;
+        // Update vertical progress bar with gradual fill (each correct answer counts)
+        const pct = totalNeeded > 0 ? Math.min(100, correctSoFar / totalNeeded * 100) : 0;
         verticalProgressBar.style.height = pct + '%';
         verticalProgressLabel.textContent = `${mastered}/${total}`;
 
@@ -2314,9 +2317,18 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
         timeDisplayEl.textContent = getTimeLimitSeconds();
 
-        // Update phase badge
+        // Update phase badge and description
         phaseBadge.textContent = PHASES[phase];
         phaseBadge.className = 'phase-badge ' + PHASE_CLASSES[phase];
+
+        const phaseDescEl = document.getElementById('phase-desc');
+        const PHASE_DESCS = [
+            'Listen and pick the right answer',
+            'No text hints — pick from memory',
+            'Type the answer yourself',
+            'Say it out loud'
+        ];
+        if (phaseDescEl) phaseDescEl.textContent = PHASE_DESCS[phase] || '';
     }
 
     // Track overlay countdown intervals so nav buttons can cancel them
