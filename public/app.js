@@ -2,7 +2,7 @@ import {
     MASTERY_THRESHOLD, REMOVAL_STREAK, LEVELS_PER_PHASE, LEVELS_PER_CYCLE,
     PHASES, PHASE_CLASSES, MAX_TIME, MIN_TIME, MIN_TIME_TYPING,
     TIMER_WARNING_RATIO, LEVEL_UP_COUNTDOWN, CYCLE_COMPLETE_COUNTDOWN,
-    STARTING_BUTTON_COUNT, BUTTONS_ADD_INTERVAL, MAX_PITCH_SEMITONES,
+    MAX_PITCH_SEMITONES,
     TTS_SPEECH_RATE, SPEECH_RESTART_DELAY, SILENT_LEVEL_THRESHOLD,
     CYCLE_COLORS, ALL_COLORS, MAX_CYCLE_WITH_NEW_COLORS, NEW_COLORS_PER_CYCLE,
     NOUN_CATEGORIES, ADJECTIVE_CATEGORY, ARTICLE_CYCLE, PLURAL_CYCLE, FEMININE_CYCLE,
@@ -1347,16 +1347,12 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         return copy;
     }
 
-    // Get number of visible buttons based on level within phase
+    // Get number of visible buttons — show ALL items so every word must
+    // be mastered before the level/phase advances.
     function getButtonCount() {
-        // Verb/pronoun mode: always 7 buttons (one per pronoun)
         if (isVerbLikeMode()) return PRONOUN_KEYS.length;
-        const maxCount = game.activeColors.length;
-        const levelInPhase = getLevelInPhase();
-        // Start with 4 buttons (or max if fewer), add 1 every 2 levels
-        const base = Math.min(STARTING_BUTTON_COUNT, maxCount);
-        const extra = Math.floor((levelInPhase - 1) / BUTTONS_ADD_INTERVAL);
-        return Math.min(base + extra, maxCount);
+        if (isColorCategory()) return game.activeColors.length;
+        return getCategoryData().items.length;
     }
 
     // Randomly select new items from the full pool
