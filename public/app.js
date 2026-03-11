@@ -2539,6 +2539,21 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     }
 
     // ========== INITIALIZATION ==========
+
+    // Brave browser TTS warning (one-time, dismissible)
+    (async function detectBrave() {
+        if (navigator.brave && await navigator.brave.isBrave() && !localStorage.getItem('waffley_brave_dismissed')) {
+            const banner = document.getElementById('brave-tts-banner');
+            if (banner) {
+                banner.hidden = false;
+                document.getElementById('brave-tts-dismiss').addEventListener('click', () => {
+                    banner.hidden = true;
+                    localStorage.setItem('waffley_brave_dismissed', '1');
+                });
+            }
+        }
+    })();
+
     updateModeUI();
     updateStartScreenProgress();
 
