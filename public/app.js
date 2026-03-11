@@ -2234,6 +2234,7 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
 
     // Update start screen progress display
     function updateStartScreenProgress() {
+        if (selectedMode === 'words') renderCategoryKanban();
         const progressDisplay = document.getElementById('progress-display');
         if (progressDisplay) progressDisplay.style.display = '';
 
@@ -2727,23 +2728,57 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         });
     });
 
-    // Category selection (words mode)
-    wordsSelector.querySelectorAll('.category-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const newCategory = btn.dataset.category;
-            if (newCategory !== selectedCategory) {
-                // Save current category progress, switch, load new
-                saveProgress();
-                selectedCategory = newCategory;
-                const newProgress = getLanguageProgress(selectedLanguage, newCategory);
-                game.totalCorrectAnswers = newProgress.totalAnswers;
-                game.currentCycle = newProgress.currentCycle;
-                game.levelsCompleted = newProgress.levelsCompleted || 0;
-                updateStartScreenProgress();
+    // ========== CATEGORY KANBAN BOARD ==========
+
+    function getCategoryStatus(lang, category) {
+        const prog = getLanguageProgress(lang, category);
+        if (!prog.totalAnswers || prog.totalAnswers === 0) return 'to-learn';
+        if (prog.currentCycle > 1) return 'mastered';
+        return 'learning';
+    }
+
+    function renderCategoryKanban() {
+        const toLearnItems = document.querySelector('#kanban-to-learn .kanban-items');
+        const learningItems = document.querySelector('#kanban-learning .kanban-items');
+        const masteredItems = document.querySelector('#kanban-mastered .kanban-items');
+        toLearnItems.innerHTML = '';
+        learningItems.innerHTML = '';
+        masteredItems.innerHTML = '';
+
+        for (const [key, cat] of Object.entries(CATEGORIES)) {
+            const status = getCategoryStatus(selectedLanguage, key);
+            const btn = document.createElement('button');
+            btn.className = 'category-btn';
+            btn.dataset.category = key;
+            btn.textContent = `${cat.icon} ${cat.label}`;
+            if (key === selectedCategory) btn.classList.add('selected');
+
+            if (status === 'mastered') {
+                masteredItems.appendChild(btn);
+            } else if (status === 'learning') {
+                learningItems.appendChild(btn);
+            } else {
+                toLearnItems.appendChild(btn);
             }
-            wordsSelector.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
-            btn.classList.add('selected');
-        });
+        }
+    }
+
+    // Category selection via event delegation (words mode)
+    wordsSelector.addEventListener('click', (e) => {
+        const btn = e.target.closest('.category-btn');
+        if (!btn) return;
+        const newCategory = btn.dataset.category;
+        if (newCategory !== selectedCategory) {
+            saveProgress();
+            selectedCategory = newCategory;
+            const newProgress = getLanguageProgress(selectedLanguage, newCategory);
+            game.totalCorrectAnswers = newProgress.totalAnswers;
+            game.currentCycle = newProgress.currentCycle;
+            game.levelsCompleted = newProgress.levelsCompleted || 0;
+            updateStartScreenProgress();
+        }
+        wordsSelector.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
     });
 
     // Verb tense selection (verbs mode)
