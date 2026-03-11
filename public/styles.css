@@ -697,6 +697,12 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     color: #fff;
 }
 
+.phase-desc {
+    font-size: 0.7rem;
+    color: var(--text-faint);
+    margin-bottom: 0.3rem;
+}
+
 /* Typing mode UI */
 .typing-ui {
     display: none;
