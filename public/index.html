@@ -121,19 +121,20 @@
         <button class="mode-btn" data-mode="verbs">🔄 Verbs</button>
     </div>
 
-    <div class="setting-label" id="words-setting-label">Category</div>
-    <div class="category-selector" id="words-selector">
-        <button class="category-btn selected" data-category="colours">🎨 Colours</button>
-        <button class="category-btn" data-category="adjectives">😊 Adjectives</button>
-        <button class="category-btn" data-category="animals">🐾 Animals</button>
-        <button class="category-btn" data-category="food">🍎 Food</button>
-        <button class="category-btn" data-category="weather">☀️ Weather</button>
-        <button class="category-btn" data-category="body">🫀 Body</button>
-        <button class="category-btn" data-category="clothing">👕 Clothing</button>
-        <button class="category-btn" data-category="home">🏠 Home</button>
-        <button class="category-btn" data-category="numbers">🔢 Numbers</button>
-        <button class="category-btn" data-category="family">👨‍👩‍👧 Family</button>
-        <button class="category-btn" data-category="professions">💼 Jobs</button>
+    <div id="words-setting-label" class="setting-label">Category</div>
+    <div class="category-kanban" id="words-selector">
+        <div class="kanban-column" id="kanban-to-learn">
+            <div class="kanban-heading">To Learn</div>
+            <div class="kanban-items"></div>
+        </div>
+        <div class="kanban-column" id="kanban-learning">
+            <div class="kanban-heading">Learning</div>
+            <div class="kanban-items"></div>
+        </div>
+        <div class="kanban-column" id="kanban-mastered">
+            <div class="kanban-heading">Mastered</div>
+            <div class="kanban-items"></div>
+        </div>
     </div>
 
     <div class="setting-label" id="verb-setting-label" style="display:none">Tense</div>

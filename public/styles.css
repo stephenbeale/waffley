@@ -387,6 +387,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     letter-spacing: 0.1em;
 }
 
+/* Flat category selector (verb tenses) */
 .category-selector {
     display: flex;
     flex-wrap: wrap;
@@ -395,9 +396,37 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     justify-content: center;
 }
 
+/* Category kanban board */
+.category-kanban {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
+}
+.kanban-column {
+    min-height: 3rem;
+}
+.kanban-heading {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-faint);
+    margin-bottom: 0.4rem;
+    text-align: center;
+}
+#kanban-to-learn .kanban-heading { color: var(--text-faint); }
+#kanban-learning .kanban-heading { color: #f0a500; }
+#kanban-mastered .kanban-heading { color: #16c79a; }
+.kanban-items {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
 .category-btn {
-    padding: 0.6rem 1.2rem;
-    font-size: 0.95rem;
+    padding: 0.5rem 0.4rem;
+    font-size: 0.85rem;
     font-weight: 600;
     border: 2px solid var(--border-default);
     border-radius: 6px;
@@ -405,9 +434,12 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     color: var(--text-muted);
     cursor: pointer;
     transition: all 0.2s;
+    width: 100%;
+    text-align: center;
 }
 
-.category-btn:hover {
+.category-btn:hover,
+.category-btn:focus-visible {
     border-color: var(--text-faint);
     color: var(--text-heading);
 }
@@ -416,6 +448,15 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     border-color: #16c79a;
     background: #16c79a;
     color: #fff;
+}
+
+/* Subtle column tints */
+#kanban-learning .category-btn { border-color: rgba(240, 165, 0, 0.3); }
+#kanban-mastered .category-btn { border-color: rgba(22, 199, 154, 0.3); }
+
+@media (max-width: 360px) {
+    .category-kanban { gap: 0.3rem; }
+    .category-btn { font-size: 0.75rem; padding: 0.4rem 0.3rem; }
 }
 
 /* Mode selector (Words / Verbs toggle) */
