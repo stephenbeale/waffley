@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speak Easy - Language Learning Made Simple</title>
+    <meta name="description" content="Learn vocabulary in Spanish, French, German, Italian, Welsh and Portuguese through interactive flashcard exercises. One language, one page, total focus.">
+    <link rel="stylesheet" href="styles.css">
+    <meta name="theme-color" content="#6c5ce7">
+</head>
+<body>
+
+<div class="home">
+    <header class="home-header">
+        <h1 class="home-title">Speak Easy</h1>
+        <p class="home-subtitle">Language learning made simple</p>
+    </header>
+
+    <p class="home-intro">
+        Pick a language and start learning vocabulary through interactive exercises.
+        Each language has its own dedicated space with categories, progress tracking, and four learning phases.
+    </p>
+
+    <div class="language-grid">
+        <a href="spanish.html" class="language-card" data-lang="es">
+            <span class="language-card-flag">🇪🇸</span>
+            <span class="language-card-name">Spanish</span>
+            <span class="language-card-native">Español</span>
+        </a>
+        <a href="french.html" class="language-card" data-lang="fr">
+            <span class="language-card-flag">🇫🇷</span>
+            <span class="language-card-name">French</span>
+            <span class="language-card-native">Français</span>
+        </a>
+        <a href="german.html" class="language-card" data-lang="de">
+            <span class="language-card-flag">🇩🇪</span>
+            <span class="language-card-name">German</span>
+            <span class="language-card-native">Deutsch</span>
+        </a>
+        <a href="italian.html" class="language-card" data-lang="it">
+            <span class="language-card-flag">🇮🇹</span>
+            <span class="language-card-name">Italian</span>
+            <span class="language-card-native">Italiano</span>
+        </a>
+        <a href="welsh.html" class="language-card" data-lang="cy">
+            <span class="language-card-flag">🏴󠁧󠁢󠁷󠁬󠁳󠁿</span>
+            <span class="language-card-name">Welsh</span>
+            <span class="language-card-native">Cymraeg</span>
+        </a>
+        <a href="portuguese.html" class="language-card" data-lang="pt">
+            <span class="language-card-flag">🇵🇹</span>
+            <span class="language-card-name">Portuguese</span>
+            <span class="language-card-native">Português</span>
+        </a>
+    </div>
+
+    <div class="home-settings">
+        <label class="toggle-row">
+            <input type="checkbox" id="audio-toggle">
+            <span class="toggle-slider"></span>
+            <span class="toggle-icon">🔊</span>
+            <span class="toggle-label">Play pronunciation</span>
+        </label>
+        <label class="toggle-row">
+            <input type="checkbox" id="theme-toggle">
+            <span class="toggle-slider"></span>
+            <span class="toggle-icon">☀️</span>
+            <span class="toggle-label">Light mode</span>
+        </label>
+    </div>
+
+    <footer class="home-footer">
+        <p class="footer-text">
+            Also by me: <a href="https://waffley.app" target="_blank" rel="noopener noreferrer">Waffley</a>
+        </p>
+    </footer>
+</div>
+
+<script>
+    // Theme persistence
+    (function() {
+        const saved = localStorage.getItem('speakeasy_theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (saved ? saved === 'light' : !prefersDark) {
+            document.body.setAttribute('data-theme', 'light');
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggle = document.getElementById('theme-toggle');
+            toggle.checked = document.body.getAttribute('data-theme') === 'light';
+            toggle.addEventListener('change', function() {
+                if (this.checked) {
+                    document.body.setAttribute('data-theme', 'light');
+                    localStorage.setItem('speakeasy_theme', 'light');
+                } else {
+                    document.body.removeAttribute('data-theme');
+                    localStorage.setItem('speakeasy_theme', 'dark');
+                }
+            });
+
+            const audioToggle = document.getElementById('audio-toggle');
+            audioToggle.checked = localStorage.getItem('speakeasy_audio') !== 'off';
+            audioToggle.addEventListener('change', function() {
+                localStorage.setItem('speakeasy_audio', this.checked ? 'on' : 'off');
+            });
+        });
+    })();
+</script>
+
+</body>
+</html>

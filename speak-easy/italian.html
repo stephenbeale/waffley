@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn Italian - Speak Easy</title>
+    <meta name="description" content="Learn Italian vocabulary through interactive exercises. Master colours, animals, food, numbers and more with Speak Easy.">
+    <link rel="stylesheet" href="styles.css">
+    <meta name="theme-color" content="#6c5ce7">
+</head>
+<body>
+<script>
+    (function(){var t=localStorage.getItem('speakeasy_theme');var d=window.matchMedia('(prefers-color-scheme:dark)').matches;if(t?t==='light':!d)document.body.setAttribute('data-theme','light')})();
+</script>
+
+<div id="topic-screen" class="lang-page active">
+    <div class="lang-header">
+        <a href="index.html" class="back-link" aria-label="Back to languages">&larr;</a>
+        <h1 class="lang-title"><span class="lang-flag">🇮🇹</span> Italian</h1>
+    </div>
+    <div class="section-label">Category</div>
+    <div class="category-grid" id="category-grid"></div>
+    <div class="journey">
+        <div class="journey-title">Your Journey</div>
+        <div class="journey-phases">
+            <div class="journey-phase" data-phase="0"><div class="journey-dot"></div><div class="journey-phase-name">Learn</div></div>
+            <div class="journey-connector"></div>
+            <div class="journey-phase" data-phase="1"><div class="journey-dot"></div><div class="journey-phase-name">Practice</div></div>
+            <div class="journey-connector"></div>
+            <div class="journey-phase" data-phase="2"><div class="journey-dot"></div><div class="journey-phase-name">Type</div></div>
+            <div class="journey-connector"></div>
+            <div class="journey-phase" data-phase="3"><div class="journey-dot"></div><div class="journey-phase-name">Speak</div></div>
+        </div>
+        <div class="journey-stats">
+            <span>Cycle <span id="journey-cycle">1</span></span><span>&middot;</span>
+            <span><span id="journey-answers">0</span> correct</span><span>&middot;</span>
+            <span><span id="journey-time">10</span>s</span>
+        </div>
+    </div>
+    <div class="start-section"><button id="start-btn" class="btn-start">Start Learning</button></div>
+</div>
+
+<div id="game-screen" class="game-screen">
+    <div class="game-controls">
+        <button class="game-ctrl-btn" id="pause-btn" aria-label="Pause">⏸</button>
+        <div class="game-info">
+            <span class="game-phase-badge" id="phase-badge">Learning</span>
+            <span id="level-display">Level 1</span><span id="time-display">10s</span>
+        </div>
+        <button class="game-ctrl-btn" id="quit-btn" aria-label="Quit">✕</button>
+    </div>
+    <div class="score-bar"><span>🇮🇹 Score: <span class="score-value" id="score-display">0</span></span></div>
+    <div class="prompt-area">
+        <div class="prompt-label" id="prompt-label">What is this?</div>
+        <div class="prompt-display" id="prompt-display"></div>
+        <div class="reinforcement-label" id="reinforcement-label"></div>
+    </div>
+    <div class="timer-container"><div class="timer-bar" id="timer-bar"></div></div>
+    <div class="answer-grid" id="answers-container"></div>
+    <div class="typing-ui" id="typing-ui">
+        <div class="accent-row" id="accent-row"></div>
+        <input type="text" id="typing-input" class="typing-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Type your answer">
+        <div class="typing-feedback" id="typing-feedback"></div>
+    </div>
+    <div class="speech-ui" id="speech-ui">
+        <div class="mic-indicator"><div class="mic-icon"></div><span id="mic-status">Listening...</span></div>
+        <div class="voice-feedback" id="voice-feedback"></div>
+        <div class="speech-attempts" id="speech-attempts"></div>
+    </div>
+</div>
+
+<div id="pause-overlay" class="overlay" role="dialog" aria-label="Paused">
+    <div class="overlay-title">Paused</div>
+    <div style="display:flex;gap:0.75rem;flex-direction:column;">
+        <button id="resume-btn" class="btn btn-primary">Resume</button>
+        <button id="quit-from-pause-btn" class="btn btn-secondary">Go to Menu</button>
+    </div>
+</div>
+<div id="level-up-overlay" class="overlay" role="dialog" aria-label="Level up">
+    <div class="overlay-title">Level Up!</div>
+    <div class="overlay-message" id="level-up-message">Level 2 - Learning</div>
+    <div class="overlay-countdown" id="level-up-countdown">3</div>
+</div>
+<div id="end-screen" class="end-screen">
+    <div class="end-title">Well Done!</div>
+    <div class="end-score" id="final-score">0</div>
+    <div class="end-score-label">correct answers</div>
+    <div class="end-stats">
+        <div class="end-stat"><div class="end-stat-value" id="accuracy-stat">0%</div><div class="end-stat-label">accuracy</div></div>
+        <div class="end-stat"><div class="end-stat-value" id="avg-time-stat">0.0s</div><div class="end-stat-label">avg time</div></div>
+    </div>
+    <button id="continue-btn" class="btn btn-primary" style="margin-top:1rem;">Continue</button>
+</div>
+
+<script type="module">
+    import langData from './lang/it.js';
+    import { init } from './app.js';
+    init('it', langData, 'it-IT');
+</script>
+</body>
+</html>
