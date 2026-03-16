@@ -5,8 +5,9 @@ import it from './lang/it.js';
 import cy from './lang/cy.js';
 import pt from './lang/pt.js';
 import ja from './lang/ja.js';
+import hr from './lang/hr.js';
 
-const LANG_DATA = { es, fr, de, it, cy, pt, ja };
+const LANG_DATA = { es, fr, de, it, cy, pt, ja, hr };
 
 // ========== LEVEL SYSTEM CONSTANTS ==========
 export const MASTERY_THRESHOLD = 2;
@@ -62,7 +63,8 @@ export const LANGUAGES = {
     it: { name: 'Italian', flag: '🇮🇹', speechCode: 'it-IT' },
     cy: { name: 'Welsh',   flag: '🏴󠁧󠁢󠁷󠁬󠁳󠁿', speechCode: 'cy-GB' },
     pt: { name: 'Portuguese', flag: '🇵🇹', speechCode: 'pt-PT' },
-    ja: { name: 'Japanese',   flag: '🇯🇵', speechCode: 'ja-JP' }
+    ja: { name: 'Japanese',   flag: '🇯🇵', speechCode: 'ja-JP' },
+    hr: { name: 'Croatian',   flag: '🇭🇷', speechCode: 'hr-HR' }
 };
 
 export const LANGUAGE_NAMES = Object.fromEntries(Object.entries(LANGUAGES).map(([k, v]) => [k, v.name]));
