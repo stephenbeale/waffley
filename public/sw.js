@@ -1,4 +1,4 @@
-const CACHE_NAME = 'waffley-v4';
+const CACHE_NAME = 'waffley-v6';
 const CDN_CACHE  = 'waffley-cdn-v1';
 
 const APP_SHELL = [
@@ -16,6 +16,7 @@ const APP_SHELL = [
     '/lang/it.js',
     '/lang/pt.js',
     '/lang/ja.js',
+    '/lang/hr.js',
 ];
 
 const ESM_ENTRY = 'https://esm.sh/@supabase/supabase-js@2';
