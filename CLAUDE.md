@@ -735,3 +735,87 @@ The following PRs from prior sessions remain open. They were NOT touched in this
 - uTalk Awin merchant ID: 59791; publisher ID: 1971095
 - uTalk nudge copy: "Prefer to learn at your own pace? Try uTalk for self-paced vocabulary"
 - PR #82 CodeRabbit nitpick (attempt-weighted category accuracy) is optional — current implementation averages per-item rounded accuracy, which may skew category ranking when attempt counts differ significantly; the fix aggregates totalCorrect/totalAttempts per category and rounds once
+
+### 2026-03-18 - One-Letter Hint Feature + Full Deploy
+
+**Work Completed:**
+
+1. **PR #96 — fix(sw): add lang/hr.js to SW precache, bump cache version** (MERGED)
+   - Croatian language file was missing from service worker precache list
+   - Bumped SW cache version to force asset refresh after previous deploy
+
+2. **PR #94 — feat: automated GitHub Pages deploy workflow** (MERGED)
+   - Added `.github/workflows/pages.yml` for automated GitHub Pages deployment
+   - Deploys on push to master
+
+3. **PR #87 — refactor: simplify SFTP deploy workflow using public/ directory** (MERGED)
+   - Simplified `.github/workflows/deploy.yml` to target `public/` directory
+   - Cleaner deploy path aligned with `feature/public-deploy-dir` restructure
+
+4. **PR #98 — feat: one-letter hint in typing mode** (MERGED)
+   - When a typed answer is exactly 1 edit distance (Levenshtein) from the correct answer, instead of ending the game it shows: "1 letter wrong — quick, change it!" with a shake animation on the input
+   - Prevents unfair game-overs for near-miss typos
+   - Does not affect scoring — only gives the user a second chance to correct a single-character error
+   - Commit: `0f0c9aa`
+
+5. **Full SiteGround deploy** (manual via File Manager)
+   - All changed files uploaded to `public_html/`
+   - Dynamic Cache purged at: https://tools.siteground.com/cacher?siteId=SndEeFpITUZJQT09
+   - SW cache bumped to v7 (commit `a10000e`) via PR #99 (`fix/redeploy-all-files`) to force client-side cache bust
+
+6. **Memory updated**
+   - Created `feedback_waffley-deploy-table.md` — numbered file table for every SiteGround deploy
+   - Updated MEMORY.md: waffley open PRs section now shows all merged (PRs #82, #83, #85, #87 all closed/merged)
+   - Added SiteGround Dynamic Cache URL to notes
+
+**PRs Merged This Session:**
+- #96 — fix(sw): add lang/hr.js to SW precache, bump cache version
+- #94 — feat: automated GitHub Pages deploy workflow
+- #87 — refactor: simplify SFTP deploy workflow using public/ directory
+- #98 — feat: one-letter hint in typing mode (1 edit distance check)
+- #99 — fix(sw): bump cache to v7 for full SiteGround redeploy
+
+**Current State:**
+- Branch: master, clean, up to date with origin/master (HEAD: `5ad36fb`)
+- SW cache: v7
+- Site live at: https://waffley.app
+- No open PRs
+- No uncommitted changes
+- No unpushed commits
+
+**CRITICAL: TTS Bug Reported**
+User reports text-to-speech not working in any browser or any language after the deploy. Investigation findings:
+- PR #98 (one-letter hint) did NOT touch any TTS code — not the cause
+- Likely a service worker cache issue or browser voice pack loading problem
+- No browser console output was captured before session end
+
+**Debugging steps for next session:**
+1. Open https://waffley.app in Chrome DevTools > Console — capture any JS errors
+2. Check Application > Service Workers — confirm SW version is v7 and activated (not stuck in "waiting")
+3. Hard-reload with Ctrl+Shift+R or disable SW in DevTools to test without caching
+4. Open DevTools > Console and run: `speechSynthesis.getVoices()` — confirm voices list is populated
+5. Check if TTS works on a fresh incognito session (rules out stale SW)
+6. If SW is stuck in "waiting": click "skipWaiting" in DevTools or clear site data and reload
+7. Verify `lang/` directory files are correctly uploaded to SiteGround (all 7: es, fr, de, it, cy, pt, hr)
+8. Check if the issue is TTS not triggering at all vs. TTS triggering but producing no audio — different root causes
+
+**Stashes:**
+- `stash@{0}` (master: WIP CLAUDE.md + ROADMAP) — contains 72-line CLAUDE.md addition + 1-line ROADMAP.md change; review before dropping
+- `stash@{1}` (master: word-stats spaced-repetition WIP) — 43-line `app.js` change; spaced repetition work from a prior session, superseded by merged PR #73; likely safe to drop
+
+**Unfinished Git Workflows:**
+- None — working tree clean, all PRs resolved
+
+**Next Steps:**
+1. **PRIORITY 1: Investigate TTS bug** — see debugging steps above; likely a stale SW or voice pack issue
+2. Review stash@{0} content (CLAUDE.md + ROADMAP WIP) and either apply or drop
+3. Review stash@{1} (spaced repetition WIP) — compare against merged PR #73 code; drop if superseded
+4. OAuth providers still needed: Google Sign-In and Apple Sign-In (see Supabase dashboard)
+5. Affiliate sign-ups still blocking Tier 3: Preply, uTalk (pending Awin approval), CV-Library, TopCV, LiveCareer
+
+**Technical Notes:**
+- One-letter hint uses Levenshtein distance = 1 check; the shake animation is a CSS class toggled on the input element
+- SW cache version must be incremented in `sw.js` before every deploy to bust cached assets for existing users
+- SiteGround Dynamic Cache URL: https://tools.siteground.com/cacher?siteId=SndEeFpITUZJQT09
+- SiteGround File Manager URL: https://tools.siteground.com/filemanager?siteId=SndEeFpITUZJQT09
+- Do NOT upload: `.git/`, `node_modules/`, `supabase/`, `docs/`, `scripts/`, `.env`, `*.md`, `package.json`
