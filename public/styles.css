@@ -471,9 +471,29 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 #kanban-learning .category-btn { border-color: rgba(240, 165, 0, 0.3); }
 #kanban-mastered .category-btn { border-color: rgba(22, 199, 154, 0.3); }
 
+@media (max-width: 480px) {
+    .category-kanban {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.4rem;
+    }
+    #kanban-mastered {
+        grid-column: 1 / -1;
+    }
+    .kanban-items {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .category-btn {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.5rem;
+        width: auto;
+    }
+}
+
 @media (max-width: 360px) {
     .category-kanban { gap: 0.3rem; }
-    .category-btn { font-size: 0.75rem; padding: 0.4rem 0.3rem; }
+    .category-btn { font-size: 0.65rem; padding: 0.25rem 0.4rem; }
 }
 
 /* Mode selector (Words / Verbs toggle) */
