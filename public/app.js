@@ -2233,6 +2233,37 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\u00df/g, 'ss').toLowerCase().trim();
     }
 
+    function isOneLetterOff(a, b) {
+        if (Math.abs(a.length - b.length) > 1) return false;
+        if (a === b) return false;
+        let edits = 0;
+        let i = 0, j = 0;
+        while (i < a.length && j < b.length) {
+            if (a[i] !== b[j]) {
+                edits++;
+                if (edits > 1) return false;
+                if (a.length > b.length) i++;
+                else if (b.length > a.length) j++;
+                else { i++; j++; }
+            } else { i++; j++; }
+        }
+        edits += (a.length - i) + (b.length - j);
+        return edits === 1;
+    }
+
+    function findOneLetterOffMatch(typed) {
+        const items = getCategoryItems();
+        const currentForm = game.currentForm || 'base';
+        const normalizedTyped = normalizeForComparison(typed);
+        for (const item of items) {
+            const translation = getFormTranslation(item, currentForm);
+            if (isOneLetterOff(normalizedTyped, normalizeForComparison(translation))) {
+                return item;
+            }
+        }
+        return null;
+    }
+
     // ========== UI UPDATE FUNCTIONS ==========
 
     // Update start screen progress display
@@ -3257,6 +3288,11 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         if (matched) {
             typingFeedback.textContent = '';
             handleAnswer(matched);
+        } else if (findOneLetterOffMatch(typed)) {
+            typingFeedback.textContent = '1 letter wrong \u2014 quick, change it!';
+            typingInput.classList.add('shake');
+            setTimeout(() => typingInput.classList.remove('shake'), 400);
+            typingInput.focus();
         } else {
             // Wrong answer — show brief feedback then end the game
             typingFeedback.textContent = `✗ "${typed}" is incorrect`;
