@@ -1,4 +1,4 @@
-const CACHE_NAME = 'waffley-v7';
+const CACHE_NAME = 'waffley-v8';
 const CDN_CACHE  = 'waffley-cdn-v1';
 
 const APP_SHELL = [
