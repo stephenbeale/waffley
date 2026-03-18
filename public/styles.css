@@ -147,14 +147,15 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 
 .app-title {
     font-family: 'Fredoka', sans-serif;
-    font-size: 3rem;
+    font-size: 3.2rem;
     letter-spacing: 0.05em;
-    background: linear-gradient(135deg, #e94560, #ff8a5c);
+    background: linear-gradient(135deg, #e94560, #ff8a5c, #f0a500);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     margin-top: 1rem;
     margin-bottom: 0.5rem;
+    filter: drop-shadow(0 2px 4px rgba(233, 69, 96, 0.3));
 }
 
 .instructions {
@@ -167,6 +168,29 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 }
 
 .instructions strong { color: var(--text-heading); }
+
+/* Waffle divider between sections */
+.waffle-divider {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 1.2rem 0;
+    width: 100%;
+    max-width: 320px;
+}
+
+.waffle-divider::before,
+.waffle-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border-default), transparent);
+}
+
+.waffle-divider-emoji {
+    font-size: 0.9rem;
+    opacity: 0.5;
+}
 
 /* #start-btn and #restart-btn use .btn.btn--primary */
 
@@ -330,7 +354,11 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 }
 
 
-#end-screen h1 { font-size: 2rem; }
+#end-screen h1 {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 2.2rem;
+    letter-spacing: 0.02em;
+}
 
 #final-score {
     font-size: 5rem;
@@ -376,19 +404,23 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 .language-btn:hover {
     border-color: var(--text-faint);
     color: var(--text-heading);
+    transform: translateY(-1px);
 }
 
 .language-btn.selected {
-    border-color: #0f3460;
-    background: #0f3460;
+    border-color: #e94560;
+    background: linear-gradient(135deg, #e94560, #c73651);
     color: #fff;
+    box-shadow: 0 2px 8px rgba(233, 69, 96, 0.3);
 }
 
 .topic-header {
-    font-size: 1.5rem;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.8rem;
     font-weight: 700;
     margin-bottom: 1.5rem;
     color: var(--text-heading);
+    letter-spacing: 0.02em;
 }
 
 /* .back-btn uses .btn.btn--secondary */
@@ -419,6 +451,9 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     grid-template-columns: 1fr 1fr 1fr;
     gap: 0.6rem;
     margin-bottom: 1.5rem;
+    max-height: 40vh;
+    overflow-y: auto;
+    padding-right: 0.2rem;
 }
 .kanban-column {
     min-height: 3rem;
@@ -433,17 +468,22 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     text-align: center;
 }
 #kanban-to-learn .kanban-heading { color: var(--text-faint); }
+#kanban-to-learn .kanban-heading::before { content: '📋 '; }
 #kanban-learning .kanban-heading { color: #f0a500; }
+#kanban-learning .kanban-heading::before { content: '🧇 '; }
 #kanban-mastered .kanban-heading { color: #16c79a; }
+#kanban-mastered .kanban-heading::before { content: '⭐ '; }
 .kanban-items {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
     gap: 0.35rem;
+    justify-content: center;
 }
 
 .category-btn {
-    padding: 0.5rem 0.4rem;
-    font-size: 0.85rem;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8rem;
     font-weight: 600;
     border: 2px solid var(--border-default);
     border-radius: 6px;
@@ -451,7 +491,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
     color: var(--text-muted);
     cursor: pointer;
     transition: all 0.2s;
-    width: 100%;
+    width: auto;
     text-align: center;
 }
 
@@ -1134,6 +1174,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 /* Level-up overlay — uses .overlay base */
 
 .level-up-title {
+    font-family: 'Fredoka', sans-serif;
     font-size: 3rem;
     font-weight: 900;
     color: #e94560;
@@ -1194,11 +1235,12 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 .progress-display {
     background: rgba(15, 52, 96, 0.3);
     border: 2px solid #0f3460;
-    border-radius: 8px;
+    border-radius: 12px;
     padding: 1rem 1.5rem;
     margin-bottom: 1.5rem;
     text-align: left;
     min-width: 250px;
+    box-shadow: 0 2px 12px rgba(15, 52, 96, 0.2);
 }
 
 .progress-title {
@@ -1359,6 +1401,7 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 /* Cycle complete overlay — uses .overlay base */
 
 .cycle-complete-title {
+    font-family: 'Fredoka', sans-serif;
     font-size: 3rem;
     font-weight: 900;
     color: #28a745;
@@ -1563,7 +1606,8 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 }
 
 .stats-title {
-    font-size: 2rem;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 2.2rem;
     font-weight: 900;
     color: #e94560;
     margin-bottom: 1.5rem;
