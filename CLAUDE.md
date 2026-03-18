@@ -736,7 +736,7 @@ The following PRs from prior sessions remain open. They were NOT touched in this
 - uTalk nudge copy: "Prefer to learn at your own pace? Try uTalk for self-paced vocabulary"
 - PR #82 CodeRabbit nitpick (attempt-weighted category accuracy) is optional — current implementation averages per-item rounded accuracy, which may skew category ranking when attempt counts differ significantly; the fix aggregates totalCorrect/totalAttempts per category and rounds once
 
-### 2026-03-18 - One-Letter Hint Feature + Full Deploy
+### 2026-03-18 - One-Letter Hint, Kanban Layout Fixes, Design Polish, Full Deploy
 
 **Work Completed:**
 
@@ -756,17 +756,31 @@ The following PRs from prior sessions remain open. They were NOT touched in this
    - When a typed answer is exactly 1 edit distance (Levenshtein) from the correct answer, instead of ending the game it shows: "1 letter wrong — quick, change it!" with a shake animation on the input
    - Prevents unfair game-overs for near-miss typos
    - Does not affect scoring — only gives the user a second chance to correct a single-character error
-   - Commit: `0f0c9aa`
 
-5. **Full SiteGround deploy** (manual via File Manager)
-   - All changed files uploaded to `public_html/`
-   - Dynamic Cache purged at: https://tools.siteground.com/cacher?siteId=SndEeFpITUZJQT09
-   - SW cache bumped to v7 (commit `a10000e`) via PR #99 (`fix/redeploy-all-files`) to force client-side cache bust
+5. **PR #99 — fix(sw): bump cache to v7 for full SiteGround redeploy** (MERGED)
+   - Full file upload to SiteGround `public_html/` (all files from PRs merged this session)
+   - Dynamic Cache purged; SW cache bumped to v7 to force client-side cache bust
 
-6. **Memory updated**
-   - Created `feedback_waffley-deploy-table.md` — numbered file table for every SiteGround deploy
-   - Updated MEMORY.md: waffley open PRs section now shows all merged (PRs #82, #83, #85, #87 all closed/merged)
-   - Added SiteGround Dynamic Cache URL to notes
+6. **PR #100 — fix/kanban-mobile-layout** (MERGED)
+   - Mobile kanban now uses a 2-column grid on screens ≤480px
+   - Category pills displayed as horizontal scrollable row on mobile (not a grid)
+   - SW cache bumped to v8 (commit `eebe2d5`) for deploy
+
+7. **PR #101 — feature/design-polish** (MERGED)
+   - Bolder titles, waffle accents, warmer colour palette
+   - Horizontal pill flow layout + 40vh max-height scroll cap on kanban for all screen sizes (applied in two commits: `1b60d77` + `6469560`)
+   - SW cache bumped to v9 before final deploy
+
+8. **Three SiteGround deploys this session** (all manual via File Manager)
+   - Deploy 1 (after PRs #96, #94, #87, #98, #99): SW v7 — full redeploy
+   - Deploy 2 (after PR #100): SW v8 — mobile kanban fix
+   - Deploy 3 (after PR #101): SW v9 — design polish + desktop kanban fix
+   - Dynamic Cache purged after each deploy
+
+9. **Memory and documentation updated**
+   - Created `feedback_waffley-deploy-table.md` — numbered deploy table for SiteGround reference
+   - Updated MEMORY.md: waffley open PRs section cleaned up; SiteGround Dynamic Cache URL added
+   - CLAUDE.md session entry for 2026-03-18 written and pushed
 
 **PRs Merged This Session:**
 - #96 — fix(sw): add lang/hr.js to SW precache, bump cache version
@@ -774,43 +788,44 @@ The following PRs from prior sessions remain open. They were NOT touched in this
 - #87 — refactor: simplify SFTP deploy workflow using public/ directory
 - #98 — feat: one-letter hint in typing mode (1 edit distance check)
 - #99 — fix(sw): bump cache to v7 for full SiteGround redeploy
+- #100 — fix: compact kanban layout on mobile with 2-col grid and horizontal pills
+- #101 — feat(ui): design polish — bolder titles, waffle accents, warmer colours + horizontal pill/scroll kanban
 
 **Current State:**
-- Branch: master, clean, up to date with origin/master (HEAD: `5ad36fb`)
-- SW cache: v7
-- Site live at: https://waffley.app
+- Branch: master, clean, up to date with origin/master (HEAD: `3a502dc`)
+- SW cache: v9
+- Site live at: https://waffley.app — all changes deployed and cache purged
 - No open PRs
 - No uncommitted changes
 - No unpushed commits
 
-**CRITICAL: TTS Bug Reported**
-User reports text-to-speech not working in any browser or any language after the deploy. Investigation findings:
-- PR #98 (one-letter hint) did NOT touch any TTS code — not the cause
+**CRITICAL: TTS Bug to Investigate**
+User reports text-to-speech broken across all browsers and all languages. Investigation not yet started.
+- None of the session PRs touched TTS code — not caused by this session's changes
 - Likely a service worker cache issue or browser voice pack loading problem
-- No browser console output was captured before session end
 
 **Debugging steps for next session:**
 1. Open https://waffley.app in Chrome DevTools > Console — capture any JS errors
-2. Check Application > Service Workers — confirm SW version is v7 and activated (not stuck in "waiting")
-3. Hard-reload with Ctrl+Shift+R or disable SW in DevTools to test without caching
-4. Open DevTools > Console and run: `speechSynthesis.getVoices()` — confirm voices list is populated
-5. Check if TTS works on a fresh incognito session (rules out stale SW)
-6. If SW is stuck in "waiting": click "skipWaiting" in DevTools or clear site data and reload
-7. Verify `lang/` directory files are correctly uploaded to SiteGround (all 7: es, fr, de, it, cy, pt, hr)
-8. Check if the issue is TTS not triggering at all vs. TTS triggering but producing no audio — different root causes
+2. Check Application > Service Workers — confirm SW v9 is activated (not stuck in "waiting")
+3. Open DevTools Console and run: `speechSynthesis.getVoices()` — confirm voices list is populated
+4. Test in a fresh incognito window (rules out stale SW)
+5. Hard-reload with Ctrl+Shift+R or disable SW in DevTools and test without caching
+6. If SW is stuck in "waiting": click "skipWaiting" in DevTools, or clear site data and reload
+7. Verify `lang/` directory files are correctly present on SiteGround (all 7: es, fr, de, it, cy, pt, hr)
+8. Distinguish: TTS not triggering at all vs. TTS triggering but producing no audio — different root causes
 
-**Stashes:**
-- `stash@{0}` (master: WIP CLAUDE.md + ROADMAP) — contains 72-line CLAUDE.md addition + 1-line ROADMAP.md change; review before dropping
-- `stash@{1}` (master: word-stats spaced-repetition WIP) — 43-line `app.js` change; spaced repetition work from a prior session, superseded by merged PR #73; likely safe to drop
+**Stashes (review next session):**
+- `stash@{0}` — "WIP: stash before creating feature/pronouns-full-category branch" — CLAUDE.md + ROADMAP.md WIP; review content before dropping
+- `stash@{1}` — "WIP: word-stats spaced-repetition system" — 43-line `app.js` change; spaced repetition work from a prior session, likely superseded by merged PR #73; compare against master before dropping
 
 **Unfinished Git Workflows:**
 - None — working tree clean, all PRs resolved
 
 **Next Steps:**
-1. **PRIORITY 1: Investigate TTS bug** — see debugging steps above; likely a stale SW or voice pack issue
-2. Review stash@{0} content (CLAUDE.md + ROADMAP WIP) and either apply or drop
-3. Review stash@{1} (spaced repetition WIP) — compare against merged PR #73 code; drop if superseded
-4. OAuth providers still needed: Google Sign-In and Apple Sign-In (see Supabase dashboard)
+1. **PRIORITY 1: Investigate TTS bug** — see debugging steps above
+2. Review stash@{0} (CLAUDE.md + ROADMAP WIP) — apply or drop
+3. Review stash@{1} (spaced repetition WIP) — compare against master; drop if superseded
+4. OAuth providers: Google Sign-In and Apple Sign-In still need Supabase credentials
 5. Affiliate sign-ups still blocking Tier 3: Preply, uTalk (pending Awin approval), CV-Library, TopCV, LiveCareer
 
 **Technical Notes:**
