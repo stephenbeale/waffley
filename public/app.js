@@ -1878,12 +1878,9 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         // Silent visual-only rounds: last levels of Learning phase
         if (getPhaseFromProgress() === 0 && getLevelInPhase() >= SILENT_LEVEL_THRESHOLD) return;
 
-        // Try neural audio first, fall back to browser TTS
-        const key = getAudioKey(color);
-        playNeuralAudio(language, key).catch(() => {
-            const word = getBrowserTTSWord(color);
-            if (word) speakWithBrowserTTS(word, language);
-        });
+        // Use browser TTS directly (neural audio files not yet available)
+        const word = getBrowserTTSWord(color);
+        if (word) speakWithBrowserTTS(word, language);
     }
 
     let speechWarmedUp = false;
