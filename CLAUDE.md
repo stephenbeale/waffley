@@ -240,6 +240,40 @@ All user-facing features are complete. Only technical debt remains:
 - Speech wrong attempts stored as array, rendered as scrolling list with CSS flexbox column-reverse
 - Mobile-specific layout uses media queries at 480px breakpoint for compact UI
 
+### 2026-02-18 - Pronoun Learning, Daily Streaks, and Game Polish Sprint
+
+**Work Completed:**
+
+All 5 PRs were merged to master in this session. Summary by PR:
+
+1. **PR #48 — Daily streak tracking and auth error feedback** (`feature/daily-streaks`)
+   - Added `dailyStreak`, `bestDailyStreak`, and `lastPlayedDate` fields to user stats
+   - Streak badge displayed on topic screen with current streak count
+   - Two new stats cards: current streak and best streak
+   - Auth error feedback shown with 5-second auto-dismiss banner
+
+2. **PR #49 — Stats button contrast, pronoun reset, and pronoun learning access** (`fix/stats-button-pronoun-access`)
+   - Stats button text changed to white for sufficient contrast against dark background
+   - `resetProgress()` and `resetStats()` now also clear `waffley_pronoun_intro` localStorage key
+   - Pronouns added as a selectable learning level
+   - Pronoun mode is always re-triggerable (not gated behind one-time completion)
+
+3. **PR #50 — Pronoun learning screen matches standard game UI** (`fix/pronoun-game-ui`)
+   - Pronoun learning now uses the full standard game layout
+   - Removed `pronoun-intro-mode` CSS class entirely
+
+4. **PR #51 — 13 code review fixes** (`fix/code-review-issues`)
+   - Speech recognition pause guard, speed mercy double-fire guard, session streak reset fix
+   - Focus management, vertical progress bar clamp, accessibility improvements
+
+5. **PR #52 — Removed persistent pronoun encouragement label** (`fix/pronoun-reinforcement-label`)
+   - Label element now cleared before each game start
+
+**Technical Notes:**
+- `waffley_pronoun_intro` is the localStorage key that gates whether pronoun intro has been seen
+- Pronoun mode deliberately bypasses the journey tracker
+- The `pronoun-intro-mode` CSS class no longer exists
+
 ### 2026-02-20 - Pronouns as Full Category + Button Fixes
 
 **Work Completed:**
