@@ -1,0 +1,228 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #1a1a2e;
+  --surface: #16213e;
+  --card: #0f3460;
+  --accent: #e94560;
+  --green: #4ecca3;
+  --yellow: #f0a500;
+  --text: #eee;
+  --muted: #999;
+  --radius: 12px;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  padding: 1.5rem 1rem 5rem;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+header { text-align: center; margin-bottom: 1.5rem; }
+h1 { font-size: 1.8rem; }
+.subtitle { color: var(--muted); font-size: 0.85rem; margin-top: 0.25rem; }
+
+/* Chore cards */
+.chore-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: opacity 0.3s, transform 0.3s;
+  position: relative;
+}
+
+.chore-card.completing {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+.chore-check {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--muted);
+  background: none;
+  color: var(--text);
+  font-size: 1.1rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.chore-check:hover {
+  border-color: var(--green);
+  background: rgba(78, 204, 163, 0.15);
+}
+
+.chore-info { flex: 1; min-width: 0; }
+
+.chore-name {
+  font-size: 1rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chore-meta {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 0.2rem;
+}
+
+.chore-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.chore-actions button {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.3rem;
+  border-radius: 6px;
+  transition: color 0.2s, background 0.2s;
+}
+
+.chore-actions button:hover {
+  color: var(--text);
+  background: rgba(255,255,255,0.08);
+}
+
+/* Status badges */
+.status-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 99px;
+  margin-left: 0.4rem;
+  vertical-align: middle;
+}
+
+.status-overdue {
+  background: rgba(233, 69, 96, 0.2);
+  color: var(--accent);
+}
+
+.status-today {
+  background: rgba(240, 165, 0, 0.2);
+  color: var(--yellow);
+}
+
+.status-upcoming {
+  background: rgba(78, 204, 163, 0.12);
+  color: var(--green);
+}
+
+/* Empty state */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--muted);
+}
+
+.empty-state p { font-size: 0.95rem; margin-top: 0.5rem; }
+
+/* FAB */
+#add-btn {
+  position: fixed;
+  bottom: 1.5rem;
+  right: calc(50% - 210px);
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(233, 69, 96, 0.4);
+  transition: transform 0.2s;
+}
+
+#add-btn:hover { transform: scale(1.1); }
+
+@media (max-width: 480px) {
+  #add-btn { right: 1.5rem; }
+}
+
+/* Dialog */
+dialog {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  width: min(90vw, 380px);
+}
+
+dialog::backdrop {
+  background: rgba(0,0,0,0.6);
+}
+
+dialog h2 { margin-bottom: 1rem; font-size: 1.2rem; }
+
+dialog label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 0.3rem;
+  margin-top: 0.8rem;
+}
+
+dialog input {
+  width: 100%;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 1rem;
+}
+
+dialog input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.2rem;
+  justify-content: flex-end;
+}
+
+.dialog-actions button {
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  border: none;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+#dialog-cancel {
+  background: rgba(255,255,255,0.08);
+  color: var(--text);
+}
+
+#dialog-save {
+  background: var(--accent);
+  color: #fff;
+}
