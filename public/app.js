@@ -1861,7 +1861,14 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
     }
     if (ttsSupported) {
         checkTTSVoices();
-        speechSynthesis.addEventListener('voiceschanged', checkTTSVoices);
+        speechSynthesis.addEventListener('voiceschanged', () => {
+            checkTTSVoices();
+            // Update banner if voices loaded after language was already selected
+            const ttsBanner = document.getElementById('tts-unavailable-banner');
+            if (ttsBanner && selectedLanguage) {
+                ttsBanner.hidden = ttsVoiceAvailable[selectedLanguage] !== false;
+            }
+        });
     }
 
     function speakWithBrowserTTS(word, language) {
@@ -2699,10 +2706,20 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
             topicHeader.textContent = `${LANGUAGE_FLAGS[selectedLanguage]} ${LANGUAGE_NAMES[selectedLanguage]}`;
             updateModeToggleVisibility();
             updateStartScreenProgress();
+            // Show/hide TTS unavailable banner
+            const ttsBanner = document.getElementById('tts-unavailable-banner');
+            if (ttsBanner) {
+                ttsBanner.hidden = ttsVoiceAvailable[selectedLanguage] !== false;
+            }
             // Warm up TTS engine early so first question audio isn't delayed
             warmUpSpeech();
             show(topicScreen);
         });
+    });
+
+    // Dismiss TTS unavailable banner
+    document.getElementById('tts-unavailable-dismiss')?.addEventListener('click', () => {
+        document.getElementById('tts-unavailable-banner').hidden = true;
     });
 
     // Mode toggle (Words / Verbs)
