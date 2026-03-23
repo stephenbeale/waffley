@@ -382,15 +382,28 @@ h1 { font-size: 2.5rem; margin-bottom: 1rem; }
 }
 
 .language-selector {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 0.5rem;
     margin-bottom: 1.5rem;
-    flex-wrap: wrap;
-    justify-content: center;
+    justify-items: center;
+}
+
+.language-selector .language-btn:last-child:nth-child(3n + 1) {
+    grid-column: 2;
+}
+
+.language-selector .language-btn:nth-last-child(2):nth-child(3n + 1) {
+    grid-column: 1;
+}
+
+.language-selector .language-btn:nth-last-child(2):nth-child(3n + 1) ~ .language-btn:last-child {
+    grid-column: 3;
 }
 
 .language-btn {
-    padding: 0.8rem 1.5rem;
+    width: 100%;
+    padding: 0.8rem 0.5rem;
     font-size: 1.1rem;
     font-weight: 600;
     border: 2px solid var(--border-default);
