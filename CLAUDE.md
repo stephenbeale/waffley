@@ -868,3 +868,28 @@ User reports text-to-speech broken across all browsers and all languages. Invest
 - SiteGround Dynamic Cache URL: https://tools.siteground.com/cacher?siteId=SndEeFpITUZJQT09
 - SiteGround File Manager URL: https://tools.siteground.com/filemanager?siteId=SndEeFpITUZJQT09
 - Do NOT upload: `.git/`, `node_modules/`, `supabase/`, `docs/`, `scripts/`, `.env`, `*.md`, `package.json`
+
+### 2026-03-23 - Supabase, TTS, and Auth Fixes
+
+**Work Completed:**
+- PR #105 merged: three fixes — Supabase singleton client (prevents multiple GoTrueClient instances), graceful anonymous auth failure (catches HTTP 422, logs once, continues offline), TTS voice detection (calls `getVoices()` before playback; skips languages with no available voice such as Welsh and Croatian)
+- PR #106 merged: follow-up fixes — TTS unavailable banner when no voices are detected, prevent Supabase client race condition on rapid page load
+
+**Work In Progress:**
+- SW cache bumped to v11 on branch `fix/sw-cache-v11` — deploy to SiteGround still pending
+- Branch `fix/sw-cache-v11` has not yet been merged to master — deploy prep only
+
+**Unfinished Git Workflows:**
+- `fix/sw-cache-v11` branch: one commit (`0b7eda3` — SW cache v11) needs to be included in the SiteGround deploy, then merged back to master
+
+**Next Steps:**
+1. Deploy to SiteGround: upload `public/` contents, increment SW cache is already v11 (done)
+2. After deploy: merge `fix/sw-cache-v11` into master and delete branch
+3. Purge SiteGround Dynamic Cache: https://tools.siteground.com/cacher?siteId=SndEeFpITUZJQT09
+4. Add `SUPABASE_ANON_KEY` secret for the daily keep-alive action: https://github.com/stephenbeale/waffley/settings/secrets/actions
+5. OAuth providers: Google Sign-In and Apple Sign-In still need Supabase credentials
+
+**Technical Notes:**
+- Supabase singleton pattern: client is created once and exported from a shared module; importing twice no longer creates a second GoTrueClient
+- TTS voice detection: `speechSynthesis.getVoices()` may return empty array on first call (async population); code must listen for `voiceschanged` event or retry
+- SW cache is now v11 — must match the version in `public/sw.js` when deploying

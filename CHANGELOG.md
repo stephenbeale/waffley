@@ -7,6 +7,15 @@ All notable changes to Waffley are documented here. Format follows [Keep a Chang
 ### Added
 - Japanese language (romaji) — 7th language, words only (no verb conjugation)
 
+## 2026-03-23
+
+### Fixed
+- Supabase client instantiated as singleton to prevent multiple GoTrueClient warnings (PR #105)
+- Anonymous auth failure (HTTP 422) now caught gracefully; logs once and continues offline rather than throwing (PR #105)
+- TTS voice detection now calls `getVoices()` before attempting playback; languages with no available voice (e.g. Welsh, Croatian) are skipped silently rather than erroring (PR #105)
+- TTS unavailable banner added when no voices are detected at all (PR #106)
+- Supabase client race condition on rapid page load prevented (PR #106)
+
 ## 2026-03-09
 
 ### Added
