@@ -1848,9 +1848,26 @@ import { isConfigured, getProgressMap, upsertCategoryProgress, upsertUserStats, 
         return `${category}-${item}`;
     }
 
+    // Track which languages have TTS voices available
+    const ttsVoiceAvailable = {};
+    function checkTTSVoices() {
+        if (!ttsSupported) return;
+        const voices = speechSynthesis.getVoices();
+        for (const [lang, config] of Object.entries(LANGUAGES)) {
+            const code = config.speechCode;
+            const prefix = code.split('-')[0];
+            ttsVoiceAvailable[lang] = voices.some(v => v.lang === code || v.lang.startsWith(prefix));
+        }
+    }
+    if (ttsSupported) {
+        checkTTSVoices();
+        speechSynthesis.addEventListener('voiceschanged', checkTTSVoices);
+    }
+
     function speakWithBrowserTTS(word, language) {
         if (!ttsSupported) return;
         const langCode = SPEECH_LANG_CODES[language] || 'es-ES';
+        if (ttsVoiceAvailable[language] === false) return; // no voice for this language
         speechSynthesis.cancel();
         const utterance = new SpeechSynthesisUtterance(word);
         utterance.lang = langCode;

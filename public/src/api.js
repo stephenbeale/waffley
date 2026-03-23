@@ -17,6 +17,7 @@ const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || '';
 
 let _createClient = null;
 let _client = null;
+let _clientPromise = null;
 let _supabaseLoadFailed = false;
 
 export function isConfigured() {
@@ -40,11 +41,15 @@ async function loadSupabase() {
 
 async function getClient() {
     if (_client) return _client;
+    if (_clientPromise) return _clientPromise;
     if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return null;
-    const create = await loadSupabase();
-    if (!create) return null;
-    _client = create(SUPABASE_URL, SUPABASE_ANON_KEY);
-    return _client;
+    _clientPromise = (async () => {
+        const create = await loadSupabase();
+        if (!create) { _clientPromise = null; return null; }
+        _client = create(SUPABASE_URL, SUPABASE_ANON_KEY);
+        return _client;
+    })();
+    return _clientPromise;
 }
 
 // Retry loading SDK when coming back online
@@ -179,7 +184,14 @@ export async function ensureSession() {
     if (session) return session.user;
 
     const { data, error } = await cl.auth.signInAnonymously();
-    if (error) throw error;
+    if (error) {
+        // Anonymous sign-ups may be disabled in Supabase — log once and continue offline
+        if (!ensureSession._warned) {
+            console.warn('[waffley] Anonymous auth failed (likely disabled in Supabase settings):', error.message);
+            ensureSession._warned = true;
+        }
+        return null;
+    }
     return data.user;
 }
 
