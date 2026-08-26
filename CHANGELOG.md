@@ -7,6 +7,9 @@ All notable changes to Waffley are documented here. Format follows [Keep a Chang
 ### Added
 - Japanese language (romaji) — 7th language, words only (no verb conjugation)
 
+### Changed
+- `supabase/README.md` documents the project dashboard URL and the 2026-08-26 unreachable/restored incident, pointing at the keep-alive workflow
+
 ## 2026-03-23
 
 ### Fixed

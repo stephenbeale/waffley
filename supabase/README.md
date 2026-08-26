@@ -7,6 +7,10 @@ This directory contains the database schema and seed scripts for the Waffley bac
 - A [Supabase](https://supabase.com) project (free tier is fine)
 - Node.js 18+ (for running the seed script)
 
+**Waffley's project dashboard:** https://supabase.com/dashboard/project/yqgrmpewmrmcajbdjaem
+
+Note: this free-tier project was previously auto-paused/deleted after prolonged repo inactivity (last confirmed working 2026-03-23; found unreachable via DNS as of 2026-08-26). It has since been restored (as of 2026-08-26). Keep the daily keep-alive Action (`.github/workflows/supabase-keepalive.yml`) enabled to prevent this recurring — check `gh workflow list` if the site's DB features stop working again.
+
 ## Step 1 — Configure credentials
 
 Copy `.env.example` to `.env` in the project root and fill in your values:
