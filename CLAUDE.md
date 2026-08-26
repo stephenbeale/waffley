@@ -893,3 +893,48 @@ User reports text-to-speech broken across all browsers and all languages. Invest
 - Supabase singleton pattern: client is created once and exported from a shared module; importing twice no longer creates a second GoTrueClient
 - TTS voice detection: `speechSynthesis.getVoices()` may return empty array on first call (async population); code must listen for `voiceschanged` event or retry
 - SW cache is now v11 — must match the version in `public/sw.js` when deploying
+
+### 2026-08-26 - Supabase Incident Response + Backlog Triage (First Session Back After ~4 Months Inactivity)
+
+**Work Completed:**
+
+1. **Supabase outage investigated and resolved** — project ref `yqgrmpewmrmcajbdjaem` appeared deleted/unreachable via DNS. User logged into the dashboard and confirmed/restored it themselves: https://supabase.com/dashboard/project/yqgrmpewmrmcajbdjaem
+2. **PR #109 — docs: add Supabase dashboard link and restore note** (MERGED) — documented the dashboard URL and the incident in `supabase/README.md`
+3. **PR #110 — docs(changelog): remove doc-only Supabase README entry** (MERGED) — reverted an incidental CHANGELOG.md entry a sub-agent had added alongside the PR #109 docs change; CHANGELOG.md is reserved for user-facing changes only, not doc/meta changes
+4. **Supabase Keep-Alive workflow re-enabled** (`gh workflow enable supabase-keepalive.yml`) — it had been auto-disabled by GitHub due to ~4 months of repo inactivity, NOT a missing secret. Confirmed `SUPABASE_ANON_KEY` has been present since 2026-03-31 (an earlier agent's theory that the secret was missing was checked and disproven). The workflow's 5xx failures visible in its run history from May correctly reflect the then-paused Supabase project, not a workflow bug.
+5. **Memory saved**: `waffley-supabase-dashboard.md` (reference) with the dashboard URL and restore context, indexed in MEMORY.md
+6. **Branch cleanup**: deleted local `fix/track-package-lock-json` — confirmed merged into master (its commit `eb6f0c3` landed via PR #108, already on master before this session)
+
+**PRs Merged This Session:**
+- #109 — docs: add Supabase dashboard link and restore note
+- #110 — docs(changelog): remove doc-only Supabase README entry
+
+**Current State:**
+- Branch: master, clean, fully synchronized with origin/master (commit `fa0f518`)
+- No open PRs
+- No uncommitted changes, no unpushed commits, no stashes
+- Supabase Keep-Alive workflow: re-enabled but **not yet verified green** — no scheduled run has fired since re-enable; last visible runs (2026-05-20 through 2026-05-24) all show `failure`, but those predate both the re-enable and the Supabase restore, so they don't indicate a current problem
+
+**Unfinished Git Workflows / Open Items:**
+- **Deploy automation still broken** — `.github/workflows/deploy.yml` (SFTP to SiteGround) has never worked; `SFTP_HOST`/`SFTP_USER`/`SFTP_PASSWORD` repo secrets were never configured. All live deploys to date have been manual SiteGround File Manager uploads. Untouched this session. See secrets page: https://github.com/stephenbeale/waffley/settings/secrets/actions
+- **5 local branches have unmerged, unreviewed commits** and need a keep-or-abandon decision (none are safe to delete as-is):
+  - `feature/japanese-language` (`7ba0a4a`) — fix: remove verb conjugations from Japanese
+  - `feature/public-deploy-dir` (`43ef906`) — refactor: move deployable files into public/ directory
+  - `feature/sentence-building-mode` (`0f5d38a`) — docs(roadmap): add verb learning path items and Brave TTS bug
+  - `feature/utalk-nudge` (`48625c1`) — feat: add uTalk affiliate nudge to home screen footer
+  - `feature/weakness-report` (`4946f81`) — docs: add session notes for 2026-03-05 uTalk nudge and PR #82 fixes
+  - `fix/brave-tts-warning` (`dede98f`) — fix: recommend Chrome/Edge only in Brave TTS banner
+  - Note: an earlier project-manager report this session claimed 6 branches (including `fix/track-package-lock-json`) were all stale/already-merged; a direct `git branch --merged master` check found only `fix/track-package-lock-json` actually was — it's been deleted. Treat any future "safe to delete" branch claims with a direct merge check before deleting.
+- **`feature/japanese-language` discrepancy needs investigating**: CHANGELOG.md's `[Unreleased]` section already credits Japanese language support as shipped, but the `feature/japanese-language` branch is NOT merged into master. This suggests Japanese language support may not actually be live despite the changelog entry — verify what's actually on master/deployed vs. what the changelog claims before trusting that entry.
+
+**Next Steps:**
+1. Configure `SFTP_HOST`/`SFTP_USER`/`SFTP_PASSWORD` repo secrets so `.github/workflows/deploy.yml` can finally automate deploys (currently 100% manual) — see website-deployer agent for guidance
+2. Verify Supabase Keep-Alive workflow goes green on its next scheduled run (06:00 UTC daily) — check `gh run list --workflow=supabase-keepalive.yml`
+3. Investigate the `feature/japanese-language` vs CHANGELOG.md discrepancy — confirm whether Japanese language support is actually live on master/deployed
+4. Triage the 5 unmerged branches listed above — for each, decide: finish and PR, or abandon and delete
+5. Once branches are triaged, re-run `git branch --merged master` to confirm what's safe to clean up
+
+**Technical Notes:**
+- GitHub auto-disables scheduled workflows after 60 days of repo inactivity — this is why Supabase Keep-Alive stopped running; re-enabling requires `gh workflow enable <file>` (or the Actions UI) and does not require any code or secret change
+- CHANGELOG.md is reserved for user-facing changes only — doc-only or meta changes (like the Supabase README note) should not get a changelog entry; PR #110 reverted one that a sub-agent added incorrectly
+- Supabase dashboard for this project: https://supabase.com/dashboard/project/yqgrmpewmrmcajbdjaem
